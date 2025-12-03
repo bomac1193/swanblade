@@ -14,7 +14,8 @@ export type AudioProvider =
   | "audiocraft"
   | "neuralgrains"
   | "sigilwave"
-  | "physim";
+  | "physim"
+  | "suno";
 
 const openaiClient = process.env.OPENAI_API_KEY ? new OpenAI({ apiKey: process.env.OPENAI_API_KEY }) : null;
 const stabilityApiKey = process.env.STABILITY_API_KEY;
@@ -30,6 +31,13 @@ const modalApiKey = process.env.MODAL_API_KEY;
 const raveModelPath = process.env.RAVE_MODEL_PATH; // TODO: Set path to RAVE model checkpoint
 const audiocraftEndpoint = process.env.AUDIOCRAFT_ENDPOINT; // TODO: Set AudioCraft API endpoint
 const neuralgrainsEndpoint = process.env.NEURALGRAINS_ENDPOINT; // TODO: Set NeuralGrains API endpoint
+
+// Suno/MiniMax - Professional vocal/music generation
+// Option 1: AIML API with MiniMax Music (Suno was deprecated, now uses MiniMax)
+const aimlApiKey = process.env.AIML_API_KEY; // https://aimlapi.com/minimax-music-api
+// Option 2: Self-hosted suno-api (https://github.com/gcui-art/suno-api)
+const sunoApiEndpoint = process.env.SUNO_API_ENDPOINT; // e.g., http://localhost:3000
+const sunoCookie = process.env.SUNO_COOKIE; // Your Suno account cookie
 
 type OpenAIAudioFormat = "wav" | "aac" | "mp3" | "flac" | "opus" | "pcm16";
 type OpenAIAudioVoice =
@@ -80,6 +88,8 @@ export async function generateSound(
       return generateWithSigilWave(request);
     case "physim":
       return generateWithPhysim(request);
+    case "suno":
+      return generateWithSuno(request);
     default:
       throw new Error("Unknown provider");
   }
@@ -323,16 +333,18 @@ async function generateWithFal(request: GenerateSoundRequestBody): Promise<Gener
 
   try {
     // Use Stable Audio 2.5 for enterprise-grade stereo quality
-    const result = (await fal.subscribe("fal-ai/stable-audio-25/text-to-audio", {
+    const result = await fal.subscribe("fal-ai/stable-audio-25/text-to-audio", {
       input: {
         prompt: prompt,
         duration: targetLength,
         num_inference_steps: 100,
         guidance_scale: 7.0,
-      },
-    })) as { audio_file: { url: string; content_type: string } };
+      } as any, // fal.ai types may be outdated
+    });
 
-    const audioUrl = result.audio_file?.url;
+    // Access audio_file from result
+    const audioFile = (result as any).audio_file;
+    const audioUrl = audioFile?.url;
     if (!audioUrl) {
       throw new Error("fal.ai did not return audio URL");
     }
@@ -346,7 +358,7 @@ async function generateWithFal(request: GenerateSoundRequestBody): Promise<Gener
     const audioBuffer = await audioResponse.arrayBuffer();
     const audioBase64 = Buffer.from(audioBuffer).toString("base64");
 
-    const contentType = result.audio_file?.content_type ?? "audio/wav";
+    const contentType = audioFile?.content_type ?? "audio/wav";
 
     return { audioUrl: `data:${contentType};base64,${audioBase64}` };
   } catch (error) {
@@ -769,6 +781,241 @@ async function generateWithPhysim(request: GenerateSoundRequestBody): Promise<Ge
   return { audioUrl: "/dummy-audio/demo1.mp3" };
 }
 
+/**
+ * Suno AI - Professional vocal and music generation
+ * Supports full songs with vocals, choir, and complex musical arrangements
+ * Best for: Angel choirs, vocals, singing, full musical compositions
+ *
+ * Two integration options:
+ * 1. Self-hosted suno-api (https://github.com/gcui-art/suno-api)
+ * 2. AIML API service (https://aimlapi.com/suno-ai-api)
+ */
+async function generateWithSuno(request: GenerateSoundRequestBody): Promise<GenerateSoundResponse> {
+  // Check which Suno integration method is configured
+  if (aimlApiKey) {
+    return generateWithSunoAIMLAPI(request);
+  } else if (sunoApiEndpoint) {
+    return generateWithSunoSelfHosted(request);
+  } else {
+    throw new Error(
+      "Suno AI not configured. Add either AIML_API_KEY or SUNO_API_ENDPOINT + SUNO_COOKIE to .env.local."
+    );
+  }
+}
+
+/**
+ * Suno via AIML API - Now uses MiniMax Music (Suno was deprecated)
+ * MiniMax supports vocals, choir, and full musical compositions
+ */
+async function generateWithSunoAIMLAPI(request: GenerateSoundRequestBody): Promise<GenerateSoundResponse> {
+  if (!aimlApiKey) {
+    throw new Error("AIML API key missing. Add AIML_API_KEY to .env.local.");
+  }
+
+  const endpoint = "https://api.aimlapi.com/v2/generate/audio";
+  const targetLength = Math.max(1, Math.min(240, request.parameters.lengthSeconds ?? 10));
+
+  // Build vocal-enhanced prompt
+  const musicPrompt = buildSunoPrompt(request, targetLength);
+  const makeInstrumental = process.env.SUNO_INSTRUMENTAL === "true" ? true : false;
+
+  try {
+    // Step 1: Initiate generation with MiniMax Music
+    const response = await fetch(endpoint, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${aimlApiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "minimax-music",
+        prompt: musicPrompt,
+        // MiniMax doesn't have explicit instrumental flag, but we can add it to prompt
+        ...(makeInstrumental && { prompt: `${musicPrompt} (instrumental only, no vocals)` }),
+      }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`AIML API MiniMax request failed (${response.status}): ${errorText}`);
+    }
+
+    const data = (await response.json()) as {
+      generation_id?: string;
+      id?: string;
+    };
+
+    // Get the generation ID
+    const generationId = data.generation_id || data.id;
+    if (!generationId) {
+      throw new Error("AIML API did not return a generation ID");
+    }
+
+    // Step 2: Poll for completion (MiniMax typically takes 30-120 seconds)
+    const maxAttempts = 60;
+    const pollInterval = 3000; // 3 seconds
+
+    for (let attempt = 0; attempt < maxAttempts; attempt++) {
+      await new Promise((resolve) => setTimeout(resolve, pollInterval));
+
+      const statusResponse = await fetch(`${endpoint}?generation_id=${generationId}`, {
+        headers: {
+          "Authorization": `Bearer ${aimlApiKey}`,
+        },
+      });
+
+      if (!statusResponse.ok) {
+        continue; // Retry on error
+      }
+
+      const statusData = (await statusResponse.json()) as {
+        status?: string;
+        audio_url?: string;
+        url?: string;
+        audio_file?: { url: string; content_type?: string };
+      };
+
+      const status = statusData.status;
+      const audioUrl = statusData.audio_url || statusData.url || statusData.audio_file?.url;
+
+      if (status === "completed" || status === "success") {
+        if (!audioUrl) {
+          throw new Error("MiniMax generation complete but no audio URL provided");
+        }
+
+        // Fetch and convert to base64
+        const audioResponse = await fetch(audioUrl);
+        if (!audioResponse.ok) {
+          throw new Error(`Failed to fetch MiniMax audio: ${audioResponse.status}`);
+        }
+
+        const audioBuffer = await audioResponse.arrayBuffer();
+        const audioBase64 = Buffer.from(audioBuffer).toString("base64");
+
+        const contentType = statusData.audio_file?.content_type || "audio/mpeg";
+
+        return { audioUrl: `data:${contentType};base64,${audioBase64}` };
+      } else if (status === "failed" || status === "error") {
+        throw new Error("MiniMax generation failed");
+      }
+      // If status is "processing" or "pending", continue polling
+    }
+
+    throw new Error("MiniMax generation timed out after 3 minutes");
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(`MiniMax (AIML API) generation failed: ${error.message}`);
+    }
+    throw new Error("MiniMax (AIML API) generation failed with unknown error");
+  }
+}
+
+/**
+ * Suno via Self-Hosted suno-api
+ * Requires running https://github.com/gcui-art/suno-api
+ */
+async function generateWithSunoSelfHosted(request: GenerateSoundRequestBody): Promise<GenerateSoundResponse> {
+  if (!sunoApiEndpoint) {
+    throw new Error("Suno API endpoint missing. Add SUNO_API_ENDPOINT to .env.local.");
+  }
+
+  const targetLength = Math.max(1, Math.min(240, request.parameters.lengthSeconds ?? 10));
+  const musicPrompt = buildSunoPrompt(request, targetLength);
+  const makeInstrumental = process.env.SUNO_INSTRUMENTAL === "true" ? true : false;
+
+  try {
+    // Generate with custom parameters
+    const generateEndpoint = `${sunoApiEndpoint}/api/custom_generate`;
+    const headers: HeadersInit = {
+      "Content-Type": "application/json",
+    };
+
+    // Add cookie if provided
+    if (sunoCookie) {
+      headers["Cookie"] = sunoCookie;
+    }
+
+    const response = await fetch(generateEndpoint, {
+      method: "POST",
+      headers,
+      body: JSON.stringify({
+        prompt: musicPrompt,
+        make_instrumental: makeInstrumental,
+        wait_audio: false, // We'll poll for results
+      }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Suno API request failed (${response.status}): ${errorText}`);
+    }
+
+    const data = (await response.json()) as Array<{
+      id: string;
+      status: string;
+      audio_url?: string;
+    }>;
+
+    if (!data || data.length === 0) {
+      throw new Error("Suno API did not return any clips");
+    }
+
+    const clipId = data[0].id;
+
+    // Poll for completion
+    const maxAttempts = 60;
+    const pollInterval = 2000; // 2 seconds
+
+    for (let attempt = 0; attempt < maxAttempts; attempt++) {
+      await new Promise((resolve) => setTimeout(resolve, pollInterval));
+
+      const statusResponse = await fetch(`${sunoApiEndpoint}/api/get?ids=${clipId}`, {
+        headers: sunoCookie ? { Cookie: sunoCookie } : {},
+      });
+
+      if (!statusResponse.ok) {
+        continue; // Retry on error
+      }
+
+      const statusData = (await statusResponse.json()) as Array<{
+        id: string;
+        status: string;
+        audio_url?: string;
+      }>;
+
+      if (statusData && statusData.length > 0) {
+        const clip = statusData[0];
+
+        if (clip.status === "streaming" || clip.status === "complete") {
+          if (!clip.audio_url) {
+            throw new Error("Suno generation complete but no audio URL");
+          }
+
+          // Fetch and convert to base64
+          const audioResponse = await fetch(clip.audio_url);
+          if (!audioResponse.ok) {
+            throw new Error(`Failed to fetch Suno audio: ${audioResponse.status}`);
+          }
+
+          const audioBuffer = await audioResponse.arrayBuffer();
+          const audioBase64 = Buffer.from(audioBuffer).toString("base64");
+
+          return { audioUrl: `data:audio/mpeg;base64,${audioBase64}` };
+        } else if (clip.status === "error") {
+          throw new Error("Suno generation failed");
+        }
+      }
+    }
+
+    throw new Error("Suno generation timed out after 2 minutes");
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(`Suno self-hosted generation failed: ${error.message}`);
+    }
+    throw new Error("Suno self-hosted generation failed with unknown error");
+  }
+}
+
 // ========== Helper Functions ==========
 
 /**
@@ -798,6 +1045,71 @@ function buildRAVEPrompt(request: GenerateSoundRequestBody, targetLength: number
     "",
     "Generate continuous, evolving neural audio without silence or clicks.",
   ].join("\n");
+}
+
+/**
+ * Build Suno-specific prompt with vocal and musical emphasis
+ * Suno excels at full musical compositions with vocals, harmonies, and complex arrangements
+ */
+function buildSunoPrompt(request: GenerateSoundRequestBody, targetLength: number): string {
+  const { parameters } = request;
+
+  // Suno loves detailed musical descriptions with emotion and vocal characteristics
+  const musicalElements = [];
+
+  if (parameters.bpm) {
+    musicalElements.push(`${parameters.bpm} BPM`);
+  }
+
+  if (parameters.key && parameters.key !== "Atonal / FX") {
+    musicalElements.push(`in ${parameters.key}`);
+  }
+
+  // Add intensity as musical energy
+  if (parameters.intensity > 70) {
+    musicalElements.push("high energy");
+  } else if (parameters.intensity > 40) {
+    musicalElements.push("moderate energy");
+  } else {
+    musicalElements.push("gentle, calm");
+  }
+
+  // Add texture as production quality
+  if (parameters.texture > 60) {
+    musicalElements.push("rich layered production");
+  } else if (parameters.texture > 30) {
+    musicalElements.push("clear production");
+  } else {
+    musicalElements.push("minimal sparse production");
+  }
+
+  // Add brightness as tonal characteristics
+  if (parameters.brightness > 60) {
+    musicalElements.push("bright crystalline tones");
+  } else if (parameters.brightness < 40) {
+    musicalElements.push("warm dark tones");
+  }
+
+  const moodTags = parameters.moodTags?.join(", ");
+  if (moodTags) {
+    musicalElements.push(moodTags.toLowerCase());
+  }
+
+  const contextStr = musicalElements.length > 0 ? ` | ${musicalElements.join(", ")}` : "";
+
+  // Enhance prompt with vocal keywords if present
+  let enhancedPrompt = request.prompt.trim();
+
+  // If the prompt mentions vocals/choir but isn't detailed enough, enhance it
+  const vocalKeywords = ["vocal", "choir", "singing", "angel", "voice", "harmony"];
+  const hasVocalMention = vocalKeywords.some((keyword) => enhancedPrompt.toLowerCase().includes(keyword));
+
+  if (hasVocalMention && enhancedPrompt.length < 100) {
+    // Add emphasis on vocal clarity for Suno
+    enhancedPrompt = `${enhancedPrompt}, with clear expressive vocals, rich harmonies, and professional vocal production`;
+  }
+
+  return `${enhancedPrompt}${contextStr}`;
 }
 
 /**
