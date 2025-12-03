@@ -2,7 +2,6 @@
 
 import { useCallback, useState } from "react";
 import { PromptComposer } from "@/components/prompt-composer";
-import { ShaderBackground } from "@/components/shader-background";
 import { ToastItem, ToastStack } from "@/components/toast-stack";
 import { WaveformPlaceholder } from "@/components/waveform-placeholder";
 import { AudioPlayerControls } from "@/components/audio-player-controls";
@@ -139,19 +138,15 @@ export default function Home() {
   };
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[#010409] text-white">
-      <div className="pointer-events-none absolute inset-0">
-        <ShaderBackground />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_rgba(16,185,129,0.12),transparent_70%)]" />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/30 to-black/90" />
+    <div className="relative min-h-screen overflow-hidden bg-black text-white">
+      <div className="pointer-events-none absolute inset-0 flex items-center justify-center px-4">
+        <div className="h-[88%] w-full max-w-5xl rounded-[40px] border border-white/10 bg-gradient-to-b from-zinc-950 via-black to-black shadow-[0_35px_120px_rgba(0,0,0,0.8)]" />
       </div>
-
-      <main className="relative z-10 flex min-h-screen flex-col items-center justify-center px-4 py-16 text-center">
+      <main className="relative z-10 flex min-h-screen flex-col items-center justify-center px-4 pb-16 pt-28 text-center">
         <div className="flex w-full max-w-5xl flex-col items-center gap-8">
           <div>
-            <p className="text-xs uppercase tracking-[0.5em] text-emerald-300">Audiogen</p>
-            <h1 className="mt-4 text-4xl font-semibold sm:text-5xl">Prompt → Sound</h1>
-            <p className="mt-3 text-base text-white/70">Describe your sound. I&apos;ll turn it into audio.</p>
+            <p className="text-xs uppercase tracking-[0.5em] text-emerald-300">Swanblade</p>
+            <h1 className="mt-4 text-2xl font-semibold sm:text-3xl">Burn the square. Birth the Strange.</h1>
           </div>
 
           {/* Library Toggle */}
@@ -169,9 +164,9 @@ export default function Home() {
               className={`rounded-lg px-4 py-2 text-sm font-medium transition ${
                 showLibrary ? "bg-emerald-500 text-white" : "bg-black/40 text-white/60 hover:text-white"
               }`}
-            >
-              📚 Library
-            </button>
+              >
+                Library
+              </button>
           </div>
 
           {showLibrary ? (
