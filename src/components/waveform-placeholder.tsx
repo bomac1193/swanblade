@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useId, useMemo } from "react";
 import { cn } from "@/lib/utils";
 
 interface WaveformPlaceholderProps {
@@ -9,6 +9,7 @@ interface WaveformPlaceholderProps {
 }
 
 export function WaveformPlaceholder({ isActive, isLoading }: WaveformPlaceholderProps) {
+  const gradientId = useId();
   const bars = useMemo(
     () =>
       Array.from({ length: 120 }, (_, index) => {
@@ -19,35 +20,46 @@ export function WaveformPlaceholder({ isActive, isLoading }: WaveformPlaceholder
     [],
   );
 
-  return (
-    <div className="w-full rounded-3xl border border-emerald-400/20 bg-gradient-to-br from-black/60 via-emerald-950/30 to-black/60 p-6 backdrop-blur-2xl shadow-2xl shadow-emerald-500/10">
-      <div className={cn("flex h-40 items-end gap-[2px] overflow-hidden", isLoading && "animate-pulse opacity-70")}>
-        {bars.map((scale, idx) => {
-          const normalizedHeight = isActive ? scale * 100 : scale * 60;
-          const barHeight = Math.max(12, normalizedHeight);
-          const hue = 160 + (idx / bars.length) * 20;
+  const pathD = useMemo(() => {
+    const amplitude = isActive ? 40 : 28;
+    const baseline = 50;
+    const coords = bars
+      .map((value, idx) => {
+        const x = (idx / (bars.length - 1)) * 100;
+        const centered = value - 0.5;
+        const y = baseline - centered * amplitude;
+        return `${idx === 0 ? "M" : "L"} ${x.toFixed(2)} ${y.toFixed(2)}`;
+      })
+      .join(" ");
+    return `M 0 ${baseline} ${coords} L 100 ${baseline} Z`;
+  }, [bars, isActive]);
 
-          return (
-            <div
-              key={idx}
-              className={cn(
-                "flex-1 rounded-full bg-gradient-to-t transition-all duration-300 ease-out",
-                isActive ? "opacity-100 shadow-lg shadow-emerald-400/30" : "opacity-60",
-              )}
-              style={{
-                height: `${barHeight}%`,
-                background: `linear-gradient(to top,
-                  hsl(${hue}, 70%, 15%) 0%,
-                  hsl(${hue}, 80%, 45%) 50%,
-                  hsl(${hue}, 90%, 65%) 100%)`,
-                animationDelay: `${idx * 15}ms`,
-                animationDuration: `${1200 + (idx % 7) * 100}ms`,
-                animationName: isActive ? "audiogen-bounce" : undefined,
-                filter: isActive ? "brightness(1.2) saturate(1.3)" : "brightness(0.8)",
-              }}
-            />
-          );
-        })}
+  return (
+    <div className="w-full rounded-3xl border border-emerald-400/10 bg-gradient-to-br from-zinc-950 via-black to-zinc-950/80 p-4 backdrop-blur-xl shadow-[0_20px_70px_rgba(0,0,0,0.5)]">
+      <div className={cn("relative h-32 w-full", isLoading && "animate-pulse opacity-70")}>
+        <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="h-full w-full">
+          <defs>
+            <linearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="rgba(16, 185, 129, 0.2)" />
+              <stop offset="50%" stopColor="rgba(16, 185, 129, 0.65)" />
+              <stop offset="100%" stopColor="rgba(236, 72, 153, 0.45)" />
+            </linearGradient>
+          </defs>
+          <path
+            d={pathD}
+            fill={`url(#${gradientId})`}
+            opacity={isActive ? 0.9 : 0.6}
+            className="transition-all duration-500"
+          />
+          <path
+            d={pathD}
+            fill="none"
+            stroke="rgba(255,255,255,0.5)"
+            strokeWidth={isActive ? 0.9 : 0.6}
+            className="drop-shadow-[0_0_8px_rgba(16,185,129,0.35)] transition-all duration-500"
+          />
+        </svg>
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/40" />
       </div>
     </div>
   );

@@ -23,9 +23,18 @@ export interface SoundGeneration {
   variantOfId?: string;
 }
 
+export interface AudioReferencePayload {
+  id: string;
+  name: string;
+  mimeType: string;
+  size: number;
+  data: string;
+}
+
 export interface GenerateSoundRequestBody {
   prompt: string;
   parameters: Omit<SoundGeneration, "id" | "name" | "prompt" | "createdAt" | "audioUrl" | "status" | "errorMessage" | "variantOfId">;
+  references?: AudioReferencePayload[];
 }
 
 export interface GenerateSoundResponse {

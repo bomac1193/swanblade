@@ -1,7 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Badge } from "@/components/ui/badge";
+import { useMemo } from "react";
 
 export type ProviderId = "replicate" | "elevenlabs" | "stability" | "openai" | "fal" | "suno";
 
@@ -14,7 +13,7 @@ export interface Provider {
   available: boolean;
 }
 
-const PROVIDERS: Provider[] = [
+export const PROVIDERS: Provider[] = [
   {
     id: "suno",
     name: "VocalForge",
@@ -65,62 +64,93 @@ const PROVIDERS: Provider[] = [
   },
 ];
 
+const VOCAL_KEYWORDS = ["vocal", "vocals", "sing", "singer", "sung", "choir", "lyrics", "lyric", "vox", "harmonies"];
+const SPEECH_KEYWORDS = ["speech", "narration", "voiceover", "voice over", "spoken", "talking"];
+const SFX_KEYWORDS = ["sfx", "ui", "interface", "click", "hit", "impact", "glitch", "whoosh", "button"];
+const AMBIENT_KEYWORDS = ["ambience", "ambient", "drones", "texture", "atmosphere", "soundscape"];
+
+export function recommendProvider(prompt: string, hasReferences: boolean): ProviderId | null {
+  const trimmed = prompt.trim().toLowerCase();
+  const mentionsVocals = VOCAL_KEYWORDS.some((keyword) => trimmed.includes(keyword));
+  const mentionsSpeech = SPEECH_KEYWORDS.some((keyword) => trimmed.includes(keyword));
+  const mentionsSfx = SFX_KEYWORDS.some((keyword) => trimmed.includes(keyword));
+  const mentionsAmbience = AMBIENT_KEYWORDS.some((keyword) => trimmed.includes(keyword));
+
+  const pickIfAvailable = (id: ProviderId): ProviderId | null => {
+    const provider = PROVIDERS.find((p) => p.id === id && p.available);
+    return provider ? provider.id : null;
+  };
+
+  if (mentionsVocals || mentionsSpeech) {
+    return pickIfAvailable("openai") ?? pickIfAvailable("elevenlabs") ?? pickIfAvailable("replicate");
+  }
+
+  if (hasReferences) {
+    return pickIfAvailable("fal") ?? pickIfAvailable("stability") ?? pickIfAvailable("replicate");
+  }
+
+  if (mentionsSfx) {
+    return pickIfAvailable("elevenlabs") ?? pickIfAvailable("stability") ?? pickIfAvailable("replicate");
+  }
+
+  if (mentionsAmbience) {
+    return pickIfAvailable("stability") ?? pickIfAvailable("fal") ?? pickIfAvailable("replicate");
+  }
+
+  if (trimmed.length > 0) {
+    return pickIfAvailable("replicate");
+  }
+
+  return PROVIDERS.find((p) => p.available)?.id ?? null;
+}
+
 interface ProviderSelectorProps {
   value: ProviderId;
   onChange: (provider: ProviderId) => void;
   prompt: string;
+  recommendation?: ProviderId | null;
+  isAuto?: boolean;
+  onResetAuto?: () => void;
 }
 
-export function ProviderSelector({ value, onChange, prompt }: ProviderSelectorProps) {
-  const [recommendation, setRecommendation] = useState<ProviderId | null>(null);
-
-  // Analyze prompt and recommend provider
-  useEffect(() => {
-    if (!prompt.trim()) {
-      setRecommendation(null);
-      return;
+export function ProviderSelector({ value, onChange, prompt, recommendation, isAuto = false, onResetAuto }: ProviderSelectorProps) {
+  const computedRecommendation = useMemo<ProviderId | null>(() => {
+    if (typeof recommendation !== "undefined") {
+      return recommendation;
     }
-
-    const lowerPrompt = prompt.toLowerCase();
-    const scores = PROVIDERS.map((provider) => {
-      let score = 0;
-      provider.goodFor.forEach((keyword) => {
-        if (lowerPrompt.includes(keyword)) {
-          score += 1;
-        }
-      });
-      return { id: provider.id, score };
-    });
-
-    // Get highest scoring available provider
-    const best = scores
-      .filter((s) => PROVIDERS.find((p) => p.id === s.id)?.available)
-      .sort((a, b) => b.score - a.score)[0];
-
-    if (best && best.score > 0) {
-      setRecommendation(best.id);
-    } else {
-      setRecommendation(null);
-    }
-  }, [prompt]);
+    return recommendProvider(prompt, false);
+  }, [prompt, recommendation]);
 
   const selectedProvider = PROVIDERS.find((p) => p.id === value);
-  const recommendedProvider = PROVIDERS.find((p) => p.id === recommendation);
+  const recommendedProvider = PROVIDERS.find((p) => p.id === computedRecommendation);
 
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between">
-        <label className="text-[11px] font-medium uppercase tracking-wider text-white/50">
-          Audio Engine
-        </label>
-        {recommendation && recommendation !== value && recommendedProvider && (
-          <button
-            onClick={() => onChange(recommendation)}
-            className="text-[10px] text-emerald-400 hover:text-emerald-300 transition"
-          >
-            💡 Use {recommendedProvider.name}
-          </button>
-        )}
+        <label className="text-[11px] font-medium uppercase tracking-wider text-white/50">Audio Engine</label>
+        <div className="flex items-center gap-2">
+          {isAuto ? (
+            <span className="text-[10px] uppercase tracking-wider text-emerald-300">Auto</span>
+          ) : (
+            onResetAuto && (
+              <button
+                type="button"
+                onClick={onResetAuto}
+                className="text-[10px] uppercase tracking-wider text-white/50 transition hover:text-emerald-300"
+              >
+                Auto-pick
+              </button>
+            )
+          )}
+          {computedRecommendation && computedRecommendation !== value && recommendedProvider && (
+            <button
+              onClick={() => onChange(computedRecommendation)}
+              className="text-[10px] text-emerald-400 transition hover:text-emerald-300"
+            >
+              💡 Use {recommendedProvider.name}
+            </button>
+          )}
+        </div>
       </div>
 
       <select
@@ -129,7 +159,7 @@ export function ProviderSelector({ value, onChange, prompt }: ProviderSelectorPr
         className="w-full rounded-lg border border-white/10 bg-black/60 px-3 py-2 text-sm text-white hover:border-white/20 focus:border-emerald-400 focus:outline-none"
       >
         {PROVIDERS.filter((p) => p.available).map((provider) => {
-          const isRecommended = provider.id === recommendation;
+          const isRecommended = provider.id === computedRecommendation;
           return (
             <option key={provider.id} value={provider.id}>
               {provider.name} — {provider.strengths.slice(0, 2).join(", ")}

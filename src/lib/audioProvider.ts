@@ -1,5 +1,5 @@
 import OpenAI from "openai";
-import type { GenerateSoundRequestBody, GenerateSoundResponse } from "@/types";
+import type { AudioReferencePayload, GenerateSoundRequestBody, GenerateSoundResponse } from "@/types";
 
 export type AudioProvider =
   | "mock"
@@ -38,6 +38,16 @@ const aimlApiKey = process.env.AIML_API_KEY; // https://aimlapi.com/minimax-musi
 // Option 2: Self-hosted suno-api (https://github.com/gcui-art/suno-api)
 const sunoApiEndpoint = process.env.SUNO_API_ENDPOINT; // e.g., http://localhost:3000
 const sunoCookie = process.env.SUNO_COOKIE; // Your Suno account cookie
+
+type ReplicateFileOutput = {
+  url: string | (() => string);
+};
+
+type FalAudioResponse = {
+  audio_file?: {
+    url?: string;
+  };
+};
 
 type OpenAIAudioFormat = "wav" | "aac" | "mp3" | "flac" | "opus" | "pcm16";
 type OpenAIAudioVoice =
@@ -259,9 +269,9 @@ async function generateWithReplicate(request: GenerateSoundRequestBody): Promise
         model_version: "stereo-large",
         duration: targetLength,
         temperature: (request.parameters.intensity ?? 50) / 100,
-        top_k: 250,
-        top_p: 0,
-        output_format: "mp3",
+        top_k: 320,
+        top_p: 0.3,
+        output_format: "wav",
         seed: request.parameters.seed ?? -1,
       },
     });
@@ -269,24 +279,26 @@ async function generateWithReplicate(request: GenerateSoundRequestBody): Promise
     // Replicate MusicGen returns a URL, FileOutput, or array of URLs
     let audioUrl: string;
 
+    const resolveUrl = (value: ReplicateFileOutput) => {
+      const raw = typeof value.url === "function" ? value.url() : value.url;
+      return String(raw);
+    };
+
     if (typeof output === "string") {
       audioUrl = output;
     } else if (Array.isArray(output) && output.length > 0) {
       const first = output[0];
       // Handle FileOutput objects with url() method
-      if (typeof first === "object" && first !== null && "url" in first) {
-        const urlResult = typeof first.url === "function" ? first.url() : first.url;
-        audioUrl = String(urlResult); // Convert to string
+      if (isReplicateFileOutput(first)) {
+        audioUrl = resolveUrl(first);
       } else if (typeof first === "string") {
         audioUrl = first;
       } else {
         throw new Error(`Unexpected array element type: ${typeof first}`);
       }
-    } else if (output && typeof output === "object" && "url" in output) {
+    } else if (isReplicateFileOutput(output)) {
       // Handle FileOutput object with url() method
-      const urlValue = (output as any).url;
-      const urlResult = typeof urlValue === "function" ? urlValue() : urlValue;
-      audioUrl = String(urlResult); // Convert to string
+      audioUrl = resolveUrl(output);
     } else {
       throw new Error(`Unexpected Replicate output format: ${typeof output}`);
     }
@@ -304,7 +316,7 @@ async function generateWithReplicate(request: GenerateSoundRequestBody): Promise
     const audioBuffer = await audioResponse.arrayBuffer();
     const audioBase64 = Buffer.from(audioBuffer).toString("base64");
 
-    return { audioUrl: `data:audio/mpeg;base64,${audioBase64}` };
+    return { audioUrl: `data:audio/wav;base64,${audioBase64}` };
   } catch (error) {
     if (error instanceof Error) {
       throw new Error(`Replicate generation failed: ${error.message}`);
@@ -333,17 +345,19 @@ async function generateWithFal(request: GenerateSoundRequestBody): Promise<Gener
 
   try {
     // Use Stable Audio 2.5 for enterprise-grade stereo quality
-    const result = await fal.subscribe("fal-ai/stable-audio-25/text-to-audio", {
-      input: {
-        prompt: prompt,
-        duration: targetLength,
-        num_inference_steps: 100,
-        guidance_scale: 7.0,
-      } as any, // fal.ai types may be outdated
-    });
+    const falInput: Record<string, unknown> = {
+      prompt: prompt,
+      duration: targetLength,
+      num_inference_steps: 100,
+      guidance_scale: 7.0,
+    };
+
+    const result = (await fal.subscribe("fal-ai/stable-audio-25/text-to-audio", {
+      input: falInput,
+    })) as FalAudioResponse;
 
     // Access audio_file from result
-    const audioFile = (result as any).audio_file;
+    const audioFile = result.audio_file;
     const audioUrl = audioFile?.url;
     if (!audioUrl) {
       throw new Error("fal.ai did not return audio URL");
@@ -526,8 +540,6 @@ async function generateWithRAVE(request: GenerateSoundRequestBody): Promise<Gene
   // This example uses the RAVE prior sampling mode
   // You may need to adjust arguments based on your model and RAVE version
   const pythonPath = process.env.RAVE_PYTHON_PATH ?? "python";
-  const sampleRate = 48000;
-  const numSamples = Math.floor(targetLength * sampleRate);
 
   // RAVE command structure (adjust to your setup):
   // python -m rave.core sample --model <path> --duration <seconds> --output <file>
@@ -553,7 +565,7 @@ async function generateWithRAVE(request: GenerateSoundRequestBody): Promise<Gene
     console.log(`[RAVE] Executing: ${command}`);
     console.log(`[RAVE] Prompt context: ${enrichedPrompt.substring(0, 100)}...`);
 
-    const { stdout, stderr } = await execAsync(command, {
+    const { stderr } = await execAsync(command, {
       timeout: 120000, // 2 minute timeout
       maxBuffer: 50 * 1024 * 1024, // 50MB buffer
     });
@@ -1083,6 +1095,8 @@ function buildSunoPrompt(request: GenerateSoundRequestBody, targetLength: number
     musicalElements.push("minimal sparse production");
   }
 
+  musicalElements.push(`target length ${targetLength}s`);
+
   // Add brightness as tonal characteristics
   if (parameters.brightness > 60) {
     musicalElements.push("bright crystalline tones");
@@ -1109,7 +1123,17 @@ function buildSunoPrompt(request: GenerateSoundRequestBody, targetLength: number
     enhancedPrompt = `${enhancedPrompt}, with clear expressive vocals, rich harmonies, and professional vocal production`;
   }
 
-  return `${enhancedPrompt}${contextStr}`;
+  const referenceSummary = formatReferenceSummary(request.references);
+  const fidelityLine =
+    "Studio-grade mix: lush stereo field, pristine transients, absolutely no lo-fi stock cues or aliasing artifacts.";
+  const tempoLine = parameters.bpm
+    ? `Keep vocals and arrangement locked to ${parameters.bpm} BPM with consistent phrasing.`
+    : "Maintain a deliberate, consistent tempo even if free-form.";
+  const durationLine = `Keep the composition alive for ${targetLength} seconds; no truncation or early fade-outs.`;
+
+  return [enhancedPrompt + contextStr, referenceSummary, tempoLine, durationLine, fidelityLine]
+    .filter(Boolean)
+    .join(" ");
 }
 
 /**
@@ -1134,9 +1158,21 @@ function buildMusicGenPrompt(request: GenerateSoundRequestBody, targetLength: nu
     musicalContext.push(`mood: ${moodTags}`);
   }
 
+  musicalContext.push(`duration ~${targetLength}s`);
+
   const contextStr = musicalContext.length > 0 ? ` (${musicalContext.join(", ")})` : "";
 
-  return `${request.prompt.trim()}${contextStr}`;
+  const tempoLine = parameters.bpm
+    ? `Lock groove tightly to ${parameters.bpm} BPM with consistent percussion/transients.`
+    : "Tempo can be free-form but maintain a steady pulse.";
+  const referenceSummary = formatReferenceSummary(request.references);
+  const durationLine = `Fill the full ${targetLength} seconds with evolving layers; no dead air until the final tail.`;
+  const fidelityLine =
+    "Hi-fi, cinematic mixdown at 48kHz+. Avoid aliasing, plastic presets, or generic stock music tropes.";
+
+  return [request.prompt.trim() + contextStr, tempoLine, referenceSummary, durationLine, fidelityLine]
+    .filter(Boolean)
+    .join(" ");
 }
 
 /**
@@ -1172,16 +1208,22 @@ function buildSoundDesignPrompt(request: GenerateSoundRequestBody, targetLength:
     `BPM: ${parameters.bpm ?? "Free"} | Key: ${parameters.key ?? "Atonal / FX"}`,
     `Dynamics — intensity ${parameters.intensity}/100, texture ${parameters.texture}/100`,
     `Tone sculpting — brightness ${parameters.brightness}/100, noisiness ${parameters.noisiness}/100`,
+    parameters.bpm ? `Lock tempo grid to exactly ${parameters.bpm} BPM with no drift.` : "Tempo can float but must feel intentional.",
+    "Render at 48kHz+ ultra high fidelity. Avoid aliasing, lo-fi grit, or preset stock loops.",
+    "Fill the entire duration with evolving material—no gaps or trailing silence.",
   ];
   if (parameters.seed != null) {
     notes.push(`Seed: ${parameters.seed} (use for repeatable structure)`);
   }
+
+  const referenceSection = buildReferenceSection(request.references);
 
   return [
     `Primary concept:\n${request.prompt.trim()}`,
     "",
     "Production notes:",
     ...notes.map((line) => `- ${line}`),
+    ...referenceSection,
     "",
     "Create layers (bed, accents, transitions) that feel handcrafted.",
     "No narration, speech, or text-to-voice artifacts. Keep it purely sound design.",
@@ -1204,4 +1246,45 @@ function formatToMime(format: OpenAIAudioFormat) {
     default:
       return "audio/wav";
   }
+}
+
+function formatFileSize(bytes: number) {
+  if (!bytes) return "unknown size";
+  const units = ["B", "KB", "MB", "GB"];
+  let size = bytes;
+  let unitIndex = 0;
+  while (size >= 1024 && unitIndex < units.length - 1) {
+    size /= 1024;
+    unitIndex += 1;
+  }
+  const precision = unitIndex === 0 ? 0 : unitIndex === 1 ? 0 : 1;
+  return `${size.toFixed(precision)} ${units[unitIndex]}`;
+}
+
+function isReplicateFileOutput(value: unknown): value is ReplicateFileOutput {
+  if (!value || typeof value !== "object") {
+    return false;
+  }
+  return "url" in value && typeof (value as ReplicateFileOutput).url !== "undefined";
+}
+
+function buildReferenceSection(references: AudioReferencePayload[] | undefined) {
+  if (!references?.length) {
+    return [];
+  }
+  return [
+    "",
+    "Audio reference DNA provided (treat as primary stems):",
+    ...references.map(
+      (ref, index) =>
+        `- Ref ${index + 1}: ${ref.name} (${ref.mimeType || "audio"}, ${formatFileSize(ref.size)}) — resample and feature prominently.`,
+    ),
+    "Aggressively sample, chop, stretch, and texture these references to match the requested BPM/key. Their fingerprint should be obvious.",
+  ];
+}
+
+function formatReferenceSummary(references: AudioReferencePayload[] | undefined) {
+  if (!references?.length) return "";
+  const names = references.map((ref) => ref.name).join(", ");
+  return `Reference DNA: ${names}. Sample heavily from these stems so their timbre drives the piece—treat them as the main instrumentation rather than background inspiration.`;
 }

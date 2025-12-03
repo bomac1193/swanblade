@@ -5,21 +5,35 @@ import type { GenerateSoundRequestBody } from "@/types";
 export const runtime = "nodejs";
 
 export async function POST(request: Request) {
-  try {
-    const body = (await request.json()) as Partial<GenerateSoundRequestBody> & { provider?: AudioProvider };
-    if (!body?.prompt || !body.prompt.trim()) {
-      return NextResponse.json({ error: "Prompt is required." }, { status: 400 });
-    }
-    if (!body.parameters) {
-      return NextResponse.json({ error: "Parameters missing from payload." }, { status: 400 });
-    }
+  const body = (await request.json()) as Partial<GenerateSoundRequestBody> & { provider?: AudioProvider };
+  if (!body?.prompt || !body.prompt.trim()) {
+    return NextResponse.json({ error: "Prompt is required." }, { status: 400 });
+  }
+  if (!body.parameters) {
+    return NextResponse.json({ error: "Parameters missing from payload." }, { status: 400 });
+  }
 
-    // Use provider from request body if provided, otherwise fall back to env
-    const provider = body.provider || resolveProvider();
-    const result = await generateSound(provider, body as GenerateSoundRequestBody);
+  const payload = body as GenerateSoundRequestBody;
+  const provider = body.provider || resolveProvider();
+
+  try {
+    const result = await generateSound(provider, payload);
     return NextResponse.json(result);
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown error while generating sound.";
+
+    if (provider === "fal") {
+      console.warn(`[generate-sound] fal.ai failed (${message}). Falling back to Replicate.`);
+      try {
+        const fallbackResult = await generateSound("replicate", payload);
+        return NextResponse.json(fallbackResult);
+      } catch (fallbackError) {
+        const fallbackMessage =
+          fallbackError instanceof Error ? fallbackError.message : "Unknown error while generating sound.";
+        return NextResponse.json({ error: fallbackMessage }, { status: 500 });
+      }
+    }
+
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }

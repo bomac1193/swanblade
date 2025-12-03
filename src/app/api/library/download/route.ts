@@ -36,7 +36,7 @@ export async function GET(request: Request) {
           "Content-Length": fileBuffer.length.toString(),
         },
       });
-    } catch (error) {
+    } catch {
       return NextResponse.json({ error: "Audio file not found on disk" }, { status: 404 });
     }
   } catch (error) {

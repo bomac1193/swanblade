@@ -1,4 +1,5 @@
 "use client";
+/* eslint-disable react-hooks/set-state-in-effect */
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { cn, secondsToTimecode } from "@/lib/utils";
@@ -14,61 +15,63 @@ export function AudioPlayerControls({ audioUrl, disabled }: AudioPlayerControlsP
   const [duration, setDuration] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
   const [loop, setLoop] = useState(false);
-  const [blobUrl, setBlobUrl] = useState<string | null>(null);
+  const [playableUrl, setPlayableUrl] = useState<string | null>(audioUrl ?? null);
 
-useEffect(() => {
-  const audio = audioRef.current;
-  if (!audio) return;
-  return () => {
-    audio.pause();
-  };
-}, []);
-
-useEffect(() => {
-  // Convert data URL to Blob URL for better browser support
-  if (audioUrl && audioUrl.startsWith('data:')) {
-    const [header, base64Data] = audioUrl.split(',');
-    const mimeType = header.match(/:(.*?);/)?.[1] || 'audio/wav';
-
-    try {
-      const binaryString = atob(base64Data);
-      const bytes = new Uint8Array(binaryString.length);
-      for (let i = 0; i < binaryString.length; i++) {
-        bytes[i] = binaryString.charCodeAt(i);
+  useEffect(() => {
+    let revoke: (() => void) | null = null;
+    if (!audioUrl) {
+      setPlayableUrl(null);
+    } else if (audioUrl.startsWith("data:")) {
+      try {
+        const [header, base64Data] = audioUrl.split(",");
+        const mimeType = header.match(/:(.*?);/)?.[1] ?? "audio/wav";
+        const binaryString = atob(base64Data);
+        const bytes = new Uint8Array(binaryString.length);
+        for (let i = 0; i < binaryString.length; i += 1) {
+          bytes[i] = binaryString.charCodeAt(i);
+        }
+        const blob = new Blob([bytes], { type: mimeType });
+        const objectUrl = URL.createObjectURL(blob);
+        revoke = () => URL.revokeObjectURL(objectUrl);
+        setPlayableUrl(objectUrl);
+      } catch (error) {
+        console.error("Failed to convert data URL to Blob:", error);
+        setPlayableUrl(null);
       }
-      const blob = new Blob([bytes], { type: mimeType });
-      const url = URL.createObjectURL(blob);
-      setBlobUrl(url);
-
-      return () => {
-        URL.revokeObjectURL(url);
-      };
-    } catch (error) {
-      console.error('Failed to convert data URL to Blob:', error);
-      setBlobUrl(null);
+    } else {
+      setPlayableUrl(audioUrl);
     }
-  } else {
-    setBlobUrl(audioUrl);
-  }
-}, [audioUrl]);
 
-useEffect(() => {
-  const audio = audioRef.current;
-  if (!audio) return;
-  audio.pause();
-  audio.currentTime = 0;
-}, [blobUrl]);
+    return () => {
+      revoke?.();
+    };
+  }, [audioUrl]);
+
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    return () => {
+      audio.pause();
+    };
+  }, []);
+
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    audio.pause();
+    audio.currentTime = 0;
+  }, [playableUrl]);
 
   const togglePlay = useCallback(() => {
-    if (!audioRef.current || !blobUrl) return;
+    if (!audioRef.current || !playableUrl) return;
     if (isPlaying) {
       audioRef.current.pause();
     } else {
       audioRef.current.play().catch((error) => {
-        console.error('Failed to play audio:', error);
+        console.error("Failed to play audio:", error);
       });
     }
-  }, [isPlaying, blobUrl]);
+  }, [isPlaying, playableUrl]);
 
   useEffect(() => {
     const audio = audioRef.current;
@@ -83,12 +86,12 @@ useEffect(() => {
       if (loop) {
         audio.currentTime = 0;
         audio.play().catch((error) => {
-          console.error('Failed to loop audio:', error);
+          console.error("Failed to loop audio:", error);
         });
       }
     };
     const handleError = (e: Event) => {
-      console.error('Audio error:', e);
+      console.error("Audio error:", e);
       setIsPlaying(false);
     };
 
@@ -169,7 +172,7 @@ useEffect(() => {
         </button>
       </div>
 
-      <audio ref={audioRef} src={blobUrl ?? undefined} preload="metadata" loop={loop} hidden />
+      <audio ref={audioRef} src={playableUrl ?? undefined} preload="metadata" loop={loop} hidden />
     </div>
   );
 }
