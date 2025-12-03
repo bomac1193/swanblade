@@ -25,7 +25,23 @@ export async function POST(request: Request) {
 
 function resolveProvider(): AudioProvider {
   const configured = process.env.AUDIO_PROVIDER?.toLowerCase();
-  if (configured === "openai" || configured === "stability" || configured === "elevenlabs" || configured === "mock") {
+  const validProviders = [
+    "mock",
+    "openai",
+    "stability",
+    "elevenlabs",
+    "replicate",
+    "fal",
+    "huggingface",
+    "modal",
+    "rave",
+    "audiocraft",
+    "neuralgrains",
+    "sigilwave",
+    "physim",
+  ];
+
+  if (configured && validProviders.includes(configured)) {
     return configured as AudioProvider;
   }
   if (process.env.OPENAI_API_KEY) {

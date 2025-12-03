@@ -6,6 +6,10 @@ export type AudioProvider =
   | "openai"
   | "stability"
   | "elevenlabs"
+  | "replicate"
+  | "fal"
+  | "huggingface"
+  | "modal"
   | "rave"
   | "audiocraft"
   | "neuralgrains"
@@ -15,6 +19,12 @@ export type AudioProvider =
 const openaiClient = process.env.OPENAI_API_KEY ? new OpenAI({ apiKey: process.env.OPENAI_API_KEY }) : null;
 const stabilityApiKey = process.env.STABILITY_API_KEY;
 const elevenlabsApiKey = process.env.ELEVENLABS_API_KEY;
+
+// Cloud audio generation providers
+const replicateApiKey = process.env.REPLICATE_API_KEY;
+const falApiKey = process.env.FAL_API_KEY;
+const huggingfaceApiKey = process.env.HUGGINGFACE_API_KEY;
+const modalApiKey = process.env.MODAL_API_KEY;
 
 // Experimental audio generation providers
 const raveModelPath = process.env.RAVE_MODEL_PATH; // TODO: Set path to RAVE model checkpoint
@@ -52,6 +62,14 @@ export async function generateSound(
       return generateWithStability(request);
     case "elevenlabs":
       return generateWithElevenLabs(request);
+    case "replicate":
+      return generateWithReplicate(request);
+    case "fal":
+      return generateWithFal(request);
+    case "huggingface":
+      return generateWithHuggingFace(request);
+    case "modal":
+      return generateWithModal(request);
     case "rave":
       return generateWithRAVE(request);
     case "audiocraft":
@@ -207,6 +225,260 @@ async function generateWithElevenLabs(request: GenerateSoundRequestBody): Promis
   }
 
   return { audioUrl: `data:${mime};base64,${audioBase64}` };
+}
+
+/**
+ * Replicate - MusicGen music generation via Replicate API
+ * Generates high-quality music from text prompts using Meta's MusicGen model
+ */
+async function generateWithReplicate(request: GenerateSoundRequestBody): Promise<GenerateSoundResponse> {
+  if (!replicateApiKey) {
+    throw new Error("Replicate API key missing. Add REPLICATE_API_KEY to .env.local.");
+  }
+
+  const Replicate = (await import("replicate")).default;
+  const replicate = new Replicate({ auth: replicateApiKey });
+
+  const targetLength = Math.max(1, Math.min(30, request.parameters.lengthSeconds ?? 10));
+  const prompt = buildMusicGenPrompt(request, targetLength);
+
+  try {
+    const output = await replicate.run("meta/musicgen:671ac645ce5e552cc63a54a2bbff63fcf798043055d2dac5fc9e36a837eedcfb", {
+      input: {
+        prompt: prompt,
+        model_version: "stereo-large",
+        duration: targetLength,
+        temperature: (request.parameters.intensity ?? 50) / 100,
+        top_k: 250,
+        top_p: 0,
+        output_format: "mp3",
+        seed: request.parameters.seed ?? -1,
+      },
+    });
+
+    // Replicate MusicGen returns a URL, FileOutput, or array of URLs
+    let audioUrl: string;
+
+    if (typeof output === "string") {
+      audioUrl = output;
+    } else if (Array.isArray(output) && output.length > 0) {
+      const first = output[0];
+      // Handle FileOutput objects with url() method
+      if (typeof first === "object" && first !== null && "url" in first) {
+        const urlResult = typeof first.url === "function" ? first.url() : first.url;
+        audioUrl = String(urlResult); // Convert to string
+      } else if (typeof first === "string") {
+        audioUrl = first;
+      } else {
+        throw new Error(`Unexpected array element type: ${typeof first}`);
+      }
+    } else if (output && typeof output === "object" && "url" in output) {
+      // Handle FileOutput object with url() method
+      const urlValue = (output as any).url;
+      const urlResult = typeof urlValue === "function" ? urlValue() : urlValue;
+      audioUrl = String(urlResult); // Convert to string
+    } else {
+      throw new Error(`Unexpected Replicate output format: ${typeof output}`);
+    }
+
+    if (!audioUrl) {
+      throw new Error(`No audio URL from Replicate`);
+    }
+
+    // Fetch the audio and convert to base64
+    const audioResponse = await fetch(audioUrl);
+    if (!audioResponse.ok) {
+      throw new Error(`Failed to fetch generated audio: ${audioResponse.status}`);
+    }
+
+    const audioBuffer = await audioResponse.arrayBuffer();
+    const audioBase64 = Buffer.from(audioBuffer).toString("base64");
+
+    return { audioUrl: `data:audio/mpeg;base64,${audioBase64}` };
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(`Replicate generation failed: ${error.message}`);
+    }
+    throw new Error("Replicate generation failed with unknown error");
+  }
+}
+
+/**
+ * fal.ai - Stable Audio generation via fal.ai API
+ * Generates high-quality audio using Stability AI's Stable Audio models
+ */
+async function generateWithFal(request: GenerateSoundRequestBody): Promise<GenerateSoundResponse> {
+  if (!falApiKey) {
+    throw new Error("fal.ai API key missing. Add FAL_API_KEY to .env.local.");
+  }
+
+  const { fal } = await import("@fal-ai/client");
+
+  fal.config({
+    credentials: falApiKey,
+  });
+
+  const targetLength = Math.max(1, Math.min(180, request.parameters.lengthSeconds ?? 10));
+  const prompt = buildMusicGenPrompt(request, targetLength);
+
+  try {
+    // Use Stable Audio 2.5 for enterprise-grade stereo quality
+    const result = (await fal.subscribe("fal-ai/stable-audio-25/text-to-audio", {
+      input: {
+        prompt: prompt,
+        duration: targetLength,
+        num_inference_steps: 100,
+        guidance_scale: 7.0,
+      },
+    })) as { audio_file: { url: string; content_type: string } };
+
+    const audioUrl = result.audio_file?.url;
+    if (!audioUrl) {
+      throw new Error("fal.ai did not return audio URL");
+    }
+
+    // Fetch the audio and convert to base64
+    const audioResponse = await fetch(audioUrl);
+    if (!audioResponse.ok) {
+      throw new Error(`Failed to fetch generated audio: ${audioResponse.status}`);
+    }
+
+    const audioBuffer = await audioResponse.arrayBuffer();
+    const audioBase64 = Buffer.from(audioBuffer).toString("base64");
+
+    const contentType = result.audio_file?.content_type ?? "audio/wav";
+
+    return { audioUrl: `data:${contentType};base64,${audioBase64}` };
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(`fal.ai generation failed: ${error.message}`);
+    }
+    throw new Error("fal.ai generation failed with unknown error");
+  }
+}
+
+/**
+ * Hugging Face - Audio generation via Hugging Face Inference API
+ * Supports multiple audio generation models from the Hugging Face Hub
+ */
+async function generateWithHuggingFace(request: GenerateSoundRequestBody): Promise<GenerateSoundResponse> {
+  if (!huggingfaceApiKey) {
+    throw new Error("Hugging Face API key missing. Add HUGGINGFACE_API_KEY to .env.local.");
+  }
+
+  const model = process.env.HUGGINGFACE_MODEL ?? "facebook/musicgen-small";
+  const endpoint = `https://api-inference.huggingface.co/models/${model}`;
+
+  const targetLength = Math.max(1, Math.min(30, request.parameters.lengthSeconds ?? 10));
+  const prompt = buildMusicGenPrompt(request, targetLength);
+
+  try {
+    const response = await fetch(endpoint, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${huggingfaceApiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        inputs: prompt,
+        parameters: {
+          max_new_tokens: Math.floor(targetLength * 50), // Approximate tokens for duration
+        },
+      }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Hugging Face request failed (${response.status}): ${errorText}`);
+    }
+
+    // Hugging Face Inference API returns audio as binary
+    const audioBuffer = await response.arrayBuffer();
+    const audioBase64 = Buffer.from(audioBuffer).toString("base64");
+
+    // Most HF audio models output WAV
+    return { audioUrl: `data:audio/wav;base64,${audioBase64}` };
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(`Hugging Face generation failed: ${error.message}`);
+    }
+    throw new Error("Hugging Face generation failed with unknown error");
+  }
+}
+
+/**
+ * Modal - Custom deployed MusicGen endpoint on Modal infrastructure
+ * Requires user to deploy their own Modal MusicGen endpoint
+ * See: https://modal.com/docs/examples/musicgen
+ */
+async function generateWithModal(request: GenerateSoundRequestBody): Promise<GenerateSoundResponse> {
+  if (!modalApiKey) {
+    throw new Error("Modal API key missing. Add MODAL_API_KEY to .env.local.");
+  }
+
+  const modalEndpoint = process.env.MODAL_ENDPOINT;
+  if (!modalEndpoint) {
+    throw new Error(
+      "Modal endpoint missing. Deploy a Modal MusicGen function and add MODAL_ENDPOINT to .env.local."
+    );
+  }
+
+  const targetLength = Math.max(1, Math.min(300, request.parameters.lengthSeconds ?? 10));
+  const prompt = buildMusicGenPrompt(request, targetLength);
+
+  try {
+    // Modal endpoints typically use JSON POST requests
+    const response = await fetch(modalEndpoint, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${modalApiKey}`,
+      },
+      body: JSON.stringify({
+        prompt: prompt,
+        lyrics: "[inst]", // Instrumental only
+        duration: targetLength,
+        format: "mp3",
+        manual_seeds: request.parameters.seed ?? 1,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Modal request failed (${response.status}): ${errorText}`);
+    }
+
+    // Modal endpoints can return either JSON with audio data or raw audio bytes
+    const contentType = response.headers.get("content-type");
+
+    if (contentType?.includes("application/json")) {
+      const data = (await response.json()) as { audio_base64?: string; audio_url?: string };
+
+      if (data.audio_base64) {
+        return { audioUrl: `data:audio/mpeg;base64,${data.audio_base64}` };
+      }
+
+      if (data.audio_url) {
+        // Fetch the audio from the URL
+        const audioResponse = await fetch(data.audio_url);
+        const audioBuffer = await audioResponse.arrayBuffer();
+        const audioBase64 = Buffer.from(audioBuffer).toString("base64");
+        return { audioUrl: `data:audio/mpeg;base64,${audioBase64}` };
+      }
+
+      throw new Error("Modal response missing audio data");
+    } else {
+      // Assume raw audio bytes
+      const audioBuffer = await response.arrayBuffer();
+      const audioBase64 = Buffer.from(audioBuffer).toString("base64");
+      return { audioUrl: `data:audio/mpeg;base64,${audioBase64}` };
+    }
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(`Modal generation failed: ${error.message}`);
+    }
+    throw new Error("Modal generation failed with unknown error");
+  }
 }
 
 /**
