@@ -7,9 +7,15 @@ import { WaveformPlaceholder } from "@/components/waveform-placeholder";
 import { AudioPlayerControls } from "@/components/audio-player-controls";
 import { LibraryPanel } from "@/components/library-panel";
 import { ProviderSelector, type ProviderId, recommendProvider } from "@/components/provider-selector";
-import type { AudioReferencePayload, SoundGeneration, SoundCategory } from "@/types";
+import { PaletteEditor } from "@/components/PaletteEditor";
+import { GameStateSelector } from "@/components/GameStateSelector";
+import type { AudioReferencePayload, SoundGeneration, SoundCategory, GameState } from "@/types";
 import type { LibrarySound } from "@/lib/libraryStorage";
+import type { SoundPalette } from "@/lib/soundPalette";
+import type { StemBundle } from "@/lib/stemGenerator";
 import { generateSoundName } from "@/lib/utils";
+
+type AppMode = "generate" | "game-audio" | "library";
 
 const PROMPT_SUGGESTIONS = [
   "Glitchy UI clicks in a neon-lit cybercafe",
@@ -108,11 +114,11 @@ function ReferenceClipCard({ clip, onRemove }: { clip: ReferenceClip; onRemove: 
 }
 
 export default function Home() {
+  const [mode, setMode] = useState<AppMode>("generate");
   const [prompt, setPrompt] = useState("");
   const [currentSound, setCurrentSound] = useState<SoundGeneration | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [toasts, setToasts] = useState<ToastItem[]>([]);
-  const [showLibrary, setShowLibrary] = useState(false);
   const [selectedProvider, setSelectedProvider] = useState<ProviderId>("replicate");
   const [lengthSeconds, setLengthSeconds] = useState(DEFAULT_PARAMETERS.lengthSeconds);
   const [providerPinned, setProviderPinned] = useState(false);
@@ -120,6 +126,12 @@ export default function Home() {
   const [isDraggingReference, setIsDraggingReference] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const referencePreviewUrls = useRef(new Set<string>());
+
+  // Blue Ocean state
+  const [selectedPalette, setSelectedPalette] = useState<SoundPalette | null>(null);
+  const [selectedGameState, setSelectedGameState] = useState<GameState | null>(null);
+  const [currentBundle, setCurrentBundle] = useState<StemBundle | null>(null);
+  const [showAdvanced, setShowAdvanced] = useState(false);
 
   const toast = useCallback((message: string, tone: ToastItem["tone"] = "neutral") => {
     const id = crypto.randomUUID();
@@ -150,26 +162,26 @@ export default function Home() {
         return;
       }
 
-        const accepted: ReferenceClip[] = [];
-        const oversized: string[] = [];
-        for (const file of audioFiles) {
-          if (accepted.length >= availableSlots) break;
-          if (file.size > MAX_REFERENCE_FILE_BYTES) {
-            oversized.push(file.name);
-            continue;
-          }
-
-          const previewUrl = URL.createObjectURL(file);
-          referencePreviewUrls.current.add(previewUrl);
-          accepted.push({
-            id: crypto.randomUUID(),
-            file,
-            name: file.name,
-            size: file.size,
-            type: file.type || "audio/mpeg",
-            previewUrl,
-          });
+      const accepted: ReferenceClip[] = [];
+      const oversized: string[] = [];
+      for (const file of audioFiles) {
+        if (accepted.length >= availableSlots) break;
+        if (file.size > MAX_REFERENCE_FILE_BYTES) {
+          oversized.push(file.name);
+          continue;
         }
+
+        const previewUrl = URL.createObjectURL(file);
+        referencePreviewUrls.current.add(previewUrl);
+        accepted.push({
+          id: crypto.randomUUID(),
+          file,
+          name: file.name,
+          size: file.size,
+          type: file.type || "audio/mpeg",
+          previewUrl,
+        });
+      }
 
       if (accepted.length) {
         setReferenceClips((prev) => [...prev, ...accepted]);
@@ -290,7 +302,7 @@ export default function Home() {
 
   const handlePlayLibrarySound = (sound: LibrarySound) => {
     setCurrentSound(sound);
-    setShowLibrary(false);
+    setMode("generate");
   };
 
   const runGeneration = async () => {
@@ -328,18 +340,30 @@ export default function Home() {
         body: JSON.stringify({
           prompt: trimmedPrompt,
           parameters: requestParameters,
-          provider: selectedProvider, // Send selected provider
+          provider: selectedProvider,
           references: referencePayloads,
+          // Blue Ocean: include palette and game state
+          palette: selectedPalette,
+          gameState: selectedGameState,
         }),
       });
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error ?? "Mock generation failed");
+        throw new Error(errorData.error ?? "Generation failed");
       }
 
-      const data = (await response.json()) as { audioUrl: string };
-      setCurrentSound((prev) => (prev ? { ...prev, audioUrl: data.audioUrl, status: "ready" } : prev));
+      const data = (await response.json()) as { audioUrl: string; provenanceCid?: string };
+      setCurrentSound((prev) =>
+        prev
+          ? {
+              ...prev,
+              audioUrl: data.audioUrl,
+              status: "ready",
+              provenanceCid: data.provenanceCid,
+            }
+          : prev
+      );
       toast("Audiogen finished rendering.", "success");
     } catch (error) {
       setCurrentSound((prev) =>
@@ -357,6 +381,57 @@ export default function Home() {
     }
   };
 
+  const runGameAudioGeneration = async () => {
+    if (isGenerating) {
+      toast("Generation in progress. Please wait.", "neutral");
+      return;
+    }
+
+    if (!selectedGameState) {
+      toast("Select a game state first.", "error");
+      return;
+    }
+
+    setIsGenerating(true);
+    setCurrentBundle(null);
+
+    try {
+      const response = await fetch("/api/generate-game-audio", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          gameState: selectedGameState,
+          palette: selectedPalette,
+          duration: lengthSeconds,
+          bpm: DEFAULT_PARAMETERS.bpm,
+          key: DEFAULT_PARAMETERS.key,
+          basePrompt: prompt.trim() || undefined,
+          provider: selectedProvider,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error ?? "Game audio generation failed");
+      }
+
+      const data = await response.json();
+      if (data.success && data.bundle) {
+        setCurrentBundle(data.bundle);
+        toast(`Generated ${data.bundle.stems.length} stems for ${selectedGameState}!`, "success");
+        if (data.warnings?.length) {
+          toast(`Warnings: ${data.warnings.join(", ")}`, "neutral");
+        }
+      } else {
+        throw new Error(data.error || "Unknown error");
+      }
+    } catch (error) {
+      toast(error instanceof Error ? error.message : "Generation failed", "error");
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
   return (
     <div className="relative min-h-screen overflow-hidden bg-black text-white">
       <div className="pointer-events-none absolute inset-0 flex items-center justify-center px-4">
@@ -369,34 +444,184 @@ export default function Home() {
             <h1 className="mt-4 text-2xl font-semibold sm:text-3xl">Burn the square. Birth the Strange.</h1>
           </div>
 
-          {/* Library Toggle */}
+          {/* Mode Toggle */}
           <div className="flex gap-3">
             <button
-              onClick={() => setShowLibrary(false)}
+              onClick={() => setMode("generate")}
               className={`rounded-lg px-4 py-2 text-sm font-medium transition ${
-                !showLibrary ? "bg-emerald-500 text-white" : "bg-black/40 text-white/60 hover:text-white"
+                mode === "generate" ? "bg-emerald-500 text-white" : "bg-black/40 text-white/60 hover:text-white"
               }`}
             >
               Generate
             </button>
             <button
-              onClick={() => setShowLibrary(true)}
+              onClick={() => setMode("game-audio")}
               className={`rounded-lg px-4 py-2 text-sm font-medium transition ${
-                showLibrary ? "bg-emerald-500 text-white" : "bg-black/40 text-white/60 hover:text-white"
+                mode === "game-audio" ? "bg-purple-500 text-white" : "bg-black/40 text-white/60 hover:text-white"
+              }`}
+            >
+              Game Audio
+            </button>
+            <button
+              onClick={() => setMode("library")}
+              className={`rounded-lg px-4 py-2 text-sm font-medium transition ${
+                mode === "library" ? "bg-emerald-500 text-white" : "bg-black/40 text-white/60 hover:text-white"
               }`}
             >
               Library
             </button>
           </div>
 
-          {showLibrary ? (
+          {mode === "library" ? (
             <div className="w-full rounded-3xl border border-white/10 bg-black/40 p-6 backdrop-blur-2xl">
               <LibraryPanel onPlaySound={handlePlayLibrarySound} />
             </div>
+          ) : mode === "game-audio" ? (
+            /* Game Audio Mode */
+            <>
+              <div className="w-full rounded-3xl border border-white/10 bg-black/50 p-6 backdrop-blur-3xl">
+                <p className="text-xs uppercase tracking-[0.3em] text-white/40">Game Audio Generator</p>
+                <p className="mt-2 text-sm text-white/60">
+                  Generate coherent stem bundles for specific game states with optional palette constraints.
+                </p>
+
+                {/* Game State Selector */}
+                <div className="mt-4">
+                  <GameStateSelector
+                    value={selectedGameState}
+                    onChange={setSelectedGameState}
+                    showDetails={true}
+                  />
+                </div>
+
+                {/* Palette Editor */}
+                <div className="mt-4">
+                  <PaletteEditor
+                    value={selectedPalette}
+                    onChange={setSelectedPalette}
+                  />
+                </div>
+
+                {/* Duration & Provider */}
+                <div className="mt-4 grid grid-cols-2 gap-4">
+                  <div className="text-left">
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.4em] text-white/50">Duration</p>
+                    <div className="mt-2 flex flex-wrap gap-2">
+                      {[15, 30, 60].map((value) => (
+                        <button
+                          key={value}
+                          type="button"
+                          onClick={() => setLengthSeconds(value)}
+                          className={`rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-wider transition ${
+                            lengthSeconds === value
+                              ? "bg-purple-500/80 text-white"
+                              : "border border-white/15 text-white/60 hover:text-white"
+                          }`}
+                        >
+                          {value}s
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <ProviderSelector
+                      value={selectedProvider}
+                      onChange={handleProviderChange}
+                      prompt=""
+                      recommendation={recommendedProvider}
+                      isAuto={!providerPinned}
+                      onResetAuto={providerPinned ? resetProviderToAuto : undefined}
+                      durationSeconds={lengthSeconds}
+                      hasReferences={false}
+                    />
+                  </div>
+                </div>
+
+                {/* Optional Base Prompt */}
+                <div className="mt-4">
+                  <textarea
+                    className="w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white placeholder:text-white/40 focus:border-purple-400/60 focus:outline-none"
+                    rows={2}
+                    placeholder="Optional: Add style keywords (e.g., 'orchestral, epic, brass')..."
+                    value={prompt}
+                    onChange={(e) => setPrompt(e.target.value)}
+                    disabled={isGenerating}
+                  />
+                </div>
+
+                {/* Generate Button */}
+                <div className="mt-4 flex justify-end">
+                  <button
+                    onClick={runGameAudioGeneration}
+                    disabled={isGenerating || !selectedGameState}
+                    className="relative inline-flex items-center justify-center rounded-full font-medium uppercase tracking-wide transition-all focus-visible:outline-none focus-visible:ring-2 disabled:opacity-60 disabled:cursor-not-allowed bg-purple-500/80 text-white hover:bg-purple-400 focus-visible:ring-purple-300 h-11 px-5 text-sm"
+                  >
+                    <span className="flex items-center gap-2">
+                      <span>{isGenerating ? "Generating Stems..." : "Generate Stem Bundle"}</span>
+                    </span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Bundle Result */}
+              {currentBundle && (
+                <div className="w-full rounded-3xl border border-white/10 bg-black/40 p-6 backdrop-blur-2xl">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-xs uppercase tracking-[0.3em] text-white/40">Stem Bundle</p>
+                      <h2 className="mt-1 text-xl font-semibold capitalize">{currentBundle.gameState} Bundle</h2>
+                    </div>
+                    <span className="rounded-full bg-purple-500/20 px-3 py-1 text-xs text-purple-300">
+                      {currentBundle.stems.length} stems
+                    </span>
+                  </div>
+
+                  <div className="mt-4 space-y-3">
+                    {currentBundle.stems.map((stem) => (
+                      <div
+                        key={stem.stemType}
+                        className="flex items-center gap-4 rounded-xl border border-white/10 bg-black/30 p-3"
+                      >
+                        <div className="flex-1">
+                          <p className="text-sm font-medium capitalize text-white">{stem.stemType}</p>
+                          <p className="text-xs text-white/50">
+                            {stem.duration}s | {stem.metadata.bpm} BPM
+                            {stem.provenanceCid && (
+                              <span className="ml-2 text-emerald-400">✓ Provenance</span>
+                            )}
+                          </p>
+                        </div>
+                        <audio
+                          controls
+                          src={stem.audioUrl}
+                          preload="metadata"
+                          controlsList="nodownload noplaybackrate"
+                          className="h-8 w-48 accent-purple-400"
+                          style={{ colorScheme: "dark" }}
+                        />
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Manifest Info */}
+                  <div className="mt-4 rounded-xl border border-white/10 bg-black/20 p-3">
+                    <p className="text-xs text-white/50">
+                      Bundle ID: {currentBundle.id} | Created: {new Date(currentBundle.createdAt).toLocaleString()}
+                    </p>
+                    {currentBundle.manifest.provenance.identityId && (
+                      <p className="mt-1 text-xs text-emerald-400">
+                        Identity: {currentBundle.manifest.provenance.identityId}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              )}
+            </>
           ) : (
+            /* Generate Mode */
             <>
               {/* Combined Prompt Composer with Provider Selection */}
-              <div className="rounded-3xl border border-white/10 bg-black/50 p-6 backdrop-blur-3xl">
+              <div className="w-full rounded-3xl border border-white/10 bg-black/50 p-6 backdrop-blur-3xl">
                 <p className="text-xs uppercase tracking-[0.3em] text-white/40">Prompt Composer</p>
 
                 {/* Reference Dropzone */}
@@ -462,6 +687,45 @@ export default function Home() {
                     hasReferences={referenceClips.length > 0}
                   />
                 </div>
+
+                {/* Advanced Options Toggle */}
+                <button
+                  onClick={() => setShowAdvanced(!showAdvanced)}
+                  className="mt-3 text-xs text-white/50 hover:text-white/70"
+                >
+                  {showAdvanced ? "▼ Hide" : "▶ Show"} Palette & Game State Options
+                </button>
+
+                {/* Blue Ocean: Palette & Game State */}
+                {showAdvanced && (
+                  <div className="mt-3 grid gap-4 md:grid-cols-2">
+                    <PaletteEditor
+                      value={selectedPalette}
+                      onChange={setSelectedPalette}
+                    />
+                    <GameStateSelector
+                      value={selectedGameState}
+                      onChange={setSelectedGameState}
+                      showDetails={false}
+                    />
+                  </div>
+                )}
+
+                {/* Active Constraints Badge */}
+                {(selectedPalette || selectedGameState) && (
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {selectedPalette && (
+                      <span className="rounded-full bg-emerald-500/20 px-3 py-1 text-xs text-emerald-300">
+                        Palette: {selectedPalette.name}
+                      </span>
+                    )}
+                    {selectedGameState && (
+                      <span className="rounded-full bg-purple-500/20 px-3 py-1 text-xs capitalize text-purple-300">
+                        State: {selectedGameState}
+                      </span>
+                    )}
+                  </div>
+                )}
 
                 {/* Length Selector */}
                 <div className="mt-4 text-left">
@@ -535,45 +799,56 @@ export default function Home() {
                 </div>
               </div>
 
+              {/* Sound Result */}
               <div className="w-full rounded-3xl border border-white/10 bg-black/40 p-6 backdrop-blur-2xl">
-            {currentSound ? (
-              <>
-                <p className="text-xs uppercase tracking-[0.3em] text-white/40">{currentSound.status}</p>
-                <h2 className="mt-2 text-2xl font-semibold">{currentSound.name}</h2>
-                <p className="mt-1 text-sm text-white/60">{currentSound.prompt}</p>
+                {currentSound ? (
+                  <>
+                    <p className="text-xs uppercase tracking-[0.3em] text-white/40">{currentSound.status}</p>
+                    <h2 className="mt-2 text-2xl font-semibold">{currentSound.name}</h2>
+                    <p className="mt-1 text-sm text-white/60">{currentSound.prompt}</p>
 
-                <div className="mt-6">
-                  <WaveformPlaceholder isActive={currentSound.status === "ready"} isLoading={currentSound.status === "pending"} />
-                </div>
+                    {/* Provenance Badge */}
+                    {currentSound.provenanceCid && (
+                      <div className="mt-2 inline-flex items-center gap-2 rounded-full bg-emerald-500/20 px-3 py-1">
+                        <span className="text-xs text-emerald-400">✓ Provenance Stamped</span>
+                        <span className="text-[10px] text-emerald-400/60 font-mono">
+                          {currentSound.provenanceCid.slice(0, 12)}...
+                        </span>
+                      </div>
+                    )}
 
-                {currentSound.status === "error" ? (
-                  <div className="mt-4 rounded-2xl border border-red-400/30 bg-red-950/40 px-4 py-3 text-sm text-red-200">
-                    {currentSound.errorMessage ?? "Generation failed. Try again."}
-                  </div>
+                    <div className="mt-6">
+                      <WaveformPlaceholder isActive={currentSound.status === "ready"} isLoading={currentSound.status === "pending"} />
+                    </div>
+
+                    {currentSound.status === "error" ? (
+                      <div className="mt-4 rounded-2xl border border-red-400/30 bg-red-950/40 px-4 py-3 text-sm text-red-200">
+                        {currentSound.errorMessage ?? "Generation failed. Try again."}
+                      </div>
+                    ) : (
+                      <div className="mt-6 flex flex-col gap-3">
+                        <AudioPlayerControls
+                          key={currentSound.audioUrl ?? currentSound.id}
+                          audioUrl={currentSound.audioUrl}
+                          disabled={currentSound.status !== "ready"}
+                        />
+                        <button
+                          onClick={saveToLibrary}
+                          disabled={currentSound.status !== "ready"}
+                          className="w-full rounded-xl bg-emerald-600 px-4 py-3 font-medium text-white transition hover:bg-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          Save to Library
+                        </button>
+                      </div>
+                    )}
+                  </>
                 ) : (
-                  <div className="mt-6 flex flex-col gap-3">
-                    <AudioPlayerControls
-                      key={currentSound.audioUrl ?? currentSound.id}
-                      audioUrl={currentSound.audioUrl}
-                      disabled={currentSound.status !== "ready"}
-                    />
-                    <button
-                      onClick={saveToLibrary}
-                      disabled={currentSound.status !== "ready"}
-                      className="w-full rounded-xl bg-emerald-600 px-4 py-3 font-medium text-white transition hover:bg-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      💾 Save to Library
-                    </button>
+                  <div className="flex flex-col items-center gap-2 py-8 text-sm text-white/60">
+                    <p>Cinematic silence.</p>
+                    <p>Prompt me and I&apos;ll paint a waveform.</p>
                   </div>
                 )}
-              </>
-            ) : (
-              <div className="flex flex-col items-center gap-2 py-8 text-sm text-white/60">
-                <p>Cinematic silence.</p>
-                <p>Prompt me and I&apos;ll paint a waveform.</p>
               </div>
-            )}
-          </div>
             </>
           )}
         </div>
