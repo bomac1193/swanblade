@@ -70,10 +70,10 @@ export function PaletteEditor({ value, onChange, onCreateFromDNA }: PaletteEdito
       <div className="mt-3 flex flex-wrap gap-2">
         <button
           onClick={() => handlePresetSelect("none")}
-          className={`px-3 py-1.5 text-label uppercase tracking-wider transition ${
+          className={`px-3 py-1.5 text-label uppercase tracking-wider border transition ${
             !value
-              ? "bg-brand-text text-brand-bg"
-              : "border border-brand-border text-brand-secondary hover:border-brand-text hover:text-brand-text"
+              ? "border-brand-text bg-brand-text text-brand-bg"
+              : "border-brand-border text-brand-secondary hover:border-brand-text hover:text-brand-text"
           }`}
         >
           No Palette
@@ -83,10 +83,10 @@ export function PaletteEditor({ value, onChange, onCreateFromDNA }: PaletteEdito
           <button
             key={id}
             onClick={() => handlePresetSelect(id)}
-            className={`px-3 py-1.5 text-label uppercase tracking-wider transition ${
+            className={`px-3 py-1.5 text-label uppercase tracking-wider border transition ${
               value?.name === preset.name
-                ? "bg-brand-text text-brand-bg"
-                : "border border-brand-border text-brand-secondary hover:border-brand-text hover:text-brand-text"
+                ? "border-brand-text bg-brand-text text-brand-bg"
+                : "border-brand-border text-brand-secondary hover:border-brand-text hover:text-brand-text"
             }`}
           >
             {preset.name}
@@ -103,10 +103,10 @@ export function PaletteEditor({ value, onChange, onCreateFromDNA }: PaletteEdito
               <button
                 key={p.id}
                 onClick={() => handleSavedSelect(p.id)}
-                className={`px-3 py-1.5 text-label uppercase tracking-wider transition ${
+                className={`px-3 py-1.5 text-label uppercase tracking-wider border transition ${
                   value?.id === p.id
-                    ? "bg-brand-accent text-brand-bg"
-                    : "border border-brand-accent/30 text-brand-accent hover:border-brand-accent"
+                    ? "border-brand-text bg-brand-text text-brand-bg"
+                    : "border-brand-border text-brand-secondary hover:border-brand-text hover:text-brand-text"
                 }`}
               >
                 {p.name}
