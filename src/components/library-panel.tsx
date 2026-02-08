@@ -385,16 +385,18 @@ export function LibraryPanel() {
       {/* Search and Filters */}
       <div className="flex flex-col gap-3">
         <Input
-          type="text"
+          type="search"
           placeholder="Search sounds..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          autoComplete="off"
+          autoComplete="new-password"
           autoCorrect="off"
           autoCapitalize="off"
           spellCheck={false}
-          name="sound-search"
+          name={`search-${Date.now()}`}
           data-form-type="other"
+          data-lpignore="true"
+          data-1p-ignore="true"
         />
 
         <div className="flex flex-wrap gap-2">
