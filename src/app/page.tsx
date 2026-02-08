@@ -411,8 +411,7 @@ export default function Home() {
         <div className="mx-auto max-w-container px-6 py-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="uppercase-label text-brand-secondary">Sound Generation</p>
-              <h1 className="mt-1 font-display text-display-lg">Swanblade</h1>
+              <h1 className="font-display text-display-lg">Swanblade</h1>
             </div>
 
             {/* Mode Toggle */}
