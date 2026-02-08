@@ -10,7 +10,6 @@ import { ProviderSelector, type ProviderId, recommendProvider } from "@/componen
 import { PaletteEditor } from "@/components/PaletteEditor";
 import { GameStateSelector } from "@/components/GameStateSelector";
 import type { AudioReferencePayload, SoundGeneration, SoundCategory, GameState } from "@/types";
-import type { LibrarySound } from "@/lib/libraryStorage";
 import type { SoundPalette } from "@/lib/soundPalette";
 import type { StemBundle } from "@/lib/stemGenerator";
 import { generateSoundName } from "@/lib/utils";
@@ -289,11 +288,6 @@ export default function Home() {
     }
   };
 
-  const handlePlayLibrarySound = (sound: LibrarySound) => {
-    setCurrentSound(sound);
-    setMode("generate");
-  };
-
   const runGeneration = async () => {
     if (isGenerating) {
       toast("Generation in progress.", "neutral");
@@ -452,7 +446,7 @@ export default function Home() {
       <main className="mx-auto max-w-container px-6 py-8">
         {mode === "library" ? (
           <div className="card">
-            <LibraryPanel onPlaySound={handlePlayLibrarySound} />
+            <LibraryPanel />
           </div>
         ) : mode === "game-audio" ? (
           <div className="grid gap-6 lg:grid-cols-2">

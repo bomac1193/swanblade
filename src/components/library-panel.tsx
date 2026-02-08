@@ -1,20 +1,53 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState, useId, useMemo } from "react";
 import { LibrarySound } from "@/lib/libraryStorage";
-import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-
-interface LibraryPanelProps {
-  onPlaySound?: (sound: LibrarySound) => void;
-}
+import { cn, secondsToTimecode } from "@/lib/utils";
 
 type SortBy = "date" | "name" | "liked" | "type" | "group";
 type FilterBy = "all" | "liked" | "category" | "group";
 
-export function LibraryPanel({ onPlaySound }: LibraryPanelProps) {
+// Compact inline waveform component
+function CompactWaveform({ isPlaying, progress }: { isPlaying: boolean; progress: number }) {
+  const gradientId = useId();
+  const bars = useMemo(
+    () =>
+      Array.from({ length: 60 }, (_, index) => {
+        const pseudoRandom = Math.abs(Math.sin(index * 12.9898 + 78.233) * Math.cos(index * 0.618));
+        const smoothWave = Math.sin(index * 0.15) * 0.3;
+        return 0.4 + (pseudoRandom % 1) * 0.6 + smoothWave;
+      }),
+    [],
+  );
+
+  return (
+    <div className="h-8 w-full bg-brand-bg border border-brand-border">
+      <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="h-full w-full">
+        <defs>
+          <linearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset={`${progress}%`} stopColor="rgba(10, 10, 10, 0.8)" />
+            <stop offset={`${progress}%`} stopColor="rgba(10, 10, 10, 0.2)" />
+          </linearGradient>
+        </defs>
+        {bars.map((height, i) => (
+          <rect
+            key={i}
+            x={(i / bars.length) * 100}
+            y={50 - height * 40}
+            width={100 / bars.length - 0.5}
+            height={height * 80}
+            fill={`url(#${gradientId})`}
+            className={cn(isPlaying && "animate-pulse")}
+          />
+        ))}
+      </svg>
+    </div>
+  );
+}
+
+export function LibraryPanel() {
   const [sounds, setSounds] = useState<LibrarySound[]>([]);
   const [filteredSounds, setFilteredSounds] = useState<LibrarySound[]>([]);
   const [loading, setLoading] = useState(true);
@@ -24,6 +57,11 @@ export function LibraryPanel({ onPlaySound }: LibraryPanelProps) {
   const [selectedGroup, setSelectedGroup] = useState<string>("");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editName, setEditName] = useState("");
+  const [playingId, setPlayingId] = useState<string | null>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const loadLibrary = useCallback(async () => {
     try {
@@ -142,6 +180,56 @@ export function LibraryPanel({ onPlaySound }: LibraryPanelProps) {
     setEditName(sound.name);
   };
 
+  const handlePlay = useCallback((sound: LibrarySound) => {
+    if (playingId === sound.id && isPlaying) {
+      audioRef.current?.pause();
+      setIsPlaying(false);
+      return;
+    }
+
+    if (playingId !== sound.id) {
+      setPlayingId(sound.id);
+      setCurrentTime(0);
+      setDuration(0);
+    }
+
+    // Construct audio URL from library
+    const audioUrl = `/api/library/audio?id=${sound.id}`;
+
+    if (audioRef.current) {
+      audioRef.current.src = audioUrl;
+      audioRef.current.play().catch(console.error);
+    }
+  }, [playingId, isPlaying]);
+
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    const onPlay = () => setIsPlaying(true);
+    const onPause = () => setIsPlaying(false);
+    const onTimeUpdate = () => setCurrentTime(audio.currentTime);
+    const onLoadedMetadata = () => setDuration(audio.duration);
+    const onEnded = () => {
+      setIsPlaying(false);
+      setCurrentTime(0);
+    };
+
+    audio.addEventListener("play", onPlay);
+    audio.addEventListener("pause", onPause);
+    audio.addEventListener("timeupdate", onTimeUpdate);
+    audio.addEventListener("loadedmetadata", onLoadedMetadata);
+    audio.addEventListener("ended", onEnded);
+
+    return () => {
+      audio.removeEventListener("play", onPlay);
+      audio.removeEventListener("pause", onPause);
+      audio.removeEventListener("timeupdate", onTimeUpdate);
+      audio.removeEventListener("loadedmetadata", onLoadedMetadata);
+      audio.removeEventListener("ended", onEnded);
+    };
+  }, []);
+
   const groups = Array.from(new Set(sounds.map((s) => s.group).filter(Boolean))) as string[];
 
   if (loading) {
@@ -223,15 +311,40 @@ export function LibraryPanel({ onPlaySound }: LibraryPanelProps) {
         </div>
       </div>
 
-      {/* Sound List */}
-      <div className="flex flex-col gap-2">
+      {/* Hidden audio element */}
+      <audio ref={audioRef} hidden />
+
+      {/* Sound List - Compact Stacked */}
+      <div className="flex flex-col gap-1">
         {filteredSounds.map((sound) => (
-          <Card
+          <div
             key={sound.id}
-            className="flex flex-col gap-3 p-4 transition hover:border-brand-text"
+            className={cn(
+              "border border-brand-border bg-brand-surface transition",
+              playingId === sound.id && "border-brand-text"
+            )}
           >
-            <div className="flex items-start justify-between gap-3">
-              <div className="flex-1">
+            {/* Main row - always visible */}
+            <div className="flex items-center gap-3 px-3 py-2">
+              {/* Play button */}
+              <button
+                onClick={() => handlePlay(sound)}
+                className="flex h-8 w-8 shrink-0 items-center justify-center border border-brand-border bg-brand-bg hover:border-brand-text"
+              >
+                {playingId === sound.id && isPlaying ? (
+                  <svg width="12" height="12" viewBox="0 0 24 24" className="fill-brand-text">
+                    <rect x="6" y="5" width="4" height="14" />
+                    <rect x="14" y="5" width="4" height="14" />
+                  </svg>
+                ) : (
+                  <svg width="12" height="12" viewBox="0 0 24 24" className="fill-brand-text">
+                    <path d="M6 4l14 8-14 8z" />
+                  </svg>
+                )}
+              </button>
+
+              {/* Name and prompt */}
+              <div className="flex-1 min-w-0">
                 {editingId === sound.id ? (
                   <div className="flex gap-2">
                     <Input
@@ -239,70 +352,75 @@ export function LibraryPanel({ onPlaySound }: LibraryPanelProps) {
                       value={editName}
                       onChange={(e) => setEditName(e.target.value)}
                       onKeyDown={(e) => e.key === "Enter" && handleRename(sound.id)}
-                      className="flex-1"
+                      className="h-6 text-body-sm"
                       autoFocus
                     />
-                    <Button size="sm" onClick={() => handleRename(sound.id)}>
-                      Save
-                    </Button>
-                    <Button size="sm" variant="secondary" onClick={() => setEditingId(null)}>
-                      Cancel
-                    </Button>
+                    <button onClick={() => handleRename(sound.id)} className="text-label text-brand-text">✓</button>
+                    <button onClick={() => setEditingId(null)} className="text-label text-brand-secondary">×</button>
                   </div>
                 ) : (
-                  <h3
-                    className="cursor-pointer text-body-lg font-medium hover:text-brand-accent"
+                  <p
+                    className="text-body-sm font-medium text-brand-text truncate cursor-pointer hover:text-brand-accent"
                     onClick={() => startEditing(sound)}
+                    title={sound.name}
                   >
                     {sound.name}
-                  </h3>
+                  </p>
                 )}
+                <p className="text-body-sm text-brand-secondary truncate">{sound.prompt}</p>
+              </div>
 
-                <p className="mt-1 text-body-sm text-brand-secondary">{sound.prompt}</p>
+              {/* Type badge */}
+              <Badge className="shrink-0">{sound.type}</Badge>
 
-                <div className="mt-2 flex flex-wrap gap-1">
-                  <Badge>
-                    {sound.type}
-                  </Badge>
-                  {sound.group && (
-                    <Badge>
-                      {sound.group}
-                    </Badge>
-                  )}
-                  {sound.tags.map((tag) => (
-                    <Badge key={tag}>
-                      {tag}
-                    </Badge>
-                  ))}
+              {/* Like button */}
+              <button
+                onClick={() => handleToggleLike(sound.id, sound.liked)}
+                className={cn(
+                  "text-body shrink-0",
+                  sound.liked ? "text-brand-text" : "text-brand-secondary hover:text-brand-text"
+                )}
+              >
+                {sound.liked ? "★" : "☆"}
+              </button>
+
+              {/* Download */}
+              <button
+                onClick={() => handleDownload(sound.id)}
+                className="text-label text-brand-secondary hover:text-brand-text"
+              >
+                ↓
+              </button>
+
+              {/* Delete */}
+              <button
+                onClick={() => handleDelete(sound.id)}
+                className="text-label text-brand-secondary hover:text-brand-text"
+              >
+                ×
+              </button>
+            </div>
+
+            {/* Expanded player row - shows when this sound is playing */}
+            {playingId === sound.id && (
+              <div className="border-t border-brand-border px-3 py-2">
+                <div className="flex items-center gap-3">
+                  <span className="text-body-sm text-brand-secondary w-10 text-right">
+                    {secondsToTimecode(currentTime)}
+                  </span>
+                  <div className="flex-1">
+                    <CompactWaveform
+                      isPlaying={isPlaying}
+                      progress={duration > 0 ? (currentTime / duration) * 100 : 0}
+                    />
+                  </div>
+                  <span className="text-body-sm text-brand-secondary w-10">
+                    {secondsToTimecode(duration)}
+                  </span>
                 </div>
               </div>
-
-              <div className="flex flex-col gap-2">
-                <button
-                  onClick={() => handleToggleLike(sound.id, sound.liked)}
-                  className={`text-label uppercase tracking-wider transition ${sound.liked ? "text-brand-text" : "text-brand-secondary hover:text-brand-text"}`}
-                  title={sound.liked ? "Unlike" : "Like"}
-                >
-                  {sound.liked ? "Liked" : "Like"}
-                </button>
-              </div>
-            </div>
-
-            <div className="flex gap-2">
-              <Button size="sm" onClick={() => onPlaySound?.(sound)} className="flex-1">
-                Play
-              </Button>
-              <Button size="sm" variant="secondary" onClick={() => handleDownload(sound.id)}>
-                Download
-              </Button>
-              <Button size="sm" variant="secondary" onClick={() => startEditing(sound)}>
-                Rename
-              </Button>
-              <Button size="sm" variant="secondary" onClick={() => handleDelete(sound.id)}>
-                Delete
-              </Button>
-            </div>
-          </Card>
+            )}
+          </div>
         ))}
       </div>
 
