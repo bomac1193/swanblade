@@ -12,10 +12,10 @@ export function MoodTagPill({ active, className, children, ...props }: MoodTagPi
     <button
       type="button"
       className={cn(
-        "rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] transition-all",
+        "border px-4 py-2 text-label uppercase tracking-wider transition-all",
         active
-          ? "border-emerald-400/60 bg-emerald-500/20 text-white shadow-[0_0_20px_rgba(16,185,129,0.3)]"
-          : "border-white/15 bg-transparent text-white/70 hover:border-white/40 hover:text-white",
+          ? "border-brand-text bg-brand-text text-brand-bg"
+          : "border-brand-border bg-transparent text-brand-secondary hover:border-brand-text hover:text-brand-text",
         className,
       )}
       {...props}

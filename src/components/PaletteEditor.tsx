@@ -52,35 +52,14 @@ export function PaletteEditor({ value, onChange, onCreateFromDNA }: PaletteEdito
     setCustomName("");
   };
 
-  const updateConstraint = (
-    field: keyof SoundPalette["constraints"],
-    index: 0 | 1,
-    newValue: number
-  ) => {
-    if (!value) return;
-
-    const constraints = { ...value.constraints };
-    const current = constraints[field];
-
-    if (current) {
-      const newRange: [number, number] = [...current] as [number, number];
-      newRange[index] = newValue;
-      constraints[field] = newRange;
-    } else {
-      constraints[field] = index === 0 ? [newValue, 100] : [0, newValue];
-    }
-
-    onChange({ ...value, constraints });
-  };
-
   return (
-    <div className="rounded-2xl border border-white/10 bg-black/40 p-4">
+    <div className="border border-brand-border bg-brand-surface p-4">
       <div className="flex items-center justify-between">
-        <p className="text-xs uppercase tracking-[0.35em] text-white/50">Sound Palette</p>
+        <p className="text-label uppercase tracking-wider text-brand-secondary">Sound Palette</p>
         {value && (
           <button
             onClick={() => onChange(null)}
-            className="text-[10px] uppercase tracking-wider text-white/40 hover:text-white/70"
+            className="text-label uppercase tracking-wider text-brand-secondary hover:text-brand-text"
           >
             Clear
           </button>
@@ -91,10 +70,10 @@ export function PaletteEditor({ value, onChange, onCreateFromDNA }: PaletteEdito
       <div className="mt-3 flex flex-wrap gap-2">
         <button
           onClick={() => handlePresetSelect("none")}
-          className={`rounded-full px-3 py-1.5 text-xs font-medium transition ${
+          className={`px-3 py-1.5 text-label uppercase tracking-wider transition ${
             !value
-              ? "bg-emerald-500/80 text-white"
-              : "border border-white/15 text-white/60 hover:text-white"
+              ? "bg-brand-text text-brand-bg"
+              : "border border-brand-border text-brand-secondary hover:border-brand-text hover:text-brand-text"
           }`}
         >
           No Palette
@@ -104,10 +83,10 @@ export function PaletteEditor({ value, onChange, onCreateFromDNA }: PaletteEdito
           <button
             key={id}
             onClick={() => handlePresetSelect(id)}
-            className={`rounded-full px-3 py-1.5 text-xs font-medium transition ${
+            className={`px-3 py-1.5 text-label uppercase tracking-wider transition ${
               value?.name === preset.name
-                ? "bg-emerald-500/80 text-white"
-                : "border border-white/15 text-white/60 hover:text-white"
+                ? "bg-brand-text text-brand-bg"
+                : "border border-brand-border text-brand-secondary hover:border-brand-text hover:text-brand-text"
             }`}
           >
             {preset.name}
@@ -118,16 +97,16 @@ export function PaletteEditor({ value, onChange, onCreateFromDNA }: PaletteEdito
       {/* Saved Palettes */}
       {savedPalettes.length > 0 && (
         <div className="mt-3">
-          <p className="text-[10px] uppercase tracking-wider text-white/40">Saved Palettes</p>
+          <p className="text-label uppercase tracking-wider text-brand-secondary">Saved Palettes</p>
           <div className="mt-2 flex flex-wrap gap-2">
             {savedPalettes.map((p) => (
               <button
                 key={p.id}
                 onClick={() => handleSavedSelect(p.id)}
-                className={`rounded-full px-3 py-1.5 text-xs font-medium transition ${
+                className={`px-3 py-1.5 text-label uppercase tracking-wider transition ${
                   value?.id === p.id
-                    ? "bg-purple-500/80 text-white"
-                    : "border border-purple-400/30 text-purple-300/70 hover:text-purple-200"
+                    ? "bg-brand-accent text-brand-bg"
+                    : "border border-brand-accent/30 text-brand-accent hover:border-brand-accent"
                 }`}
               >
                 {p.name}
@@ -140,16 +119,16 @@ export function PaletteEditor({ value, onChange, onCreateFromDNA }: PaletteEdito
       {/* Current Palette Details */}
       {value && (
         <div className="mt-4 space-y-3">
-          <div className="rounded-xl border border-white/10 bg-black/30 p-3">
-            <p className="text-sm font-medium text-white">{value.name}</p>
-            <p className="mt-1 text-xs text-white/50">{value.description}</p>
+          <div className="border border-brand-border bg-brand-bg p-3">
+            <p className="text-body-lg font-medium text-brand-text">{value.name}</p>
+            <p className="mt-1 text-body-sm text-brand-secondary">{value.description}</p>
 
             {/* Genres & Moods */}
             <div className="mt-2 flex flex-wrap gap-1">
               {value.genres.map((g) => (
                 <span
                   key={g}
-                  className="rounded-full bg-emerald-500/20 px-2 py-0.5 text-[10px] text-emerald-300"
+                  className="bg-brand-text px-2 py-0.5 text-label text-brand-bg"
                 >
                   {g}
                 </span>
@@ -157,7 +136,7 @@ export function PaletteEditor({ value, onChange, onCreateFromDNA }: PaletteEdito
               {value.moods.map((m) => (
                 <span
                   key={m}
-                  className="rounded-full bg-purple-500/20 px-2 py-0.5 text-[10px] text-purple-300"
+                  className="bg-brand-border px-2 py-0.5 text-label text-brand-text"
                 >
                   {m}
                 </span>
@@ -168,13 +147,13 @@ export function PaletteEditor({ value, onChange, onCreateFromDNA }: PaletteEdito
           {/* Constraint Sliders */}
           <button
             onClick={() => setShowCustomEditor(!showCustomEditor)}
-            className="text-xs text-white/50 hover:text-white/70"
+            className="text-body-sm text-brand-secondary hover:text-brand-text"
           >
             {showCustomEditor ? "Hide" : "Edit"} Constraints
           </button>
 
           {showCustomEditor && (
-            <div className="space-y-3 rounded-xl border border-white/10 bg-black/30 p-3">
+            <div className="space-y-3 border border-brand-border bg-brand-bg p-3">
               {/* BPM Range */}
               {value.constraints.bpmRange && (
                 <ConstraintSlider
@@ -230,12 +209,12 @@ export function PaletteEditor({ value, onChange, onCreateFromDNA }: PaletteEdito
                   placeholder="Palette name..."
                   value={customName}
                   onChange={(e) => setCustomName(e.target.value)}
-                  className="flex-1 rounded-lg border border-white/10 bg-black/40 px-3 py-1.5 text-sm text-white placeholder:text-white/30"
+                  className="flex-1 border border-brand-border bg-brand-surface px-3 py-1.5 text-body text-brand-text placeholder:text-brand-secondary focus:border-brand-text focus:outline-none"
                 />
                 <button
                   onClick={savePalette}
                   disabled={!customName.trim()}
-                  className="rounded-lg bg-emerald-500/80 px-4 py-1.5 text-xs font-medium text-white disabled:opacity-50"
+                  className="bg-brand-text px-4 py-1.5 text-label uppercase tracking-wider text-brand-bg disabled:opacity-40"
                 >
                   Save
                 </button>
@@ -249,7 +228,7 @@ export function PaletteEditor({ value, onChange, onCreateFromDNA }: PaletteEdito
       {onCreateFromDNA && (
         <button
           onClick={onCreateFromDNA}
-          className="mt-3 w-full rounded-xl border border-dashed border-white/20 py-2 text-xs text-white/50 hover:border-white/40 hover:text-white/70"
+          className="mt-3 w-full border border-dashed border-brand-border py-2 text-label uppercase tracking-wider text-brand-secondary hover:border-brand-text hover:text-brand-text"
         >
           + Create from Sound DNA
         </button>
@@ -270,8 +249,8 @@ function ConstraintSlider({ label, min, max, value, onChange }: ConstraintSlider
   return (
     <div>
       <div className="flex items-center justify-between">
-        <span className="text-xs text-white/60">{label}</span>
-        <span className="text-xs text-white/40">
+        <span className="text-body-sm text-brand-secondary">{label}</span>
+        <span className="text-body-sm text-brand-secondary">
           {value[0]} - {value[1]}
         </span>
       </div>
@@ -282,7 +261,7 @@ function ConstraintSlider({ label, min, max, value, onChange }: ConstraintSlider
           max={max}
           value={value[0]}
           onChange={(e) => onChange([parseInt(e.target.value), value[1]])}
-          className="flex-1 accent-emerald-400"
+          className="flex-1 accent-brand-text"
         />
         <input
           type="range"
@@ -290,7 +269,7 @@ function ConstraintSlider({ label, min, max, value, onChange }: ConstraintSlider
           max={max}
           value={value[1]}
           onChange={(e) => onChange([value[0], parseInt(e.target.value)])}
-          className="flex-1 accent-emerald-400"
+          className="flex-1 accent-brand-text"
         />
       </div>
     </div>

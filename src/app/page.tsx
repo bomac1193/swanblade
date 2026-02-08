@@ -47,7 +47,7 @@ type ReferenceClip = {
 };
 
 const MAX_REFERENCE_FILES = 3;
-const MAX_REFERENCE_FILE_BYTES = 25 * 1024 * 1024; // 25MB
+const MAX_REFERENCE_FILE_BYTES = 25 * 1024 * 1024;
 const MAX_REFERENCE_FILE_SIZE_LABEL = "25 MB";
 const LENGTH_PRESETS = [5, 12, 30, 60];
 
@@ -85,28 +85,27 @@ function readFileAsBase64(file: File): Promise<string> {
 
 function ReferenceClipCard({ clip, onRemove }: { clip: ReferenceClip; onRemove: (id: string) => void }) {
   return (
-    <div className="rounded-2xl border border-white/10 bg-black/80 px-4 py-3 text-white shadow-[0_10px_30px_rgba(0,0,0,0.4)]">
+    <div className="border border-brand-border bg-brand-surface p-4">
       <div className="flex items-center justify-between gap-3">
         <div>
-          <p className="text-sm font-semibold text-white">{clip.name}</p>
-          <p className="text-[11px] uppercase tracking-[0.3em] text-white/50">{formatDisplayBytes(clip.size)}</p>
+          <p className="text-body font-medium text-brand-text">{clip.name}</p>
+          <p className="uppercase-label text-brand-secondary">{formatDisplayBytes(clip.size)}</p>
         </div>
         <button
           type="button"
           onClick={() => onRemove(clip.id)}
-          className="text-[11px] font-semibold uppercase tracking-[0.4em] text-white/50 transition hover:text-rose-200"
+          className="uppercase-label text-brand-secondary hover:text-brand-text"
         >
           Remove
         </button>
       </div>
-      <div className="mt-2 rounded-xl border border-white/15 bg-black/90 px-3 py-2">
+      <div className="mt-3 border border-brand-border bg-brand-bg p-2">
         <audio
           controls
           src={clip.previewUrl}
           preload="metadata"
           controlsList="nodownload noplaybackrate"
-          className="h-8 w-full accent-white"
-          style={{ colorScheme: "dark" }}
+          className="h-8 w-full"
         />
       </div>
     </div>
@@ -143,9 +142,7 @@ export default function Home() {
 
   const addReferenceFiles = useCallback(
     (fileList: FileList | File[] | null) => {
-      if (!fileList || fileList.length === 0) {
-        return;
-      }
+      if (!fileList || fileList.length === 0) return;
       const allFiles = Array.from(fileList);
       const audioFiles = allFiles.filter((file) => file.type.startsWith("audio/"));
       if (!audioFiles.length) {
@@ -188,9 +185,6 @@ export default function Home() {
       }
       if (oversized.length) {
         toast(`These files exceeded ${MAX_REFERENCE_FILE_SIZE_LABEL}: ${oversized.join(", ")}`, "error");
-      }
-      if (audioFiles.length > accepted.length + oversized.length) {
-        toast("Audio reference limit reached. Remove one to add another.", "neutral");
       }
     },
     [referenceClips.length, toast],
@@ -241,9 +235,7 @@ export default function Home() {
   };
 
   const serializeReferencePayloads = useCallback(async (): Promise<AudioReferencePayload[]> => {
-    if (!referenceClips.length) {
-      return [];
-    }
+    if (!referenceClips.length) return [];
     return Promise.all(
       referenceClips.map(async (clip) => ({
         id: clip.id,
@@ -290,13 +282,10 @@ export default function Home() {
         body: JSON.stringify(currentSound),
       });
 
-      if (!response.ok) {
-        throw new Error("Failed to save to library");
-      }
-
-      toast("Saved to library!", "success");
+      if (!response.ok) throw new Error("Failed to save to library");
+      toast("Saved to library.", "success");
     } catch {
-      toast("Failed to save to library", "error");
+      toast("Failed to save to library.", "error");
     }
   };
 
@@ -307,13 +296,13 @@ export default function Home() {
 
   const runGeneration = async () => {
     if (isGenerating) {
-      toast("Audiogen is still rendering. Please wait.", "neutral");
+      toast("Generation in progress.", "neutral");
       return;
     }
 
     const trimmedPrompt = prompt.trim();
     if (!trimmedPrompt) {
-      toast("Describe the sound or how to treat your references.", "error");
+      toast("Enter a prompt to generate.", "error");
       return;
     }
 
@@ -342,7 +331,6 @@ export default function Home() {
           parameters: requestParameters,
           provider: selectedProvider,
           references: referencePayloads,
-          // Blue Ocean: include palette and game state
           palette: selectedPalette,
           gameState: selectedGameState,
         }),
@@ -355,27 +343,14 @@ export default function Home() {
 
       const data = (await response.json()) as { audioUrl: string; provenanceCid?: string };
       setCurrentSound((prev) =>
-        prev
-          ? {
-              ...prev,
-              audioUrl: data.audioUrl,
-              status: "ready",
-              provenanceCid: data.provenanceCid,
-            }
-          : prev
+        prev ? { ...prev, audioUrl: data.audioUrl, status: "ready", provenanceCid: data.provenanceCid } : prev
       );
-      toast("Audiogen finished rendering.", "success");
+      toast("Generation complete.", "success");
     } catch (error) {
       setCurrentSound((prev) =>
-        prev
-          ? {
-              ...prev,
-              status: "error",
-              errorMessage: error instanceof Error ? error.message : "Unknown error.",
-            }
-          : prev,
+        prev ? { ...prev, status: "error", errorMessage: error instanceof Error ? error.message : "Unknown error." } : prev
       );
-      toast("Generation failed. Try again.", "error");
+      toast("Generation failed.", "error");
     } finally {
       setIsGenerating(false);
     }
@@ -383,12 +358,12 @@ export default function Home() {
 
   const runGameAudioGeneration = async () => {
     if (isGenerating) {
-      toast("Generation in progress. Please wait.", "neutral");
+      toast("Generation in progress.", "neutral");
       return;
     }
 
     if (!selectedGameState) {
-      toast("Select a game state first.", "error");
+      toast("Select a game state.", "error");
       return;
     }
 
@@ -412,80 +387,85 @@ export default function Home() {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error ?? "Game audio generation failed");
+        throw new Error(errorData.error ?? "Generation failed");
       }
 
       const data = await response.json();
       if (data.success && data.bundle) {
         setCurrentBundle(data.bundle);
-        toast(`Generated ${data.bundle.stems.length} stems for ${selectedGameState}!`, "success");
-        if (data.warnings?.length) {
-          toast(`Warnings: ${data.warnings.join(", ")}`, "neutral");
-        }
+        toast(`Generated ${data.bundle.stems.length} stems.`, "success");
       } else {
         throw new Error(data.error || "Unknown error");
       }
     } catch (error) {
-      toast(error instanceof Error ? error.message : "Generation failed", "error");
+      toast(error instanceof Error ? error.message : "Generation failed.", "error");
     } finally {
       setIsGenerating(false);
     }
   };
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-black text-white">
-      <div className="pointer-events-none absolute inset-0 flex items-center justify-center px-4">
-        <div className="h-[88%] w-full max-w-5xl rounded-[40px] border border-white/10 bg-gradient-to-b from-zinc-950 via-black to-black shadow-[0_35px_120px_rgba(0,0,0,0.8)]" />
-      </div>
-      <main className="relative z-10 flex min-h-screen flex-col items-center justify-center px-4 pb-16 pt-28 text-center">
-        <div className="flex w-full max-w-5xl flex-col items-center gap-8">
-          <div>
-            <p className="text-xs uppercase tracking-[0.5em] text-emerald-300">Swanblade</p>
-            <h1 className="mt-4 text-2xl font-semibold sm:text-3xl">Burn the square. Birth the Strange.</h1>
-          </div>
-
-          {/* Mode Toggle */}
-          <div className="flex gap-3">
-            <button
-              onClick={() => setMode("generate")}
-              className={`rounded-lg px-4 py-2 text-sm font-medium transition ${
-                mode === "generate" ? "bg-emerald-500 text-white" : "bg-black/40 text-white/60 hover:text-white"
-              }`}
-            >
-              Generate
-            </button>
-            <button
-              onClick={() => setMode("game-audio")}
-              className={`rounded-lg px-4 py-2 text-sm font-medium transition ${
-                mode === "game-audio" ? "bg-purple-500 text-white" : "bg-black/40 text-white/60 hover:text-white"
-              }`}
-            >
-              Game Audio
-            </button>
-            <button
-              onClick={() => setMode("library")}
-              className={`rounded-lg px-4 py-2 text-sm font-medium transition ${
-                mode === "library" ? "bg-emerald-500 text-white" : "bg-black/40 text-white/60 hover:text-white"
-              }`}
-            >
-              Library
-            </button>
-          </div>
-
-          {mode === "library" ? (
-            <div className="w-full rounded-3xl border border-white/10 bg-black/40 p-6 backdrop-blur-2xl">
-              <LibraryPanel onPlaySound={handlePlayLibrarySound} />
+    <div className="min-h-screen bg-brand-bg text-brand-text">
+      {/* Header */}
+      <header className="border-b border-brand-border">
+        <div className="mx-auto max-w-container px-6 py-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="uppercase-label text-brand-secondary">Sound Generation</p>
+              <h1 className="mt-1 font-display text-display-lg">Swanblade</h1>
             </div>
-          ) : mode === "game-audio" ? (
-            /* Game Audio Mode */
-            <>
-              <div className="w-full rounded-3xl border border-white/10 bg-black/50 p-6 backdrop-blur-3xl">
-                <p className="text-xs uppercase tracking-[0.3em] text-white/40">Game Audio Generator</p>
-                <p className="mt-2 text-sm text-white/60">
-                  Generate coherent stem bundles for specific game states with optional palette constraints.
-                </p>
 
-                {/* Game State Selector */}
+            {/* Mode Toggle */}
+            <nav className="flex gap-1 border border-brand-border">
+              <button
+                onClick={() => setMode("generate")}
+                className={`px-4 py-2 uppercase-label transition ${
+                  mode === "generate"
+                    ? "bg-brand-text text-brand-bg"
+                    : "bg-transparent text-brand-secondary hover:text-brand-text"
+                }`}
+              >
+                Generate
+              </button>
+              <button
+                onClick={() => setMode("game-audio")}
+                className={`px-4 py-2 uppercase-label transition ${
+                  mode === "game-audio"
+                    ? "bg-brand-text text-brand-bg"
+                    : "bg-transparent text-brand-secondary hover:text-brand-text"
+                }`}
+              >
+                Game Audio
+              </button>
+              <button
+                onClick={() => setMode("library")}
+                className={`px-4 py-2 uppercase-label transition ${
+                  mode === "library"
+                    ? "bg-brand-text text-brand-bg"
+                    : "bg-transparent text-brand-secondary hover:text-brand-text"
+                }`}
+              >
+                Library
+              </button>
+            </nav>
+          </div>
+        </div>
+      </header>
+
+      <main className="mx-auto max-w-container px-6 py-8">
+        {mode === "library" ? (
+          <div className="card">
+            <LibraryPanel onPlaySound={handlePlayLibrarySound} />
+          </div>
+        ) : mode === "game-audio" ? (
+          <div className="grid gap-6 lg:grid-cols-2">
+            {/* Left: Controls */}
+            <div className="space-y-6">
+              <div className="card">
+                <h4 className="text-heading-sm text-brand-text">Game State</h4>
+                <p className="mt-1 text-body-sm text-brand-secondary">
+                  Generate coherent stem bundles for specific game contexts.
+                </p>
                 <div className="mt-4">
                   <GameStateSelector
                     value={selectedGameState}
@@ -493,56 +473,62 @@ export default function Home() {
                     showDetails={true}
                   />
                 </div>
+              </div>
 
-                {/* Palette Editor */}
+              <div className="card">
+                <h4 className="text-heading-sm text-brand-text">Sound Palette</h4>
+                <p className="mt-1 text-body-sm text-brand-secondary">
+                  Constrain generation to a consistent aesthetic.
+                </p>
                 <div className="mt-4">
-                  <PaletteEditor
-                    value={selectedPalette}
-                    onChange={setSelectedPalette}
+                  <PaletteEditor value={selectedPalette} onChange={setSelectedPalette} />
+                </div>
+              </div>
+
+              <div className="card">
+                <h4 className="text-heading-sm text-brand-text">Parameters</h4>
+
+                {/* Duration */}
+                <div className="mt-4">
+                  <p className="uppercase-label text-brand-secondary">Duration</p>
+                  <div className="mt-2 flex gap-2">
+                    {[15, 30, 60].map((value) => (
+                      <button
+                        key={value}
+                        onClick={() => setLengthSeconds(value)}
+                        className={`px-4 py-2 uppercase-label transition ${
+                          lengthSeconds === value
+                            ? "bg-brand-text text-brand-bg"
+                            : "border border-brand-border text-brand-secondary hover:border-brand-text hover:text-brand-text"
+                        }`}
+                      >
+                        {value}s
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Provider */}
+                <div className="mt-4">
+                  <ProviderSelector
+                    value={selectedProvider}
+                    onChange={handleProviderChange}
+                    prompt=""
+                    recommendation={recommendedProvider}
+                    isAuto={!providerPinned}
+                    onResetAuto={providerPinned ? resetProviderToAuto : undefined}
+                    durationSeconds={lengthSeconds}
+                    hasReferences={false}
                   />
                 </div>
 
-                {/* Duration & Provider */}
-                <div className="mt-4 grid grid-cols-2 gap-4">
-                  <div className="text-left">
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.4em] text-white/50">Duration</p>
-                    <div className="mt-2 flex flex-wrap gap-2">
-                      {[15, 30, 60].map((value) => (
-                        <button
-                          key={value}
-                          type="button"
-                          onClick={() => setLengthSeconds(value)}
-                          className={`rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-wider transition ${
-                            lengthSeconds === value
-                              ? "bg-purple-500/80 text-white"
-                              : "border border-white/15 text-white/60 hover:text-white"
-                          }`}
-                        >
-                          {value}s
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                  <div>
-                    <ProviderSelector
-                      value={selectedProvider}
-                      onChange={handleProviderChange}
-                      prompt=""
-                      recommendation={recommendedProvider}
-                      isAuto={!providerPinned}
-                      onResetAuto={providerPinned ? resetProviderToAuto : undefined}
-                      durationSeconds={lengthSeconds}
-                      hasReferences={false}
-                    />
-                  </div>
-                </div>
-
-                {/* Optional Base Prompt */}
+                {/* Optional Prompt */}
                 <div className="mt-4">
+                  <p className="uppercase-label text-brand-secondary">Style Keywords (Optional)</p>
                   <textarea
-                    className="w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white placeholder:text-white/40 focus:border-purple-400/60 focus:outline-none"
+                    className="input-field mt-2"
                     rows={2}
-                    placeholder="Optional: Add style keywords (e.g., 'orchestral, epic, brass')..."
+                    placeholder="e.g., orchestral, epic, brass..."
                     value={prompt}
                     onChange={(e) => setPrompt(e.target.value)}
                     disabled={isGenerating}
@@ -550,84 +536,115 @@ export default function Home() {
                 </div>
 
                 {/* Generate Button */}
-                <div className="mt-4 flex justify-end">
+                <div className="mt-6">
                   <button
                     onClick={runGameAudioGeneration}
                     disabled={isGenerating || !selectedGameState}
-                    className="relative inline-flex items-center justify-center rounded-full font-medium uppercase tracking-wide transition-all focus-visible:outline-none focus-visible:ring-2 disabled:opacity-60 disabled:cursor-not-allowed bg-purple-500/80 text-white hover:bg-purple-400 focus-visible:ring-purple-300 h-11 px-5 text-sm"
+                    className="btn-primary w-full"
                   >
-                    <span className="flex items-center gap-2">
-                      <span>{isGenerating ? "Generating Stems..." : "Generate Stem Bundle"}</span>
-                    </span>
+                    {isGenerating ? "Generating..." : "Generate Stem Bundle"}
                   </button>
                 </div>
               </div>
+            </div>
 
-              {/* Bundle Result */}
-              {currentBundle && (
-                <div className="w-full rounded-3xl border border-white/10 bg-black/40 p-6 backdrop-blur-2xl">
-                  <div className="flex items-center justify-between">
+            {/* Right: Result */}
+            <div className="card">
+              <h4 className="text-heading-sm text-brand-text">Output</h4>
+
+              {currentBundle ? (
+                <div className="mt-4">
+                  <div className="flex items-center justify-between border-b border-brand-border pb-3">
                     <div>
-                      <p className="text-xs uppercase tracking-[0.3em] text-white/40">Stem Bundle</p>
-                      <h2 className="mt-1 text-xl font-semibold capitalize">{currentBundle.gameState} Bundle</h2>
+                      <p className="text-heading-sm capitalize">{currentBundle.gameState} Bundle</p>
+                      <p className="text-body-sm text-brand-secondary">
+                        {currentBundle.stems.length} stems generated
+                      </p>
                     </div>
-                    <span className="rounded-full bg-purple-500/20 px-3 py-1 text-xs text-purple-300">
-                      {currentBundle.stems.length} stems
-                    </span>
                   </div>
 
                   <div className="mt-4 space-y-3">
                     {currentBundle.stems.map((stem) => (
-                      <div
-                        key={stem.stemType}
-                        className="flex items-center gap-4 rounded-xl border border-white/10 bg-black/30 p-3"
-                      >
-                        <div className="flex-1">
-                          <p className="text-sm font-medium capitalize text-white">{stem.stemType}</p>
-                          <p className="text-xs text-white/50">
-                            {stem.duration}s | {stem.metadata.bpm} BPM
-                            {stem.provenanceCid && (
-                              <span className="ml-2 text-emerald-400">✓ Provenance</span>
-                            )}
-                          </p>
+                      <div key={stem.stemType} className="border border-brand-border p-3">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-body font-medium capitalize">{stem.stemType}</p>
+                            <p className="text-body-sm text-brand-secondary">
+                              {stem.duration}s · {stem.metadata.bpm} BPM
+                              {stem.provenanceCid && " · Provenance verified"}
+                            </p>
+                          </div>
                         </div>
-                        <audio
-                          controls
-                          src={stem.audioUrl}
-                          preload="metadata"
-                          controlsList="nodownload noplaybackrate"
-                          className="h-8 w-48 accent-purple-400"
-                          style={{ colorScheme: "dark" }}
-                        />
+                        <div className="mt-2">
+                          <audio
+                            controls
+                            src={stem.audioUrl}
+                            preload="metadata"
+                            controlsList="nodownload noplaybackrate"
+                            className="h-8 w-full"
+                          />
+                        </div>
                       </div>
                     ))}
                   </div>
 
-                  {/* Manifest Info */}
-                  <div className="mt-4 rounded-xl border border-white/10 bg-black/20 p-3">
-                    <p className="text-xs text-white/50">
-                      Bundle ID: {currentBundle.id} | Created: {new Date(currentBundle.createdAt).toLocaleString()}
+                  <div className="mt-4 border-t border-brand-border pt-4">
+                    <p className="text-body-sm text-brand-secondary">
+                      Bundle ID: {currentBundle.id}
                     </p>
-                    {currentBundle.manifest.provenance.identityId && (
-                      <p className="mt-1 text-xs text-emerald-400">
-                        Identity: {currentBundle.manifest.provenance.identityId}
-                      </p>
-                    )}
                   </div>
                 </div>
+              ) : (
+                <div className="mt-4 py-12 text-center">
+                  <p className="text-body text-brand-secondary">
+                    Select a game state and generate to create a stem bundle.
+                  </p>
+                </div>
               )}
-            </>
-          ) : (
-            /* Generate Mode */
-            <>
-              {/* Combined Prompt Composer with Provider Selection */}
-              <div className="w-full rounded-3xl border border-white/10 bg-black/50 p-6 backdrop-blur-3xl">
-                <p className="text-xs uppercase tracking-[0.3em] text-white/40">Prompt Composer</p>
+            </div>
+          </div>
+        ) : (
+          /* Generate Mode */
+          <div className="grid gap-6 lg:grid-cols-2">
+            {/* Left: Controls */}
+            <div className="space-y-6">
+              {/* Prompt */}
+              <div className="card">
+                <h4 className="text-heading-sm text-brand-text">Prompt</h4>
+                <textarea
+                  className="input-field mt-3"
+                  rows={4}
+                  placeholder="Describe the sound you want to generate..."
+                  value={prompt}
+                  onChange={(e) => setPrompt(e.target.value)}
+                  disabled={isGenerating}
+                />
 
-                {/* Reference Dropzone */}
+                {/* Suggestions */}
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {PROMPT_SUGGESTIONS.map((suggestion) => (
+                    <button
+                      key={suggestion}
+                      type="button"
+                      onClick={() => setPrompt(suggestion)}
+                      className="btn-secondary px-3 py-1.5 text-[10px]"
+                    >
+                      {suggestion}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* References */}
+              <div className="card">
+                <h4 className="text-heading-sm text-brand-text">Audio References</h4>
+                <p className="mt-1 text-body-sm text-brand-secondary">
+                  Upload audio files as inspiration for generation.
+                </p>
+
                 <div
-                  className={`mt-4 rounded-2xl border-2 border-dashed px-5 py-6 text-left transition ${
-                    isDraggingReference ? "border-emerald-400/70 bg-emerald-500/10" : "border-white/15 bg-black/30"
+                  className={`mt-4 border-2 border-dashed p-6 text-center transition ${
+                    isDraggingReference ? "border-brand-text bg-brand-surface" : "border-brand-border"
                   }`}
                   onDragOver={handleDragOver}
                   onDragLeave={handleDragLeave}
@@ -641,41 +658,36 @@ export default function Home() {
                     className="hidden"
                     onChange={handleFileInputChange}
                   />
-                  <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                    <div>
-                      <p className="text-xs uppercase tracking-[0.35em] text-white/50">Audio References</p>
-                      <p className="text-sm text-white/70">
-                        Drag WAV/MP3 inspiration here or upload up to {MAX_REFERENCE_FILES} clips (
-                        {MAX_REFERENCE_FILE_SIZE_LABEL} max each).
-                      </p>
-                    </div>
+                  <p className="text-body-sm text-brand-secondary">
+                    Drag audio files here or{" "}
                     <button
                       type="button"
                       onClick={openFilePicker}
-                      className="self-start rounded-full border border-white/30 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-white transition hover:border-emerald-400 hover:text-emerald-200"
+                      className="text-brand-text underline"
                     >
-                      Upload
+                      browse
                     </button>
-                  </div>
-
-                  {referenceClips.length ? (
-                    <div className="mt-4 space-y-3">
-                      {referenceClips.map((clip) => (
-                        <ReferenceClipCard key={clip.id} clip={clip} onRemove={removeReference} />
-                      ))}
-                      <p className="text-xs text-white/50">
-                        Swanblade mutates these stems according to your prompt. Reference order influences weight.
-                      </p>
-                    </div>
-                  ) : (
-                    <p className="mt-4 text-sm text-white/60">
-                      Drop stems, full songs, or raw textures. Swanblade will treat them as DNA to warp per your prompt.
-                    </p>
-                  )}
+                  </p>
+                  <p className="mt-1 text-body-sm text-brand-secondary">
+                    Up to {MAX_REFERENCE_FILES} files, {MAX_REFERENCE_FILE_SIZE_LABEL} max each
+                  </p>
                 </div>
 
-                {/* Provider Selector */}
-                <div className="mt-3">
+                {referenceClips.length > 0 && (
+                  <div className="mt-4 space-y-3">
+                    {referenceClips.map((clip) => (
+                      <ReferenceClipCard key={clip.id} clip={clip} onRemove={removeReference} />
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Parameters */}
+              <div className="card">
+                <h4 className="text-heading-sm text-brand-text">Parameters</h4>
+
+                {/* Provider */}
+                <div className="mt-4">
                   <ProviderSelector
                     value={selectedProvider}
                     onChange={handleProviderChange}
@@ -688,173 +700,156 @@ export default function Home() {
                   />
                 </div>
 
-                {/* Advanced Options Toggle */}
-                <button
-                  onClick={() => setShowAdvanced(!showAdvanced)}
-                  className="mt-3 text-xs text-white/50 hover:text-white/70"
-                >
-                  {showAdvanced ? "▼ Hide" : "▶ Show"} Palette & Game State Options
-                </button>
-
-                {/* Blue Ocean: Palette & Game State */}
-                {showAdvanced && (
-                  <div className="mt-3 grid gap-4 md:grid-cols-2">
-                    <PaletteEditor
-                      value={selectedPalette}
-                      onChange={setSelectedPalette}
-                    />
-                    <GameStateSelector
-                      value={selectedGameState}
-                      onChange={setSelectedGameState}
-                      showDetails={false}
-                    />
+                {/* Duration */}
+                <div className="mt-4">
+                  <p className="uppercase-label text-brand-secondary">Duration</p>
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {LENGTH_PRESETS.map((value) => (
+                      <button
+                        key={value}
+                        onClick={() => setLengthSeconds(value)}
+                        className={`px-4 py-2 uppercase-label transition ${
+                          lengthSeconds === value
+                            ? "bg-brand-text text-brand-bg"
+                            : "border border-brand-border text-brand-secondary hover:border-brand-text hover:text-brand-text"
+                        }`}
+                      >
+                        {value < 60 ? `${value}s` : `${value / 60}m`}
+                      </button>
+                    ))}
+                    <div className="flex items-center border border-brand-border px-3 py-2">
+                      <input
+                        type="number"
+                        min={2}
+                        max={120}
+                        value={lengthSeconds}
+                        onChange={(e) => setLengthSeconds(Math.max(2, Math.min(120, Number(e.target.value))))}
+                        className="w-12 bg-transparent text-center text-body text-brand-text focus:outline-none"
+                      />
+                      <span className="ml-1 text-body-sm text-brand-secondary">s</span>
+                    </div>
                   </div>
-                )}
+                </div>
 
-                {/* Active Constraints Badge */}
+                {/* Advanced: Palette & Game State */}
+                <div className="mt-4">
+                  <button
+                    onClick={() => setShowAdvanced(!showAdvanced)}
+                    className="uppercase-label text-brand-secondary hover:text-brand-text"
+                  >
+                    {showAdvanced ? "- Hide" : "+ Show"} Advanced Options
+                  </button>
+
+                  {showAdvanced && (
+                    <div className="mt-4 space-y-4 border-t border-brand-border pt-4">
+                      <div>
+                        <p className="uppercase-label text-brand-secondary">Sound Palette</p>
+                        <div className="mt-2">
+                          <PaletteEditor value={selectedPalette} onChange={setSelectedPalette} />
+                        </div>
+                      </div>
+                      <div>
+                        <p className="uppercase-label text-brand-secondary">Game State</p>
+                        <div className="mt-2">
+                          <GameStateSelector value={selectedGameState} onChange={setSelectedGameState} showDetails={false} />
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Active Constraints */}
                 {(selectedPalette || selectedGameState) && (
-                  <div className="mt-3 flex flex-wrap gap-2">
+                  <div className="mt-4 flex flex-wrap gap-2 border-t border-brand-border pt-4">
                     {selectedPalette && (
-                      <span className="rounded-full bg-emerald-500/20 px-3 py-1 text-xs text-emerald-300">
+                      <span className="border border-brand-border px-2 py-1 text-body-sm">
                         Palette: {selectedPalette.name}
                       </span>
                     )}
                     {selectedGameState && (
-                      <span className="rounded-full bg-purple-500/20 px-3 py-1 text-xs capitalize text-purple-300">
+                      <span className="border border-brand-border px-2 py-1 text-body-sm capitalize">
                         State: {selectedGameState}
                       </span>
                     )}
                   </div>
                 )}
 
-                {/* Length Selector */}
-                <div className="mt-4 text-left">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.4em] text-white/50">Length</p>
-                  <div className="mt-2 flex flex-wrap gap-2">
-                    {LENGTH_PRESETS.map((value) => (
-                      <button
-                        key={value}
-                        type="button"
-                        onClick={() => setLengthSeconds(value)}
-                        className={`rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-wider transition ${
-                          lengthSeconds === value
-                            ? "bg-emerald-500/80 text-white"
-                            : "border border-white/15 text-white/60 hover:text-white"
-                        }`}
-                      >
-                        {value < 60 ? `${value}s` : `${value / 60}m`}
-                      </button>
-                    ))}
-                    <div className="flex items-center gap-2 rounded-full border border-white/15 px-3 py-1.5 text-xs text-white/70">
-                      <span>Custom</span>
-                      <input
-                        type="number"
-                        min={2}
-                        max={120}
-                        value={lengthSeconds}
-                        onChange={(event) => setLengthSeconds(Math.max(2, Math.min(120, Number(event.target.value))))}
-                        className="w-16 bg-transparent text-right text-sm text-white focus:outline-none"
-                      />
-                      <span>s</span>
-                    </div>
-                  </div>
-                  <p className="mt-2 text-xs text-white/50">Swanblade will keep the texture alive for the entire duration.</p>
-                </div>
-
-                {/* Prompt Input */}
-                <textarea
-                  className="mt-3 w-full rounded-3xl border border-white/10 bg-black/40 px-6 py-5 text-base text-white leading-relaxed placeholder:text-white/40 focus:border-emerald-400/60 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 disabled:opacity-60"
-                  rows={3}
-                  placeholder="Describe the sound or how to transform your references…"
-                  value={prompt}
-                  onChange={(e) => setPrompt(e.target.value)}
-                  disabled={isGenerating}
-                />
-
-                {/* Suggestions */}
-                <div className="mt-3 flex flex-wrap gap-2">
-                  {PROMPT_SUGGESTIONS.map((suggestion) => (
-                    <button
-                      key={suggestion}
-                      type="button"
-                      onClick={() => setPrompt(suggestion)}
-                      className="rounded-full border border-white/15 px-4 py-2 text-xs text-white/70 transition hover:border-emerald-400/60 hover:text-white"
-                    >
-                      {suggestion}
-                    </button>
-                  ))}
-                </div>
-
                 {/* Generate Button */}
-                <div className="mt-4 flex justify-end">
+                <div className="mt-6">
                   <button
                     onClick={runGeneration}
                     disabled={isGenerating}
-                    className="relative inline-flex items-center justify-center rounded-full font-medium uppercase tracking-wide transition-all focus-visible:outline-none focus-visible:ring-2 disabled:opacity-60 disabled:cursor-not-allowed bg-emerald-500/80 text-white hover:bg-emerald-400 focus-visible:ring-emerald-300 h-11 px-5 text-sm"
+                    className="btn-primary w-full"
                   >
-                    <span className="flex items-center gap-2">
-                      <span>{isGenerating ? "Generating..." : "Generate Sound"}</span>
-                    </span>
+                    {isGenerating ? "Generating..." : "Generate Sound"}
                   </button>
                 </div>
               </div>
+            </div>
 
-              {/* Sound Result */}
-              <div className="w-full rounded-3xl border border-white/10 bg-black/40 p-6 backdrop-blur-2xl">
-                {currentSound ? (
-                  <>
-                    <p className="text-xs uppercase tracking-[0.3em] text-white/40">{currentSound.status}</p>
-                    <h2 className="mt-2 text-2xl font-semibold">{currentSound.name}</h2>
-                    <p className="mt-1 text-sm text-white/60">{currentSound.prompt}</p>
+            {/* Right: Result */}
+            <div className="card">
+              <h4 className="text-heading-sm text-brand-text">Output</h4>
 
-                    {/* Provenance Badge */}
+              {currentSound ? (
+                <div className="mt-4">
+                  <div className="border-b border-brand-border pb-4">
+                    <p className="uppercase-label text-brand-secondary">{currentSound.status}</p>
+                    <h3 className="mt-1 font-display text-display-md">{currentSound.name}</h3>
+                    <p className="mt-2 text-body text-brand-secondary">{currentSound.prompt}</p>
+
                     {currentSound.provenanceCid && (
-                      <div className="mt-2 inline-flex items-center gap-2 rounded-full bg-emerald-500/20 px-3 py-1">
-                        <span className="text-xs text-emerald-400">✓ Provenance Stamped</span>
-                        <span className="text-[10px] text-emerald-400/60 font-mono">
-                          {currentSound.provenanceCid.slice(0, 12)}...
+                      <div className="mt-2">
+                        <span className="border border-brand-border px-2 py-1 text-body-sm">
+                          Provenance: {currentSound.provenanceCid.slice(0, 16)}...
                         </span>
                       </div>
                     )}
-
-                    <div className="mt-6">
-                      <WaveformPlaceholder isActive={currentSound.status === "ready"} isLoading={currentSound.status === "pending"} />
-                    </div>
-
-                    {currentSound.status === "error" ? (
-                      <div className="mt-4 rounded-2xl border border-red-400/30 bg-red-950/40 px-4 py-3 text-sm text-red-200">
-                        {currentSound.errorMessage ?? "Generation failed. Try again."}
-                      </div>
-                    ) : (
-                      <div className="mt-6 flex flex-col gap-3">
-                        <AudioPlayerControls
-                          key={currentSound.audioUrl ?? currentSound.id}
-                          audioUrl={currentSound.audioUrl}
-                          disabled={currentSound.status !== "ready"}
-                        />
-                        <button
-                          onClick={saveToLibrary}
-                          disabled={currentSound.status !== "ready"}
-                          className="w-full rounded-xl bg-emerald-600 px-4 py-3 font-medium text-white transition hover:bg-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                          Save to Library
-                        </button>
-                      </div>
-                    )}
-                  </>
-                ) : (
-                  <div className="flex flex-col items-center gap-2 py-8 text-sm text-white/60">
-                    <p>Cinematic silence.</p>
-                    <p>Prompt me and I&apos;ll paint a waveform.</p>
                   </div>
-                )}
-              </div>
-            </>
-          )}
-        </div>
+
+                  <div className="mt-4">
+                    <WaveformPlaceholder
+                      isActive={currentSound.status === "ready"}
+                      isLoading={currentSound.status === "pending"}
+                    />
+                  </div>
+
+                  {currentSound.status === "error" ? (
+                    <div className="mt-4 border border-status-error bg-status-error/5 p-4">
+                      <p className="text-body text-status-error">
+                        {currentSound.errorMessage ?? "Generation failed."}
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="mt-4 space-y-3">
+                      <AudioPlayerControls
+                        key={currentSound.audioUrl ?? currentSound.id}
+                        audioUrl={currentSound.audioUrl}
+                        disabled={currentSound.status !== "ready"}
+                      />
+                      <button
+                        onClick={saveToLibrary}
+                        disabled={currentSound.status !== "ready"}
+                        className="btn-secondary w-full"
+                      >
+                        Save to Library
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="mt-4 py-12 text-center">
+                  <p className="text-body text-brand-secondary">
+                    Enter a prompt and generate to create audio.
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </main>
 
-      <ToastStack items={toasts} onDismiss={(id) => setToasts((prev) => prev.filter((toast) => toast.id !== id))} />
+      <ToastStack items={toasts} onDismiss={(id) => setToasts((prev) => prev.filter((t) => t.id !== id))} />
     </div>
   );
 }

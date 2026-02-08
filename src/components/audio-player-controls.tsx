@@ -120,21 +120,21 @@ export function AudioPlayerControls({ audioUrl, disabled }: AudioPlayerControlsP
   };
 
   return (
-    <div className={cn("rounded-3xl border border-white/10 bg-black/30 p-6", disabled && "opacity-60")}>
+    <div className={cn("border border-brand-border bg-brand-bg p-6", disabled && "opacity-40")}>
       <div className="flex items-center gap-4">
         <button
           type="button"
           onClick={togglePlay}
           disabled={!audioUrl || disabled}
-          className="flex h-16 w-16 items-center justify-center rounded-2xl border border-white/15 bg-white/5 transition hover:border-emerald-400/60"
+          className="flex h-14 w-14 items-center justify-center border border-brand-border bg-brand-surface transition hover:border-brand-text"
         >
           {isPlaying ? (
-            <svg width="26" height="26" viewBox="0 0 24 24" className="fill-white">
-              <rect x="6" y="5" width="4" height="14" rx="1" />
-              <rect x="14" y="5" width="4" height="14" rx="1" />
+            <svg width="24" height="24" viewBox="0 0 24 24" className="fill-brand-text">
+              <rect x="6" y="5" width="4" height="14" />
+              <rect x="14" y="5" width="4" height="14" />
             </svg>
           ) : (
-            <svg width="26" height="26" viewBox="0 0 24 24" className="fill-white">
+            <svg width="24" height="24" viewBox="0 0 24 24" className="fill-brand-text">
               <path d="M6 4l14 8-14 8z" />
             </svg>
           )}
@@ -148,9 +148,9 @@ export function AudioPlayerControls({ audioUrl, disabled }: AudioPlayerControlsP
             value={currentTime}
             disabled={!audioUrl || disabled}
             onChange={(event) => handleSeek(parseFloat(event.target.value))}
-            className="h-2 w-full cursor-pointer appearance-none rounded-full bg-white/10 accent-emerald-400 [&::-webkit-slider-thumb]:h-3.5 [&::-webkit-slider-thumb]:w-3.5 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-emerald-400 [&::-moz-range-thumb]:h-3.5 [&::-moz-range-thumb]:w-3.5 [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-emerald-400"
+            className="h-1 w-full cursor-pointer appearance-none bg-brand-border accent-brand-text [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:bg-brand-text [&::-moz-range-thumb]:h-3 [&::-moz-range-thumb]:w-3 [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:bg-brand-text"
           />
-          <div className="flex items-center justify-between text-xs text-white/60">
+          <div className="flex items-center justify-between text-body-sm text-brand-secondary">
             <span>{secondsToTimecode(currentTime)}</span>
             <span>{secondsToTimecode(duration)}</span>
           </div>
@@ -159,11 +159,11 @@ export function AudioPlayerControls({ audioUrl, disabled }: AudioPlayerControlsP
           type="button"
           onClick={() => setLoop((prev) => !prev)}
           className={cn(
-            "ml-4 flex h-12 w-12 items-center justify-center rounded-xl border border-white/15 transition",
-            loop ? "border-emerald-400/60 bg-emerald-500/20" : "bg-transparent",
+            "ml-4 flex h-10 w-10 items-center justify-center border border-brand-border transition",
+            loop ? "bg-brand-text" : "bg-transparent",
           )}
         >
-          <svg width="24" height="24" viewBox="0 0 24 24" className="stroke-current text-white" fill="none" strokeWidth={1.6}>
+          <svg width="20" height="20" viewBox="0 0 24 24" className={cn("stroke-current", loop ? "text-brand-bg" : "text-brand-text")} fill="none" strokeWidth={1.6}>
             <polyline points="17 1 21 5 17 9" />
             <path d="M3 11v-1a4 4 0 014-4h14" />
             <polyline points="7 23 3 19 7 15" />

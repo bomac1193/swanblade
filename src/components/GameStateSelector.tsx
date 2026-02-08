@@ -8,21 +8,6 @@ interface GameStateSelectorProps {
   showDetails?: boolean;
 }
 
-const GAME_STATE_ICONS: Record<GameState, string> = {
-  menu: "🎮",
-  exploration: "🗺️",
-  combat: "⚔️",
-  boss: "👹",
-  victory: "🏆",
-  defeat: "💀",
-  stealth: "🥷",
-  ambient: "🌙",
-  tension: "😰",
-  chase: "🏃",
-  cutscene: "🎬",
-  credits: "📜",
-};
-
 const GAME_STATE_CATEGORIES = {
   Core: ["menu", "exploration", "ambient"] as GameState[],
   Action: ["combat", "boss", "chase", "stealth"] as GameState[],
@@ -38,13 +23,13 @@ export function GameStateSelector({
   const selectedConfig = value ? GAME_STATE_CONFIGS[value] : null;
 
   return (
-    <div className="rounded-2xl border border-white/10 bg-black/40 p-4">
+    <div className="border border-brand-border bg-brand-surface p-4">
       <div className="flex items-center justify-between">
-        <p className="text-xs uppercase tracking-[0.35em] text-white/50">Game State</p>
+        <p className="text-label uppercase tracking-wider text-brand-secondary">Game State</p>
         {value && (
           <button
             onClick={() => onChange(null)}
-            className="text-[10px] uppercase tracking-wider text-white/40 hover:text-white/70"
+            className="text-label uppercase tracking-wider text-brand-secondary hover:text-brand-text"
           >
             Clear
           </button>
@@ -55,20 +40,19 @@ export function GameStateSelector({
       <div className="mt-3 space-y-3">
         {Object.entries(GAME_STATE_CATEGORIES).map(([category, states]) => (
           <div key={category}>
-            <p className="text-[10px] uppercase tracking-wider text-white/30">{category}</p>
+            <p className="text-label uppercase tracking-wider text-brand-secondary/60">{category}</p>
             <div className="mt-1 flex flex-wrap gap-2">
               {states.map((state) => (
                 <button
                   key={state}
                   onClick={() => onChange(value === state ? null : state)}
-                  className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition ${
+                  className={`px-3 py-1.5 text-label uppercase tracking-wider transition ${
                     value === state
-                      ? "bg-emerald-500/80 text-white"
-                      : "border border-white/15 text-white/60 hover:border-emerald-400/40 hover:text-white"
+                      ? "bg-brand-text text-brand-bg"
+                      : "border border-brand-border text-brand-secondary hover:border-brand-text hover:text-brand-text"
                   }`}
                 >
-                  <span>{GAME_STATE_ICONS[state]}</span>
-                  <span className="capitalize">{state}</span>
+                  {state}
                 </button>
               ))}
             </div>
@@ -78,17 +62,14 @@ export function GameStateSelector({
 
       {/* Selected State Details */}
       {showDetails && selectedConfig && value && (
-        <div className="mt-4 rounded-xl border border-white/10 bg-black/30 p-3">
-          <div className="flex items-center gap-2">
-            <span className="text-xl">{GAME_STATE_ICONS[value]}</span>
-            <div>
-              <p className="text-sm font-medium capitalize text-white">{value}</p>
-              <p className="text-xs text-white/50">{selectedConfig.description}</p>
-            </div>
+        <div className="mt-4 border border-brand-border bg-brand-bg p-3">
+          <div>
+            <p className="text-body-lg font-medium capitalize text-brand-text">{value}</p>
+            <p className="text-body-sm text-brand-secondary">{selectedConfig.description}</p>
           </div>
 
           {/* Modifiers */}
-          <div className="mt-3 grid grid-cols-2 gap-2 text-xs">
+          <div className="mt-3 grid grid-cols-2 gap-2 text-body-sm">
             <ModifierBadge
               label="Energy"
               value={selectedConfig.modifiers.energyOffset}
@@ -116,7 +97,7 @@ export function GameStateSelector({
             {selectedConfig.promptKeywords.map((keyword) => (
               <span
                 key={keyword}
-                className="rounded-full bg-white/10 px-2 py-0.5 text-[10px] text-white/70"
+                className="bg-brand-border px-2 py-0.5 text-label text-brand-text"
               >
                 {keyword}
               </span>
@@ -125,7 +106,7 @@ export function GameStateSelector({
 
           {/* Default Stems */}
           <div className="mt-3">
-            <p className="text-[10px] uppercase tracking-wider text-white/40">
+            <p className="text-label uppercase tracking-wider text-brand-secondary">
               Default Stems
             </p>
             <div className="mt-1 flex flex-wrap gap-1">
@@ -134,7 +115,7 @@ export function GameStateSelector({
                 .map(([stem, volume]) => (
                   <span
                     key={stem}
-                    className="rounded-full bg-emerald-500/20 px-2 py-0.5 text-[10px] text-emerald-300"
+                    className="bg-brand-text px-2 py-0.5 text-label text-brand-bg"
                   >
                     {stem} ({Math.round(volume * 100)}%)
                   </span>
@@ -158,15 +139,15 @@ function ModifierBadge({ label, value, suffix }: ModifierBadgeProps) {
   const isNegative = value < 0;
 
   return (
-    <div className="flex items-center justify-between rounded-lg bg-white/5 px-2 py-1">
-      <span className="text-white/50">{label}</span>
+    <div className="flex items-center justify-between bg-brand-surface px-2 py-1 border border-brand-border">
+      <span className="text-brand-secondary">{label}</span>
       <span
         className={
           isPositive
-            ? "text-emerald-400"
+            ? "text-brand-text font-medium"
             : isNegative
-            ? "text-red-400"
-            : "text-white/50"
+            ? "text-status-error"
+            : "text-brand-secondary"
         }
       >
         {isPositive ? "+" : ""}
@@ -190,10 +171,9 @@ export function GameStateBadge({
   return (
     <button
       onClick={onClick}
-      className="flex items-center gap-1 rounded-full bg-emerald-500/20 px-2 py-0.5 text-xs text-emerald-300 hover:bg-emerald-500/30"
+      className="bg-brand-text px-2 py-0.5 text-label uppercase tracking-wider text-brand-bg hover:bg-brand-accent"
     >
-      <span>{GAME_STATE_ICONS[state]}</span>
-      <span className="capitalize">{state}</span>
+      {state}
     </button>
   );
 }

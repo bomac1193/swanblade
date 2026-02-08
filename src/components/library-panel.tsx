@@ -25,7 +25,6 @@ export function LibraryPanel({ onPlaySound }: LibraryPanelProps) {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editName, setEditName] = useState("");
 
-  // Load library sounds
   const loadLibrary = useCallback(async () => {
     try {
       setLoading(true);
@@ -43,11 +42,9 @@ export function LibraryPanel({ onPlaySound }: LibraryPanelProps) {
     loadLibrary();
   }, [loadLibrary]);
 
-  // Filter and sort sounds
   useEffect(() => {
     let filtered = [...sounds];
 
-    // Apply search filter
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
       filtered = filtered.filter(
@@ -58,14 +55,12 @@ export function LibraryPanel({ onPlaySound }: LibraryPanelProps) {
       );
     }
 
-    // Apply category filter
     if (filterBy === "liked") {
       filtered = filtered.filter((sound) => sound.liked);
     } else if (filterBy === "group" && selectedGroup) {
       filtered = filtered.filter((sound) => sound.group === selectedGroup);
     }
 
-    // Sort
     filtered.sort((a, b) => {
       switch (sortBy) {
         case "date":
@@ -152,7 +147,7 @@ export function LibraryPanel({ onPlaySound }: LibraryPanelProps) {
   if (loading) {
     return (
       <div className="flex items-center justify-center p-12">
-        <p className="text-sm text-white/60">Loading library...</p>
+        <p className="text-body text-brand-secondary">Loading library...</p>
       </div>
     );
   }
@@ -160,8 +155,8 @@ export function LibraryPanel({ onPlaySound }: LibraryPanelProps) {
   if (sounds.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center gap-3 p-12 text-center">
-        <p className="text-sm text-white/60">Your library is empty</p>
-        <p className="text-xs text-white/40">Generate sounds and save them to build your collection</p>
+        <p className="text-body text-brand-secondary">Your library is empty</p>
+        <p className="text-body-sm text-brand-secondary/60">Generate sounds and save them to build your collection</p>
       </div>
     );
   }
@@ -175,14 +170,13 @@ export function LibraryPanel({ onPlaySound }: LibraryPanelProps) {
           placeholder="Search sounds..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="bg-black/40 border-white/10"
         />
 
         <div className="flex flex-wrap gap-2">
           <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value as SortBy)}
-            className="rounded-lg border border-white/10 bg-black/40 px-3 py-1.5 text-sm text-white"
+            className="border border-brand-border bg-brand-bg px-3 py-1.5 text-body text-brand-text"
           >
             <option value="date">Newest First</option>
             <option value="name">Name A-Z</option>
@@ -193,8 +187,8 @@ export function LibraryPanel({ onPlaySound }: LibraryPanelProps) {
 
           <button
             onClick={() => setFilterBy("all")}
-            className={`rounded-lg px-3 py-1.5 text-sm transition ${
-              filterBy === "all" ? "bg-emerald-500 text-white" : "bg-black/40 text-white/60 hover:text-white"
+            className={`px-3 py-1.5 text-label uppercase tracking-wider transition ${
+              filterBy === "all" ? "bg-brand-text text-brand-bg" : "border border-brand-border text-brand-secondary hover:text-brand-text"
             }`}
           >
             All ({sounds.length})
@@ -202,11 +196,11 @@ export function LibraryPanel({ onPlaySound }: LibraryPanelProps) {
 
           <button
             onClick={() => setFilterBy("liked")}
-            className={`rounded-lg px-3 py-1.5 text-sm transition ${
-              filterBy === "liked" ? "bg-emerald-500 text-white" : "bg-black/40 text-white/60 hover:text-white"
+            className={`px-3 py-1.5 text-label uppercase tracking-wider transition ${
+              filterBy === "liked" ? "bg-brand-text text-brand-bg" : "border border-brand-border text-brand-secondary hover:text-brand-text"
             }`}
           >
-            ❤️ Liked ({sounds.filter((s) => s.liked).length})
+            Liked ({sounds.filter((s) => s.liked).length})
           </button>
 
           {groups.length > 0 && (
@@ -216,7 +210,7 @@ export function LibraryPanel({ onPlaySound }: LibraryPanelProps) {
                 setSelectedGroup(e.target.value);
                 setFilterBy("group");
               }}
-              className="rounded-lg border border-white/10 bg-black/40 px-3 py-1.5 text-sm text-white"
+              className="border border-brand-border bg-brand-bg px-3 py-1.5 text-body text-brand-text"
             >
               <option value="">All Groups</option>
               {groups.map((group) => (
@@ -234,7 +228,7 @@ export function LibraryPanel({ onPlaySound }: LibraryPanelProps) {
         {filteredSounds.map((sound) => (
           <Card
             key={sound.id}
-            className="flex flex-col gap-3 border-white/10 bg-black/40 p-4 backdrop-blur-xl transition hover:border-emerald-400/30"
+            className="flex flex-col gap-3 p-4 transition hover:border-brand-text"
           >
             <div className="flex items-start justify-between gap-3">
               <div className="flex-1">
@@ -245,38 +239,38 @@ export function LibraryPanel({ onPlaySound }: LibraryPanelProps) {
                       value={editName}
                       onChange={(e) => setEditName(e.target.value)}
                       onKeyDown={(e) => e.key === "Enter" && handleRename(sound.id)}
-                      className="flex-1 bg-black/40"
+                      className="flex-1"
                       autoFocus
                     />
                     <Button size="sm" onClick={() => handleRename(sound.id)}>
-                      ✓
+                      Save
                     </Button>
-                    <Button size="sm" variant="outline" onClick={() => setEditingId(null)}>
-                      ✗
+                    <Button size="sm" variant="secondary" onClick={() => setEditingId(null)}>
+                      Cancel
                     </Button>
                   </div>
                 ) : (
                   <h3
-                    className="cursor-pointer text-base font-semibold hover:text-emerald-400"
+                    className="cursor-pointer text-body-lg font-medium hover:text-brand-accent"
                     onClick={() => startEditing(sound)}
                   >
                     {sound.name}
                   </h3>
                 )}
 
-                <p className="mt-1 text-xs text-white/60">{sound.prompt}</p>
+                <p className="mt-1 text-body-sm text-brand-secondary">{sound.prompt}</p>
 
                 <div className="mt-2 flex flex-wrap gap-1">
-                  <Badge className="text-xs">
+                  <Badge>
                     {sound.type}
                   </Badge>
                   {sound.group && (
-                    <Badge className="text-xs">
-                      📁 {sound.group}
+                    <Badge>
+                      {sound.group}
                     </Badge>
                   )}
                   {sound.tags.map((tag) => (
-                    <Badge key={tag} className="text-xs">
+                    <Badge key={tag}>
                       {tag}
                     </Badge>
                   ))}
@@ -286,26 +280,26 @@ export function LibraryPanel({ onPlaySound }: LibraryPanelProps) {
               <div className="flex flex-col gap-2">
                 <button
                   onClick={() => handleToggleLike(sound.id, sound.liked)}
-                  className="text-xl transition hover:scale-110"
+                  className={`text-label uppercase tracking-wider transition ${sound.liked ? "text-brand-text" : "text-brand-secondary hover:text-brand-text"}`}
                   title={sound.liked ? "Unlike" : "Like"}
                 >
-                  {sound.liked ? "❤️" : "🤍"}
+                  {sound.liked ? "Liked" : "Like"}
                 </button>
               </div>
             </div>
 
             <div className="flex gap-2">
               <Button size="sm" onClick={() => onPlaySound?.(sound)} className="flex-1">
-                ▶️ Play
+                Play
               </Button>
-              <Button size="sm" variant="outline" onClick={() => handleDownload(sound.id)}>
-                ⬇️ Download
+              <Button size="sm" variant="secondary" onClick={() => handleDownload(sound.id)}>
+                Download
               </Button>
-              <Button size="sm" variant="outline" onClick={() => startEditing(sound)}>
-                ✏️ Rename
+              <Button size="sm" variant="secondary" onClick={() => startEditing(sound)}>
+                Rename
               </Button>
-              <Button size="sm" variant="outline" onClick={() => handleDelete(sound.id)}>
-                🗑️ Delete
+              <Button size="sm" variant="secondary" onClick={() => handleDelete(sound.id)}>
+                Delete
               </Button>
             </div>
           </Card>
@@ -314,7 +308,7 @@ export function LibraryPanel({ onPlaySound }: LibraryPanelProps) {
 
       {filteredSounds.length === 0 && (
         <div className="flex items-center justify-center p-8">
-          <p className="text-sm text-white/60">No sounds match your filters</p>
+          <p className="text-body text-brand-secondary">No sounds match your filters</p>
         </div>
       )}
     </div>

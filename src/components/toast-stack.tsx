@@ -16,9 +16,9 @@ interface ToastStackProps {
 }
 
 const toneClasses: Record<ToastTone, string> = {
-  success: "border-emerald-400/40 bg-emerald-500/10 text-emerald-50",
-  error: "border-red-400/40 bg-red-950/30 text-red-200",
-  neutral: "border-white/20 bg-white/5 text-white",
+  success: "border-brand-text bg-brand-surface text-brand-text",
+  error: "border-status-error bg-brand-surface text-status-error",
+  neutral: "border-brand-border bg-brand-surface text-brand-text",
 };
 
 export function ToastStack({ items, onDismiss }: ToastStackProps) {
@@ -28,7 +28,7 @@ export function ToastStack({ items, onDismiss }: ToastStackProps) {
         <div
           key={toast.id}
           className={cn(
-            "pointer-events-auto rounded-2xl border px-4 py-3 text-sm shadow-2xl backdrop-blur-2xl",
+            "pointer-events-auto border px-4 py-3 text-body shadow-lg",
             toneClasses[toast.tone],
           )}
         >
@@ -37,7 +37,7 @@ export function ToastStack({ items, onDismiss }: ToastStackProps) {
             <button
               type="button"
               onClick={() => onDismiss(toast.id)}
-              className="text-xs uppercase tracking-[0.3em] text-white/60"
+              className="text-label uppercase tracking-wider text-brand-secondary hover:text-brand-text"
             >
               Close
             </button>

@@ -13,12 +13,12 @@ interface PromptComposerProps {
 
 export function PromptComposer({ value, onChange, onSubmit, suggestions, isGenerating }: PromptComposerProps) {
   return (
-    <div className="rounded-3xl border border-white/10 bg-black/50 p-6 backdrop-blur-3xl">
-      <p className="text-xs uppercase tracking-[0.3em] text-white/40">Prompt Composer</p>
+    <div className="border border-brand-border bg-brand-surface p-6">
+      <p className="text-label uppercase tracking-wider text-brand-secondary">Prompt Composer</p>
       <Textarea
         rows={3}
         value={value}
-        placeholder="Describe the sound you want Audiogen to create…"
+        placeholder="Describe the sound you want to create..."
         onChange={(event) => onChange(event.target.value)}
         className="mt-3"
       />
@@ -29,7 +29,7 @@ export function PromptComposer({ value, onChange, onSubmit, suggestions, isGener
             key={suggestion}
             type="button"
             onClick={() => onChange(suggestion)}
-            className="rounded-full border border-white/15 px-4 py-2 text-xs text-white/70 transition hover:border-emerald-400/60 hover:text-white"
+            className="border border-brand-border px-4 py-2 text-label uppercase tracking-wider text-brand-secondary transition hover:border-brand-text hover:text-brand-text"
           >
             {suggestion}
           </button>
@@ -38,7 +38,7 @@ export function PromptComposer({ value, onChange, onSubmit, suggestions, isGener
 
       <div className="mt-4 flex justify-end">
         <Button onClick={onSubmit} loading={isGenerating}>
-          {isGenerating ? "Designing sound…" : "Generate Sound"}
+          {isGenerating ? "Generating..." : "Generate Sound"}
         </Button>
       </div>
     </div>

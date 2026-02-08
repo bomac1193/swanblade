@@ -35,31 +35,30 @@ export function WaveformPlaceholder({ isActive, isLoading }: WaveformPlaceholder
   }, [bars, isActive]);
 
   return (
-    <div className="w-full rounded-3xl border border-emerald-400/10 bg-gradient-to-br from-zinc-950 via-black to-zinc-950/80 p-4 backdrop-blur-xl shadow-[0_20px_70px_rgba(0,0,0,0.5)]">
+    <div className="w-full border border-brand-border bg-brand-bg p-4">
       <div className={cn("relative h-32 w-full", isLoading && "animate-pulse opacity-70")}>
         <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="h-full w-full">
           <defs>
             <linearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="rgba(16, 185, 129, 0.2)" />
-              <stop offset="50%" stopColor="rgba(16, 185, 129, 0.65)" />
-              <stop offset="100%" stopColor="rgba(236, 72, 153, 0.45)" />
+              <stop offset="0%" stopColor="rgba(10, 10, 10, 0.1)" />
+              <stop offset="50%" stopColor="rgba(10, 10, 10, 0.3)" />
+              <stop offset="100%" stopColor="rgba(10, 10, 10, 0.1)" />
             </linearGradient>
           </defs>
           <path
             d={pathD}
             fill={`url(#${gradientId})`}
-            opacity={isActive ? 0.9 : 0.6}
+            opacity={isActive ? 0.9 : 0.5}
             className="transition-all duration-500"
           />
           <path
             d={pathD}
             fill="none"
-            stroke="rgba(255,255,255,0.5)"
+            stroke="rgba(10, 10, 10, 0.4)"
             strokeWidth={isActive ? 0.9 : 0.6}
-            className="drop-shadow-[0_0_8px_rgba(16,185,129,0.35)] transition-all duration-500"
+            className="transition-all duration-500"
           />
         </svg>
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/40" />
       </div>
     </div>
   );

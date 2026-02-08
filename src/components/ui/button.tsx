@@ -5,17 +5,17 @@ type Variant = "primary" | "secondary" | "ghost" | "outline" | "danger";
 type Size = "sm" | "md" | "lg" | "icon";
 
 const variantClasses: Record<Variant, string> = {
-  primary: "bg-emerald-500/80 text-white hover:bg-emerald-400 focus-visible:ring-emerald-300",
-  secondary: "bg-white/10 text-white hover:bg-white/20 focus-visible:ring-white/30",
-  ghost: "bg-transparent text-white/70 hover:text-white hover:bg-white/5 focus-visible:ring-white/20",
-  outline: "border border-white/20 text-white hover:bg-white/5 focus-visible:ring-white/30",
-  danger: "bg-red-500/80 text-white hover:bg-red-400 focus-visible:ring-red-400",
+  primary: "bg-brand-text text-brand-bg border border-brand-text hover:bg-brand-accent hover:border-brand-accent",
+  secondary: "bg-transparent text-brand-text border border-brand-border hover:border-brand-text",
+  ghost: "bg-transparent text-brand-secondary hover:text-brand-text hover:bg-brand-border/30",
+  outline: "border border-brand-border text-brand-text hover:border-brand-text",
+  danger: "bg-status-error text-white border border-status-error hover:opacity-90",
 };
 
 const sizeClasses: Record<Size, string> = {
-  sm: "h-9 px-3 text-sm",
-  md: "h-11 px-5 text-sm",
-  lg: "h-12 px-6 text-base",
+  sm: "h-9 px-4 text-label",
+  md: "h-11 px-6 text-label",
+  lg: "h-12 px-8 text-label",
   icon: "h-11 w-11",
 };
 
@@ -31,7 +31,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       <button
         ref={ref}
         className={cn(
-          "relative inline-flex items-center justify-center rounded-full font-medium uppercase tracking-wide transition-all focus-visible:outline-none focus-visible:ring-2 disabled:opacity-60 disabled:cursor-not-allowed",
+          "relative inline-flex items-center justify-center font-medium uppercase tracking-wider transition-all focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand-text focus-visible:ring-offset-2 disabled:opacity-40 disabled:cursor-not-allowed",
           variantClasses[variant],
           sizeClasses[size],
           className,
@@ -40,7 +40,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         {...props}
       >
         <span className="flex items-center gap-2">
-          {loading && <span className="h-2 w-2 animate-ping rounded-full bg-current"></span>}
+          {loading && <span className="h-1.5 w-1.5 animate-ping bg-current"></span>}
           <span>{children}</span>
         </span>
       </button>

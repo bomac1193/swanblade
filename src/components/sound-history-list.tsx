@@ -13,9 +13,9 @@ interface SoundHistoryListProps {
 export function SoundHistoryList({ items, selectedId, onSelect }: SoundHistoryListProps) {
   if (!items.length) {
     return (
-      <div className="flex h-full flex-col items-center justify-center rounded-3xl border border-dashed border-white/10 bg-black/20 p-6 text-center">
-        <p className="text-sm text-white/60">Describe a sound and I&apos;ll design it.</p>
-        <p className="mt-2 text-xs text-white/30">Your sound history will live here.</p>
+      <div className="flex h-full flex-col items-center justify-center border border-dashed border-brand-border bg-brand-surface p-6 text-center">
+        <p className="text-body text-brand-secondary">Describe a sound and I&apos;ll design it.</p>
+        <p className="mt-2 text-body-sm text-brand-secondary/60">Your sound history will live here.</p>
       </div>
     );
   }
@@ -28,20 +28,20 @@ export function SoundHistoryList({ items, selectedId, onSelect }: SoundHistoryLi
           type="button"
           onClick={() => onSelect(sound.id)}
           className={cn(
-            "w-full rounded-3xl border border-white/10 p-4 text-left transition hover:border-emerald-400/40 hover:bg-emerald-400/5",
-            selectedId === sound.id && "border-emerald-400/80 bg-emerald-500/10 shadow-[0_0_50px_rgba(16,185,129,0.3)]",
+            "w-full border border-brand-border p-4 text-left transition hover:border-brand-text",
+            selectedId === sound.id && "border-brand-text bg-brand-bg",
           )}
         >
           <div className="flex items-center justify-between gap-2">
             <div>
-              <p className="text-sm font-semibold text-white">{sound.name}</p>
-              <p className="text-[11px] uppercase tracking-[0.3em] text-white/40">
+              <p className="text-body font-medium text-brand-text">{sound.name}</p>
+              <p className="text-label uppercase tracking-wider text-brand-secondary">
                 {sound.type} • {formatRelativeTimestamp(sound.createdAt)}
               </p>
             </div>
             <StatusBadge status={sound.status} />
           </div>
-          <p className="mt-3 line-clamp-2 text-sm text-white/60">{sound.prompt}</p>
+          <p className="mt-3 line-clamp-2 text-body-sm text-brand-secondary">{sound.prompt}</p>
         </button>
       ))}
     </div>

@@ -46,21 +46,21 @@ export function SoundParametersPanel({ value, onChange }: SoundParametersPanelPr
   };
 
   return (
-    <div className="flex h-full flex-col gap-6 rounded-3xl border border-white/10 bg-black/40 p-6 backdrop-blur-3xl">
+    <div className="flex h-full flex-col gap-6 border border-brand-border bg-brand-surface p-6">
       <div>
-        <p className="text-xs uppercase tracking-[0.3em] text-white/40">Sound Parameters</p>
-        <h3 className="mt-2 text-2xl font-semibold text-white">Designer Controls</h3>
+        <p className="text-label uppercase tracking-wider text-brand-secondary">Sound Parameters</p>
+        <h3 className="mt-2 font-display text-display-md text-brand-text">Designer Controls</h3>
       </div>
 
       <div className="space-y-4">
-        <label className="text-xs font-semibold uppercase tracking-[0.3em] text-white/40">Type</label>
+        <label className="text-label uppercase tracking-wider text-brand-secondary">Type</label>
         <select
           value={value.type}
           onChange={(event) => onChange("type", event.target.value as SoundCategory)}
-          className="w-full rounded-2xl border border-white/15 bg-black/50 px-4 py-3 text-sm text-white"
+          className="w-full border border-brand-border bg-brand-bg px-4 py-3 text-body text-brand-text"
         >
           {SOUND_TYPES.map((type) => (
-            <option key={type} value={type} className="bg-black text-white">
+            <option key={type} value={type}>
               {type}
             </option>
           ))}
@@ -85,7 +85,7 @@ export function SoundParametersPanel({ value, onChange }: SoundParametersPanelPr
           onChange={(event) => onChange("texture", Number(event.target.value))}
         />
         <RangeSlider
-          label="Bright ↔ Dark"
+          label="Brightness"
           min={-1}
           max={1}
           step={0.1}
@@ -93,7 +93,7 @@ export function SoundParametersPanel({ value, onChange }: SoundParametersPanelPr
           onChange={(event) => onChange("brightness", Number(event.target.value))}
         />
         <RangeSlider
-          label="Clean ↔ Noisy"
+          label="Noisiness"
           min={-1}
           max={1}
           step={0.1}
@@ -103,7 +103,7 @@ export function SoundParametersPanel({ value, onChange }: SoundParametersPanelPr
       </div>
 
       <div>
-        <p className="text-xs font-semibold uppercase tracking-[0.3em] text-white/40">Mood Tags</p>
+        <p className="text-label uppercase tracking-wider text-brand-secondary">Mood Tags</p>
         <div className="mt-3 flex flex-wrap gap-2">
           {MOOD_TAGS.map((tag) => (
             <MoodTagPill key={tag} active={value.moodTags.includes(tag)} onClick={() => toggleMood(tag)}>
@@ -114,7 +114,7 @@ export function SoundParametersPanel({ value, onChange }: SoundParametersPanelPr
       </div>
 
       <div>
-        <p className="text-xs font-semibold uppercase tracking-[0.3em] text-white/40">Length</p>
+        <p className="text-label uppercase tracking-wider text-brand-secondary">Length</p>
         <div className="mt-3 grid grid-cols-5 gap-2">
           {LENGTH_OPTIONS.map((seconds) => (
             <button
@@ -122,8 +122,8 @@ export function SoundParametersPanel({ value, onChange }: SoundParametersPanelPr
               type="button"
               onClick={() => onChange("lengthSeconds", seconds)}
               className={cn(
-                "rounded-2xl border border-white/15 py-2 text-xs font-semibold text-white/70 transition",
-                value.lengthSeconds === seconds && "border-emerald-400/70 bg-emerald-500/10 text-white",
+                "border border-brand-border py-2 text-label uppercase tracking-wider text-brand-secondary transition",
+                value.lengthSeconds === seconds && "border-brand-text bg-brand-text text-brand-bg",
               )}
             >
               {seconds}s
@@ -136,17 +136,17 @@ export function SoundParametersPanel({ value, onChange }: SoundParametersPanelPr
         <button
           type="button"
           onClick={() => setAdvancedOpen((prev) => !prev)}
-          className="flex w-full items-center justify-between rounded-2xl border border-white/10 px-4 py-3 text-sm text-white/70"
+          className="flex w-full items-center justify-between border border-brand-border px-4 py-3 text-body text-brand-secondary"
         >
           Advanced Parameters
-          <span className="text-xs uppercase tracking-[0.3em] text-white/40">{advancedOpen ? "Hide" : "Show"}</span>
+          <span className="text-label uppercase tracking-wider text-brand-secondary">{advancedOpen ? "Hide" : "Show"}</span>
         </button>
 
         {advancedOpen && (
-          <div className="space-y-3 rounded-2xl border border-white/10 p-4">
+          <div className="space-y-3 border border-brand-border p-4">
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <p className="text-xs uppercase tracking-[0.3em] text-white/40">BPM</p>
+                <p className="text-label uppercase tracking-wider text-brand-secondary">BPM</p>
                 <Input
                   type="number"
                   value={value.bpm ?? ""}
@@ -160,15 +160,15 @@ export function SoundParametersPanel({ value, onChange }: SoundParametersPanelPr
                 />
               </div>
               <div>
-                <p className="text-xs uppercase tracking-[0.3em] text-white/40">Key</p>
+                <p className="text-label uppercase tracking-wider text-brand-secondary">Key</p>
                 <select
                   value={value.key ?? ""}
                   onChange={(event) => onChange("key", event.target.value || undefined)}
-                  className="w-full rounded-2xl border border-white/15 bg-black/50 px-4 py-3 text-sm text-white"
+                  className="w-full border border-brand-border bg-brand-bg px-4 py-3 text-body text-brand-text"
                 >
                   <option value="">—</option>
                   {KEY_OPTIONS.map((key) => (
-                    <option key={key} value={key} className="bg-black text-white">
+                    <option key={key} value={key}>
                       {key}
                     </option>
                   ))}
@@ -176,7 +176,7 @@ export function SoundParametersPanel({ value, onChange }: SoundParametersPanelPr
               </div>
             </div>
             <div>
-              <p className="text-xs uppercase tracking-[0.3em] text-white/40">Seed</p>
+              <p className="text-label uppercase tracking-wider text-brand-secondary">Seed</p>
               <Input
                 type="number"
                 value={value.seed ?? ""}
