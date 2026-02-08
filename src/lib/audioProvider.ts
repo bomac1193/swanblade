@@ -15,7 +15,8 @@ export type AudioProvider =
   | "neuralgrains"
   | "sigilwave"
   | "physim"
-  | "suno";
+  | "suno"
+  | "starforge";
 
 const openaiClient = process.env.OPENAI_API_KEY ? new OpenAI({ apiKey: process.env.OPENAI_API_KEY }) : null;
 const stabilityApiKey = process.env.STABILITY_API_KEY;
@@ -38,6 +39,14 @@ const aimlApiKey = process.env.AIML_API_KEY; // https://aimlapi.com/minimax-musi
 // Option 2: Self-hosted suno-api (https://github.com/gcui-art/suno-api)
 const sunoApiEndpoint = process.env.SUNO_API_ENDPOINT; // e.g., http://localhost:3000
 const sunoCookie = process.env.SUNO_COOKIE; // Your Suno account cookie
+
+// Starforge - Sonic Identity LoRA Generation
+const starforgeApiUrl = process.env.STARFORGE_API_URL || "http://localhost:5000";
+const starforgeLoraId = process.env.STARFORGE_LORA_ID; // Default LoRA model to use
+
+// o8 Protocol - Provenance Stamping
+const o8ApiUrl = process.env.O8_API_URL || "http://localhost:3001";
+const o8IdentityId = process.env.O8_IDENTITY_ID; // Identity for provenance stamping
 
 type ReplicateFileOutput = {
   url: string | (() => string);
@@ -100,6 +109,8 @@ export async function generateSound(
       return generateWithPhysim(request);
     case "suno":
       return generateWithSuno(request);
+    case "starforge":
+      return generateWithStarforge(request);
     default:
       throw new Error("Unknown provider");
   }
@@ -209,10 +220,13 @@ async function generateWithElevenLabs(request: GenerateSoundRequestBody): Promis
   const durationSeconds = Math.max(0.5, Math.min(22, request.parameters.lengthSeconds ?? 10));
   const outputFormat = process.env.ELEVENLABS_OUTPUT_FORMAT ?? "mp3_44100_192";
 
+  // Build enhanced prompt for ElevenLabs with BPM/rhythm emphasis
+  const enhancedPrompt = buildElevenLabsPrompt(request, durationSeconds);
+
   const body = {
-    text: request.prompt,
+    text: enhancedPrompt,
     duration_seconds: durationSeconds,
-    prompt_influence: 0.5,
+    prompt_influence: 0.75, // Increased from 0.5 for better prompt adherence
   };
 
   const url = new URL(endpoint);
@@ -353,7 +367,7 @@ async function generateWithFal(request: GenerateSoundRequestBody): Promise<Gener
     };
 
     const result = (await fal.subscribe("fal-ai/stable-audio-25/text-to-audio", {
-      input: falInput,
+      input: falInput as any,
     })) as FalAudioResponse;
 
     // Access audio_file from result
@@ -372,7 +386,7 @@ async function generateWithFal(request: GenerateSoundRequestBody): Promise<Gener
     const audioBuffer = await audioResponse.arrayBuffer();
     const audioBase64 = Buffer.from(audioBuffer).toString("base64");
 
-    const contentType = audioFile?.content_type ?? "audio/wav";
+    const contentType = (audioFile as any)?.content_type ?? "audio/wav";
 
     return { audioUrl: `data:${contentType};base64,${audioBase64}` };
   } catch (error) {
@@ -1137,6 +1151,54 @@ function buildSunoPrompt(request: GenerateSoundRequestBody, targetLength: number
 }
 
 /**
+ * Build ElevenLabs-specific prompt with strong BPM and rhythm emphasis
+ * ElevenLabs excels at sound effects when given precise, detailed instructions
+ */
+function buildElevenLabsPrompt(request: GenerateSoundRequestBody, targetLength: number): string {
+  const { parameters } = request;
+
+  // Build rhythm-focused descriptors
+  const rhythmElements = [];
+
+  // CRITICAL: BPM must be first and emphasized
+  if (parameters.bpm) {
+    rhythmElements.push(`EXACTLY ${parameters.bpm} BPM`);
+    rhythmElements.push(`strict ${parameters.bpm} beats per minute tempo`);
+    rhythmElements.push(`locked to ${parameters.bpm} BPM grid`);
+  }
+
+  // Add stereo/spatial descriptors
+  const moodTags = parameters.moodTags?.filter(tag =>
+    tag.toLowerCase().includes('wide') ||
+    tag.toLowerCase().includes('stereo') ||
+    tag.toLowerCase().includes('spatial')
+  );
+  if (moodTags && moodTags.length > 0) {
+    rhythmElements.push(moodTags.join(', '));
+  }
+
+  // Add intensity as energy descriptor
+  if (parameters.intensity > 70) {
+    rhythmElements.push('high intensity');
+  } else if (parameters.intensity > 40) {
+    rhythmElements.push('medium intensity');
+  } else {
+    rhythmElements.push('subtle intensity');
+  }
+
+  // Emphasize continuous sound, not tails
+  rhythmElements.push(`continuous for full ${targetLength} seconds`);
+  rhythmElements.push('no fade-out or reverb tail only');
+  rhythmElements.push('active sound throughout entire duration');
+
+  // Build the final prompt with BPM at the start
+  const bpmPrefix = parameters.bpm ? `${parameters.bpm} BPM: ` : '';
+  const rhythmContext = rhythmElements.length > 0 ? ` | ${rhythmElements.join(', ')}` : '';
+
+  return `${bpmPrefix}${request.prompt.trim()}${rhythmContext}`;
+}
+
+/**
  * Build MusicGen/AudioCraft-specific prompt
  */
 function buildMusicGenPrompt(request: GenerateSoundRequestBody, targetLength: number): string {
@@ -1163,12 +1225,12 @@ function buildMusicGenPrompt(request: GenerateSoundRequestBody, targetLength: nu
   const contextStr = musicalContext.length > 0 ? ` (${musicalContext.join(", ")})` : "";
 
   const tempoLine = parameters.bpm
-    ? `Lock groove tightly to ${parameters.bpm} BPM with consistent percussion/transients.`
-    : "Tempo can be free-form but maintain a steady pulse.";
+    ? `CRITICAL: Lock EXACTLY to ${parameters.bpm} BPM - every beat, every bar, perfectly quantized to ${parameters.bpm} beats per minute. Maintain strict metronomic ${parameters.bpm} BPM timing throughout with consistent percussion/transients hitting precisely on the beat grid.`
+    : "Tempo can be free-form but maintain a steady, deliberate pulse throughout.";
   const referenceSummary = formatReferenceSummary(request.references);
-  const durationLine = `Fill the full ${targetLength} seconds with evolving layers; no dead air until the final tail.`;
+  const durationLine = `Fill the ENTIRE ${targetLength} seconds with active, evolving sound - NOT just reverb tails or fade-outs. The sound should be present and dynamic for the full duration.`;
   const fidelityLine =
-    "Hi-fi, cinematic mixdown at 48kHz+. Avoid aliasing, plastic presets, or generic stock music tropes.";
+    "Hi-fi, cinematic mixdown at 48kHz+. Avoid aliasing, plastic presets, or generic stock music tropes. No long reverb-only tails at the end.";
 
   return [request.prompt.trim() + contextStr, tempoLine, referenceSummary, durationLine, fidelityLine]
     .filter(Boolean)
@@ -1287,4 +1349,226 @@ function formatReferenceSummary(references: AudioReferencePayload[] | undefined)
   if (!references?.length) return "";
   const names = references.map((ref) => ref.name).join(", ");
   return `Reference DNA: ${names}. Sample heavily from these stems so their timbre drives the piece—treat them as the main instrumentation rather than background inspiration.`;
+}
+
+// ============================================================================
+// STARFORGE - Sonic Identity LoRA Generation
+// ============================================================================
+
+/**
+ * Generate audio using Starforge LoRA (your trained Sonic Identity model)
+ * Automatically stamps output with o8 provenance
+ */
+async function generateWithStarforge(request: GenerateSoundRequestBody): Promise<GenerateSoundResponse> {
+  const loraId = starforgeLoraId || request.parameters.loraId;
+
+  if (!loraId) {
+    throw new Error(
+      "No Starforge LoRA model specified. Set STARFORGE_LORA_ID in .env.local or pass loraId in parameters."
+    );
+  }
+
+  const { parameters } = request;
+  const duration = Math.max(5, Math.min(60, parameters.lengthSeconds ?? 30));
+
+  // Build enhanced prompt with Sonic DNA context
+  const prompt = buildStarforgePrompt(request, duration);
+
+  // Generate via Starforge API
+  const response = await fetch(`${starforgeApiUrl}/api/lora/models/${loraId}/generate`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      prompt,
+      duration,
+      loraStrength: parameters.loraStrength ?? 0.8,
+    }),
+  });
+
+  if (!response.ok) {
+    const error = await response.text();
+    throw new Error(`Starforge generation failed: ${error}`);
+  }
+
+  const result = await response.json();
+
+  if (!result.success || !result.audioUrl) {
+    throw new Error(result.error || "Starforge returned no audio");
+  }
+
+  // Stamp with o8 provenance if configured
+  let provenanceCid: string | undefined;
+  if (o8IdentityId) {
+    try {
+      provenanceCid = await stampWithO8Provenance({
+        audioUrl: result.audioUrl,
+        prompt,
+        loraId,
+        generationId: result.generationId,
+        identityId: o8IdentityId,
+      });
+      console.log(`o8 provenance stamped: ${provenanceCid}`);
+    } catch (error) {
+      console.warn("o8 provenance stamping failed:", error);
+      // Continue without provenance - generation still valid
+    }
+  }
+
+  return {
+    audioUrl: result.audioUrl,
+    // Include provenance metadata if available
+    ...(provenanceCid && { provenanceCid }),
+  };
+}
+
+/**
+ * Build Starforge-optimized prompt with Sonic DNA context
+ */
+function buildStarforgePrompt(request: GenerateSoundRequestBody, targetLength: number): string {
+  const { parameters } = request;
+  const elements: string[] = [];
+
+  // Base prompt
+  elements.push(request.prompt.trim());
+
+  // BPM if specified
+  if (parameters.bpm) {
+    elements.push(`${parameters.bpm} BPM`);
+  }
+
+  // Key if specified
+  if (parameters.key) {
+    elements.push(`${parameters.key}`);
+  }
+
+  // Mood/style from tags
+  if (parameters.moodTags?.length) {
+    elements.push(parameters.moodTags.join(", "));
+  }
+
+  // Energy/intensity mapping
+  if (parameters.intensity > 70) {
+    elements.push("high energy, driving");
+  } else if (parameters.intensity > 40) {
+    elements.push("moderate energy");
+  } else {
+    elements.push("calm, ambient");
+  }
+
+  // Texture mapping
+  if (parameters.texture > 60) {
+    elements.push("rich layered production");
+  } else if (parameters.texture < 40) {
+    elements.push("minimal, sparse");
+  }
+
+  // Duration
+  elements.push(`${targetLength} seconds`);
+
+  return elements.join(", ");
+}
+
+// ============================================================================
+// O8 PROTOCOL - Provenance Stamping
+// ============================================================================
+
+interface O8ProvenanceInput {
+  audioUrl: string;
+  prompt: string;
+  loraId: string;
+  generationId: string;
+  identityId: string;
+}
+
+/**
+ * Stamp generated audio with o8 provenance
+ * Creates an immutable record linking output to Sonic Identity
+ */
+async function stampWithO8Provenance(input: O8ProvenanceInput): Promise<string> {
+  const { audioUrl, prompt, loraId, generationId, identityId } = input;
+
+  // Fetch audio and create fingerprint
+  const audioResponse = await fetch(audioUrl);
+  if (!audioResponse.ok) {
+    throw new Error("Failed to fetch audio for fingerprinting");
+  }
+
+  const audioBuffer = await audioResponse.arrayBuffer();
+  const audioBase64 = Buffer.from(audioBuffer).toString("base64");
+
+  // Get fingerprint from o8
+  const fingerprintResponse = await fetch(`${o8ApiUrl}/api/provenance/fingerprint`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ data: audioBase64 }),
+  });
+
+  if (!fingerprintResponse.ok) {
+    throw new Error("Failed to generate audio fingerprint");
+  }
+
+  const { fingerprint } = await fingerprintResponse.json();
+
+  // Stamp with o8 provenance
+  const stampResponse = await fetch(`${o8ApiUrl}/api/provenance/stamp`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      identity_id: identityId,
+      content_type: "audio",
+      content_fingerprint: fingerprint,
+      title: `Starforge Generation ${generationId}`,
+      ai_contribution: 1.0, // Fully AI-generated
+      ai_model: {
+        name: "starforge-lora",
+        provider: "starforge",
+        version: loraId,
+      },
+      metadata: {
+        prompt,
+        lora_id: loraId,
+        generation_id: generationId,
+        source: "swanblade",
+        timestamp: new Date().toISOString(),
+      },
+    }),
+  });
+
+  if (!stampResponse.ok) {
+    const error = await stampResponse.text();
+    throw new Error(`o8 stamping failed: ${error}`);
+  }
+
+  const stampResult = await stampResponse.json();
+  return stampResult.declaration_cid;
+}
+
+/**
+ * Verify o8 provenance for an audio file
+ */
+export async function verifyO8Provenance(declarationCid: string): Promise<{
+  valid: boolean;
+  identity?: string;
+  timestamp?: string;
+  details?: Record<string, unknown>;
+}> {
+  const response = await fetch(`${o8ApiUrl}/api/provenance/verify`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ declaration_cid: declarationCid }),
+  });
+
+  if (!response.ok) {
+    return { valid: false };
+  }
+
+  const result = await response.json();
+  return {
+    valid: result.valid,
+    identity: result.identity_id,
+    timestamp: result.timestamp,
+    details: result,
+  };
 }

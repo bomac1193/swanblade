@@ -68,37 +68,76 @@ const VOCAL_KEYWORDS = ["vocal", "vocals", "sing", "singer", "sung", "choir", "l
 const SPEECH_KEYWORDS = ["speech", "narration", "voiceover", "voice over", "spoken", "talking"];
 const SFX_KEYWORDS = ["sfx", "ui", "interface", "click", "hit", "impact", "glitch", "whoosh", "button"];
 const AMBIENT_KEYWORDS = ["ambience", "ambient", "drones", "texture", "atmosphere", "soundscape"];
+const PERCUSSION_KEYWORDS = ["drum", "drums", "percussion", "beat", "kick", "snare", "hi-hat", "hihat", "cymbal", "tom", "clap", "rim", "loop"];
+const RHYTHMIC_KEYWORDS = ["bpm", "tempo", "groove", "rhythm", "rhythmic", "metronome", "quantized"];
 
-export function recommendProvider(prompt: string, hasReferences: boolean): ProviderId | null {
+export function recommendProvider(prompt: string, hasReferences: boolean, durationSeconds?: number): ProviderId | null {
   const trimmed = prompt.trim().toLowerCase();
   const mentionsVocals = VOCAL_KEYWORDS.some((keyword) => trimmed.includes(keyword));
   const mentionsSpeech = SPEECH_KEYWORDS.some((keyword) => trimmed.includes(keyword));
   const mentionsSfx = SFX_KEYWORDS.some((keyword) => trimmed.includes(keyword));
   const mentionsAmbience = AMBIENT_KEYWORDS.some((keyword) => trimmed.includes(keyword));
+  const mentionsPercussion = PERCUSSION_KEYWORDS.some((keyword) => trimmed.includes(keyword));
+  const mentionsRhythm = RHYTHMIC_KEYWORDS.some((keyword) => trimmed.includes(keyword));
+
+  // Extract BPM if mentioned
+  const bpmMatch = trimmed.match(/(\d{2,3})\s*bpm/);
+  const hasBPM = bpmMatch !== null || mentionsRhythm;
+
+  // Determine if this is a short or long request
+  const duration = durationSeconds ?? 10;
+  const isShort = duration <= 22; // ElevenLabs max
+  const isLong = duration > 30; // Beyond Replicate
 
   const pickIfAvailable = (id: ProviderId): ProviderId | null => {
     const provider = PROVIDERS.find((p) => p.id === id && p.available);
     return provider ? provider.id : null;
   };
 
+  // PRIORITY 1: Vocals/Speech (OpenAI or Suno)
   if (mentionsVocals || mentionsSpeech) {
-    return pickIfAvailable("openai") ?? pickIfAvailable("elevenlabs") ?? pickIfAvailable("replicate");
+    return pickIfAvailable("openai") ?? pickIfAvailable("suno") ?? pickIfAvailable("elevenlabs") ?? pickIfAvailable("replicate");
   }
 
+  // PRIORITY 2: Percussion with BPM (ElevenLabs for short, FAL for long)
+  if (mentionsPercussion && hasBPM) {
+    if (isShort) {
+      return pickIfAvailable("elevenlabs") ?? pickIfAvailable("fal") ?? pickIfAvailable("replicate");
+    } else if (isLong) {
+      return pickIfAvailable("fal") ?? pickIfAvailable("stability") ?? pickIfAvailable("replicate");
+    } else {
+      // Medium length (22-30s)
+      return pickIfAvailable("elevenlabs") ?? pickIfAvailable("fal") ?? pickIfAvailable("replicate");
+    }
+  }
+
+  // PRIORITY 3: References provided (FAL/Stability best for resampling)
   if (hasReferences) {
     return pickIfAvailable("fal") ?? pickIfAvailable("stability") ?? pickIfAvailable("replicate");
   }
 
-  if (mentionsSfx) {
-    return pickIfAvailable("elevenlabs") ?? pickIfAvailable("stability") ?? pickIfAvailable("replicate");
+  // PRIORITY 4: SFX/Percussion without strict BPM
+  if (mentionsSfx || mentionsPercussion) {
+    if (isShort) {
+      return pickIfAvailable("elevenlabs") ?? pickIfAvailable("stability") ?? pickIfAvailable("replicate");
+    } else {
+      return pickIfAvailable("fal") ?? pickIfAvailable("stability") ?? pickIfAvailable("replicate");
+    }
   }
 
+  // PRIORITY 5: Ambient/Soundscapes
   if (mentionsAmbience) {
     return pickIfAvailable("stability") ?? pickIfAvailable("fal") ?? pickIfAvailable("replicate");
   }
 
+  // PRIORITY 6: Long duration content
+  if (isLong) {
+    return pickIfAvailable("fal") ?? pickIfAvailable("stability") ?? pickIfAvailable("replicate");
+  }
+
+  // DEFAULT: Replicate for general music
   if (trimmed.length > 0) {
-    return pickIfAvailable("replicate");
+    return pickIfAvailable("replicate") ?? pickIfAvailable("fal");
   }
 
   return PROVIDERS.find((p) => p.available)?.id ?? null;
@@ -111,15 +150,26 @@ interface ProviderSelectorProps {
   recommendation?: ProviderId | null;
   isAuto?: boolean;
   onResetAuto?: () => void;
+  durationSeconds?: number;
+  hasReferences?: boolean;
 }
 
-export function ProviderSelector({ value, onChange, prompt, recommendation, isAuto = false, onResetAuto }: ProviderSelectorProps) {
+export function ProviderSelector({
+  value,
+  onChange,
+  prompt,
+  recommendation,
+  isAuto = false,
+  onResetAuto,
+  durationSeconds,
+  hasReferences = false
+}: ProviderSelectorProps) {
   const computedRecommendation = useMemo<ProviderId | null>(() => {
     if (typeof recommendation !== "undefined") {
       return recommendation;
     }
-    return recommendProvider(prompt, false);
-  }, [prompt, recommendation]);
+    return recommendProvider(prompt, hasReferences, durationSeconds);
+  }, [prompt, recommendation, hasReferences, durationSeconds]);
 
   const selectedProvider = PROVIDERS.find((p) => p.id === value);
   const recommendedProvider = PROVIDERS.find((p) => p.id === computedRecommendation);

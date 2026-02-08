@@ -244,8 +244,8 @@ export default function Home() {
   }, [referenceClips]);
 
   const recommendedProvider = useMemo(() => {
-    return recommendProvider(prompt, referenceClips.length > 0);
-  }, [prompt, referenceClips.length]);
+    return recommendProvider(prompt, referenceClips.length > 0, lengthSeconds);
+  }, [prompt, referenceClips.length, lengthSeconds]);
 
   useEffect(() => {
     if (!providerPinned && recommendedProvider && selectedProvider !== recommendedProvider) {
@@ -458,6 +458,8 @@ export default function Home() {
                     recommendation={recommendedProvider}
                     isAuto={!providerPinned}
                     onResetAuto={providerPinned ? resetProviderToAuto : undefined}
+                    durationSeconds={lengthSeconds}
+                    hasReferences={referenceClips.length > 0}
                   />
                 </div>
 

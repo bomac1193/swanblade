@@ -21,6 +21,12 @@ export interface SoundGeneration {
   status: SoundGenerationStatus;
   errorMessage?: string;
   variantOfId?: string;
+  // Starforge LoRA
+  loraId?: string;
+  loraStrength?: number;
+  // o8 Provenance
+  provenanceCid?: string;
+  identityId?: string;
 }
 
 export interface AudioReferencePayload {
@@ -39,4 +45,63 @@ export interface GenerateSoundRequestBody {
 
 export interface GenerateSoundResponse {
   audioUrl: string;
+  provenanceCid?: string;
+}
+
+// ==================== Blue Ocean Types ====================
+
+export type GameState =
+  | "menu"
+  | "exploration"
+  | "combat"
+  | "boss"
+  | "victory"
+  | "defeat"
+  | "stealth"
+  | "ambient"
+  | "tension"
+  | "chase"
+  | "cutscene"
+  | "credits";
+
+export interface PaletteConstraints {
+  bpmRange: [number, number] | null;
+  energyRange: [number, number] | null;
+  textureRange: [number, number] | null;
+  brightnessRange: [number, number] | null;
+  noisinessRange: [number, number] | null;
+  valenceRange: [number, number] | null;
+}
+
+export interface SoundPaletteRef {
+  id: string;
+  name: string;
+  constraints: PaletteConstraints;
+  genres: string[];
+  moods: string[];
+}
+
+export interface SoundDNARef {
+  id: string;
+  name: string;
+  bpm: number;
+  key: string | null;
+  energy: number;
+  brightness: number;
+  texture: number;
+}
+
+export interface StemInfo {
+  type: string;
+  audioUrl: string;
+  provenanceCid?: string;
+}
+
+export interface StemBundleRef {
+  id: string;
+  name: string;
+  gameState: GameState;
+  stems: StemInfo[];
+  paletteId?: string;
+  createdAt: string;
 }
