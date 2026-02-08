@@ -415,33 +415,33 @@ export default function Home() {
             </div>
 
             {/* Mode Toggle */}
-            <nav className="flex gap-1 border border-brand-border">
+            <nav className="flex gap-1">
               <button
                 onClick={() => setMode("generate")}
-                className={`px-4 py-2 uppercase-label transition ${
+                className={`px-4 py-2 uppercase-label border transition ${
                   mode === "generate"
-                    ? "bg-brand-text text-brand-bg"
-                    : "bg-transparent text-brand-secondary hover:text-brand-text"
+                    ? "border-brand-text bg-brand-text text-brand-bg"
+                    : "border-brand-border bg-transparent text-brand-secondary hover:border-brand-text hover:text-brand-text"
                 }`}
               >
                 Generate
               </button>
               <button
                 onClick={() => setMode("game-audio")}
-                className={`px-4 py-2 uppercase-label transition ${
+                className={`px-4 py-2 uppercase-label border transition ${
                   mode === "game-audio"
-                    ? "bg-brand-text text-brand-bg"
-                    : "bg-transparent text-brand-secondary hover:text-brand-text"
+                    ? "border-brand-text bg-brand-text text-brand-bg"
+                    : "border-brand-border bg-transparent text-brand-secondary hover:border-brand-text hover:text-brand-text"
                 }`}
               >
                 Game Audio
               </button>
               <button
                 onClick={() => setMode("library")}
-                className={`px-4 py-2 uppercase-label transition ${
+                className={`px-4 py-2 uppercase-label border transition ${
                   mode === "library"
-                    ? "bg-brand-text text-brand-bg"
-                    : "bg-transparent text-brand-secondary hover:text-brand-text"
+                    ? "border-brand-text bg-brand-text text-brand-bg"
+                    : "border-brand-border bg-transparent text-brand-secondary hover:border-brand-text hover:text-brand-text"
                 }`}
               >
                 Library
@@ -495,10 +495,10 @@ export default function Home() {
                       <button
                         key={value}
                         onClick={() => setLengthSeconds(value)}
-                        className={`px-4 py-2 uppercase-label transition ${
+                        className={`px-4 py-2 uppercase-label border transition ${
                           lengthSeconds === value
-                            ? "bg-brand-text text-brand-bg"
-                            : "border border-brand-border text-brand-secondary hover:border-brand-text hover:text-brand-text"
+                            ? "border-brand-text bg-brand-text text-brand-bg"
+                            : "border-brand-border text-brand-secondary hover:border-brand-text hover:text-brand-text"
                         }`}
                       >
                         {value}s
@@ -707,10 +707,10 @@ export default function Home() {
                       <button
                         key={value}
                         onClick={() => setLengthSeconds(value)}
-                        className={`px-4 py-2 uppercase-label transition ${
+                        className={`px-4 py-2 uppercase-label border transition ${
                           lengthSeconds === value
-                            ? "bg-brand-text text-brand-bg"
-                            : "border border-brand-border text-brand-secondary hover:border-brand-text hover:text-brand-text"
+                            ? "border-brand-text bg-brand-text text-brand-bg"
+                            : "border-brand-border text-brand-secondary hover:border-brand-text hover:text-brand-text"
                         }`}
                       >
                         {value < 60 ? `${value}s` : `${value / 60}m`}
