@@ -17,85 +17,83 @@ function SmoothWaveform({
   progress: number;
   onSeek: (percent: number) => void;
 }) {
-  const waveformRef = useRef<SVGSVGElement>(null);
-
-  // Generate smooth waveform points
-  const waveformPoints = useMemo(() => {
-    const points: { x: number; y: number }[] = [];
-    const numPoints = 100;
+  // Generate smooth waveform path (static shape)
+  const waveformPath = useMemo(() => {
+    const points: number[] = [];
+    const numPoints = 80;
 
     for (let i = 0; i <= numPoints; i++) {
-      const x = (i / numPoints) * 100;
       const t = i / numPoints;
-      // Combine multiple sine waves for organic look
       const wave1 = Math.sin(t * 15) * 0.3;
       const wave2 = Math.sin(t * 23 + 1.5) * 0.2;
       const wave3 = Math.sin(t * 7 + 0.8) * 0.25;
       const noise = Math.sin(t * 47) * 0.1;
       const envelope = Math.sin(t * Math.PI) * 0.15;
-      const amplitude = 0.5 + wave1 + wave2 + wave3 + noise + envelope;
-      points.push({ x, y: amplitude });
+      points.push(0.5 + wave1 + wave2 + wave3 + noise + envelope);
     }
-    return points;
+
+    // Build SVG path
+    let path = '';
+    // Top edge
+    points.forEach((amp, i) => {
+      const x = (i / (points.length - 1)) * 100;
+      const y = 50 - amp * 35;
+      path += i === 0 ? `M ${x} ${y}` : ` L ${x} ${y}`;
+    });
+    // Bottom edge (reversed)
+    for (let i = points.length - 1; i >= 0; i--) {
+      const x = (i / (points.length - 1)) * 100;
+      const y = 50 + points[i] * 35;
+      path += ` L ${x} ${y}`;
+    }
+    path += ' Z';
+    return path;
   }, []);
 
-  // Create path for the waveform
-  const createPath = (startX: number, endX: number) => {
-    const relevantPoints = waveformPoints.filter(p => p.x >= startX && p.x <= endX);
-    if (relevantPoints.length === 0) return '';
-
-    // Top half
-    const topPath = relevantPoints.map((p, i) => {
-      const yPos = 50 - p.y * 35;
-      return i === 0 ? `M ${p.x} ${yPos}` : `L ${p.x} ${yPos}`;
-    }).join(' ');
-
-    // Bottom half (mirrored)
-    const bottomPath = [...relevantPoints].reverse().map((p) => {
-      const yPos = 50 + p.y * 35;
-      return `L ${p.x} ${yPos}`;
-    }).join(' ');
-
-    return `${topPath} ${bottomPath} Z`;
-  };
-
-  const handleClick = (e: React.MouseEvent<SVGSVGElement>) => {
+  const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const percent = (x / rect.width) * 100;
     onSeek(Math.max(0, Math.min(100, percent)));
   };
 
-  const playedPath = createPath(0, progress);
-  const unplayedPath = createPath(progress, 100);
+  // Clamp progress
+  const clampedProgress = Math.max(0, Math.min(100, progress));
 
   return (
-    <div className="h-12 w-full bg-brand-bg border border-brand-border cursor-pointer">
+    <div
+      className="h-12 w-full bg-brand-bg border border-brand-border cursor-pointer relative overflow-hidden"
+      onClick={handleClick}
+    >
+      {/* Full waveform in gray */}
       <svg
-        ref={waveformRef}
         viewBox="0 0 100 100"
         preserveAspectRatio="none"
-        className="h-full w-full"
-        onClick={handleClick}
+        className="absolute inset-0 h-full w-full"
       >
-        {/* Played portion - solid black */}
-        {playedPath && (
-          <path d={playedPath} fill="#0A0A0A" />
-        )}
-        {/* Unplayed portion - light gray */}
-        {unplayedPath && (
-          <path d={unplayedPath} fill="rgba(10, 10, 10, 0.2)" />
-        )}
-        {/* Playhead line */}
-        <line
-          x1={progress}
-          y1="10"
-          x2={progress}
-          y2="90"
-          stroke="#0A0A0A"
-          strokeWidth="1"
-        />
+        <path d={waveformPath} fill="rgba(10, 10, 10, 0.2)" />
       </svg>
+
+      {/* Played portion overlay - clips the black waveform */}
+      <div
+        className="absolute inset-0 overflow-hidden"
+        style={{ width: `${clampedProgress}%` }}
+      >
+        <svg
+          viewBox="0 0 100 100"
+          preserveAspectRatio="none"
+          className="h-full"
+          style={{ width: `${100 / (clampedProgress / 100 || 1)}%` }}
+        >
+          <path d={waveformPath} fill="#0A0A0A" />
+        </svg>
+      </div>
+
+      {/* Playhead */}
+      <div
+        className="absolute top-1 bottom-1 w-0.5 bg-black"
+        style={{ left: `${clampedProgress}%` }}
+      />
     </div>
   );
 }
@@ -276,33 +274,25 @@ export function LibraryPanel() {
     }
   }, [duration]);
 
-  useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
-
-    const onPlay = () => setIsPlaying(true);
-    const onPause = () => setIsPlaying(false);
-    const onTimeUpdate = () => setCurrentTime(audio.currentTime);
-    const onLoadedMetadata = () => setDuration(audio.duration);
-    const onEnded = () => {
-      setIsPlaying(false);
-      setCurrentTime(0);
-    };
-
-    audio.addEventListener("play", onPlay);
-    audio.addEventListener("pause", onPause);
-    audio.addEventListener("timeupdate", onTimeUpdate);
-    audio.addEventListener("loadedmetadata", onLoadedMetadata);
-    audio.addEventListener("ended", onEnded);
-
-    return () => {
-      audio.removeEventListener("play", onPlay);
-      audio.removeEventListener("pause", onPause);
-      audio.removeEventListener("timeupdate", onTimeUpdate);
-      audio.removeEventListener("loadedmetadata", onLoadedMetadata);
-      audio.removeEventListener("ended", onEnded);
-    };
+  const handleAudioTimeUpdate = useCallback(() => {
+    if (audioRef.current) {
+      setCurrentTime(audioRef.current.currentTime);
+    }
   }, []);
+
+  const handleAudioLoadedMetadata = useCallback(() => {
+    if (audioRef.current) {
+      setDuration(audioRef.current.duration);
+    }
+  }, []);
+
+  const handleAudioEnded = useCallback(() => {
+    setIsPlaying(false);
+    setCurrentTime(0);
+  }, []);
+
+  const handleAudioPlay = useCallback(() => setIsPlaying(true), []);
+  const handleAudioPause = useCallback(() => setIsPlaying(false), []);
 
   const groups = Array.from(new Set(sounds.map((s) => s.group).filter(Boolean))) as string[];
 
@@ -386,7 +376,15 @@ export function LibraryPanel() {
       </div>
 
       {/* Hidden audio element */}
-      <audio ref={audioRef} hidden />
+      <audio
+        ref={audioRef}
+        hidden
+        onPlay={handleAudioPlay}
+        onPause={handleAudioPause}
+        onTimeUpdate={handleAudioTimeUpdate}
+        onLoadedMetadata={handleAudioLoadedMetadata}
+        onEnded={handleAudioEnded}
+      />
 
       {/* Sound List - Compact Stacked */}
       <div className="flex flex-col gap-3 max-w-2xl">
