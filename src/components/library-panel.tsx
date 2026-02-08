@@ -9,39 +9,89 @@ import { cn, secondsToTimecode } from "@/lib/utils";
 type SortBy = "date" | "name" | "liked" | "type" | "group";
 type FilterBy = "all" | "liked" | "category" | "group";
 
-// Compact inline waveform component
-function CompactWaveform({ isPlaying, progress }: { isPlaying: boolean; progress: number }) {
-  const gradientId = useId();
-  const bars = useMemo(
-    () =>
-      Array.from({ length: 60 }, (_, index) => {
-        const pseudoRandom = Math.abs(Math.sin(index * 12.9898 + 78.233) * Math.cos(index * 0.618));
-        const smoothWave = Math.sin(index * 0.15) * 0.3;
-        return 0.4 + (pseudoRandom % 1) * 0.6 + smoothWave;
-      }),
-    [],
-  );
+// Smooth waveform component with seek support
+function SmoothWaveform({
+  progress,
+  onSeek
+}: {
+  progress: number;
+  onSeek: (percent: number) => void;
+}) {
+  const clipId = useId();
+
+  // Generate smooth waveform path
+  const waveformPath = useMemo(() => {
+    const points: number[] = [];
+    const numPoints = 100;
+
+    for (let i = 0; i <= numPoints; i++) {
+      const x = i / numPoints;
+      // Combine multiple sine waves for organic look
+      const wave1 = Math.sin(x * 15) * 0.3;
+      const wave2 = Math.sin(x * 23 + 1.5) * 0.2;
+      const wave3 = Math.sin(x * 7 + 0.8) * 0.25;
+      const noise = Math.sin(x * 47) * 0.1;
+      const envelope = Math.sin(x * Math.PI) * 0.15; // Fade in/out
+      points.push(0.5 + wave1 + wave2 + wave3 + noise + envelope);
+    }
+
+    // Create smooth curve path for top half
+    const topPath = points.map((y, i) => {
+      const x = (i / points.length) * 100;
+      const yPos = 50 - y * 40;
+      return i === 0 ? `M ${x} ${yPos}` : `L ${x} ${yPos}`;
+    }).join(' ');
+
+    // Mirror for bottom half
+    const bottomPath = [...points].reverse().map((y, i) => {
+      const x = 100 - (i / points.length) * 100;
+      const yPos = 50 + y * 40;
+      return `L ${x} ${yPos}`;
+    }).join(' ');
+
+    return `${topPath} ${bottomPath} Z`;
+  }, []);
+
+  const handleClick = (e: React.MouseEvent<SVGSVGElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const percent = (x / rect.width) * 100;
+    onSeek(Math.max(0, Math.min(100, percent)));
+  };
 
   return (
-    <div className="h-8 w-full bg-brand-bg border border-brand-border">
-      <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="h-full w-full">
+    <div className="h-10 w-full bg-brand-bg border border-brand-border cursor-pointer">
+      <svg
+        viewBox="0 0 100 100"
+        preserveAspectRatio="none"
+        className="h-full w-full"
+        onClick={handleClick}
+      >
         <defs>
-          <linearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset={`${progress}%`} stopColor="rgba(10, 10, 10, 0.8)" />
-            <stop offset={`${progress}%`} stopColor="rgba(10, 10, 10, 0.2)" />
-          </linearGradient>
+          <clipPath id={clipId}>
+            <rect x="0" y="0" width={progress} height="100" />
+          </clipPath>
         </defs>
-        {bars.map((height, i) => (
-          <rect
-            key={i}
-            x={(i / bars.length) * 100}
-            y={50 - height * 40}
-            width={100 / bars.length - 0.5}
-            height={height * 80}
-            fill={`url(#${gradientId})`}
-            className={cn(isPlaying && "animate-pulse")}
-          />
-        ))}
+        {/* Unplayed portion - light gray */}
+        <path
+          d={waveformPath}
+          fill="rgba(10, 10, 10, 0.15)"
+        />
+        {/* Played portion - solid black */}
+        <path
+          d={waveformPath}
+          fill="#0A0A0A"
+          clipPath={`url(#${clipId})`}
+        />
+        {/* Playhead line */}
+        <line
+          x1={progress}
+          y1="5"
+          x2={progress}
+          y2="95"
+          stroke="#0A0A0A"
+          strokeWidth="0.5"
+        />
       </svg>
     </div>
   );
@@ -180,20 +230,24 @@ export function LibraryPanel() {
     setEditName(sound.name);
   };
 
-  const handlePlay = useCallback((sound: LibrarySound) => {
+  const handlePlayPause = useCallback((sound: LibrarySound) => {
+    // If this sound is already playing, pause it
     if (playingId === sound.id && isPlaying) {
       audioRef.current?.pause();
-      setIsPlaying(false);
       return;
     }
 
-    if (playingId !== sound.id) {
-      setPlayingId(sound.id);
-      setCurrentTime(0);
-      setDuration(0);
+    // If this sound is paused, resume it
+    if (playingId === sound.id && !isPlaying) {
+      audioRef.current?.play().catch(console.error);
+      return;
     }
 
-    // Construct audio URL from library
+    // Different sound - load and play
+    setPlayingId(sound.id);
+    setCurrentTime(0);
+    setDuration(0);
+
     const audioUrl = `/api/library/audio?id=${sound.id}`;
 
     if (audioRef.current) {
@@ -201,6 +255,23 @@ export function LibraryPanel() {
       audioRef.current.play().catch(console.error);
     }
   }, [playingId, isPlaying]);
+
+  const handleStop = useCallback(() => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+      setCurrentTime(0);
+      setIsPlaying(false);
+    }
+  }, []);
+
+  const handleSeek = useCallback((percent: number) => {
+    if (audioRef.current && duration > 0) {
+      const newTime = (percent / 100) * duration;
+      audioRef.current.currentTime = newTime;
+      setCurrentTime(newTime);
+    }
+  }, [duration]);
 
   useEffect(() => {
     const audio = audioRef.current;
@@ -315,7 +386,7 @@ export function LibraryPanel() {
       <audio ref={audioRef} hidden />
 
       {/* Sound List - Compact Stacked */}
-      <div className="flex flex-col gap-1">
+      <div className="flex flex-col gap-1 max-w-2xl">
         {filteredSounds.map((sound) => (
           <div
             key={sound.id}
@@ -325,19 +396,19 @@ export function LibraryPanel() {
             )}
           >
             {/* Main row - always visible */}
-            <div className="flex items-center gap-3 px-3 py-2">
-              {/* Play button */}
+            <div className="flex items-center gap-2 px-2 py-1.5">
+              {/* Play/Pause button */}
               <button
-                onClick={() => handlePlay(sound)}
-                className="flex h-8 w-8 shrink-0 items-center justify-center border border-brand-border bg-brand-bg hover:border-brand-text"
+                onClick={() => handlePlayPause(sound)}
+                className="flex h-7 w-7 shrink-0 items-center justify-center border border-brand-border bg-brand-bg hover:border-brand-text"
               >
                 {playingId === sound.id && isPlaying ? (
-                  <svg width="12" height="12" viewBox="0 0 24 24" className="fill-brand-text">
+                  <svg width="10" height="10" viewBox="0 0 24 24" className="fill-brand-text">
                     <rect x="6" y="5" width="4" height="14" />
                     <rect x="14" y="5" width="4" height="14" />
                   </svg>
                 ) : (
-                  <svg width="12" height="12" viewBox="0 0 24 24" className="fill-brand-text">
+                  <svg width="10" height="10" viewBox="0 0 24 24" className="fill-brand-text">
                     <path d="M6 4l14 8-14 8z" />
                   </svg>
                 )}
@@ -352,7 +423,7 @@ export function LibraryPanel() {
                       value={editName}
                       onChange={(e) => setEditName(e.target.value)}
                       onKeyDown={(e) => e.key === "Enter" && handleRename(sound.id)}
-                      className="h-6 text-body-sm"
+                      className="h-5 text-body-sm"
                       autoFocus
                     />
                     <button onClick={() => handleRename(sound.id)} className="text-label text-brand-text">✓</button>
@@ -367,17 +438,16 @@ export function LibraryPanel() {
                     {sound.name}
                   </p>
                 )}
-                <p className="text-body-sm text-brand-secondary truncate">{sound.prompt}</p>
               </div>
 
               {/* Type badge */}
-              <Badge className="shrink-0">{sound.type}</Badge>
+              <Badge className="shrink-0 text-[10px] px-1.5 py-0.5">{sound.type}</Badge>
 
               {/* Like button */}
               <button
                 onClick={() => handleToggleLike(sound.id, sound.liked)}
                 className={cn(
-                  "text-body shrink-0",
+                  "text-sm shrink-0",
                   sound.liked ? "text-brand-text" : "text-brand-secondary hover:text-brand-text"
                 )}
               >
@@ -387,7 +457,7 @@ export function LibraryPanel() {
               {/* Download */}
               <button
                 onClick={() => handleDownload(sound.id)}
-                className="text-label text-brand-secondary hover:text-brand-text"
+                className="text-sm text-brand-secondary hover:text-brand-text"
               >
                 ↓
               </button>
@@ -395,26 +465,39 @@ export function LibraryPanel() {
               {/* Delete */}
               <button
                 onClick={() => handleDelete(sound.id)}
-                className="text-label text-brand-secondary hover:text-brand-text"
+                className="text-sm text-brand-secondary hover:text-brand-text"
               >
                 ×
               </button>
             </div>
 
-            {/* Expanded player row - shows when this sound is playing */}
+            {/* Expanded player row - shows when this sound is selected */}
             {playingId === sound.id && (
-              <div className="border-t border-brand-border px-3 py-2">
-                <div className="flex items-center gap-3">
-                  <span className="text-body-sm text-brand-secondary w-10 text-right">
+              <div className="border-t border-brand-border px-2 py-2">
+                <div className="flex items-center gap-2">
+                  {/* Stop button */}
+                  <button
+                    onClick={handleStop}
+                    className="flex h-6 w-6 shrink-0 items-center justify-center border border-brand-border bg-brand-bg hover:border-brand-text"
+                    title="Stop"
+                  >
+                    <svg width="8" height="8" viewBox="0 0 24 24" className="fill-brand-text">
+                      <rect x="5" y="5" width="14" height="14" />
+                    </svg>
+                  </button>
+
+                  <span className="text-body-sm text-brand-secondary w-8 text-right shrink-0">
                     {secondsToTimecode(currentTime)}
                   </span>
+
                   <div className="flex-1">
-                    <CompactWaveform
-                      isPlaying={isPlaying}
+                    <SmoothWaveform
                       progress={duration > 0 ? (currentTime / duration) * 100 : 0}
+                      onSeek={handleSeek}
                     />
                   </div>
-                  <span className="text-body-sm text-brand-secondary w-10">
+
+                  <span className="text-body-sm text-brand-secondary w-8 shrink-0">
                     {secondsToTimecode(duration)}
                   </span>
                 </div>
