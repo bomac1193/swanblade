@@ -410,7 +410,43 @@ export default function Home() {
       <header className="border-b border-brand-border">
         <div className="mx-auto max-w-container px-6 py-6">
           <div className="flex items-center justify-between">
-            <div>
+            <div className="flex items-center gap-3">
+              {/* Logo - Ink Swan meets Blade */}
+              <svg
+                width="40"
+                height="40"
+                viewBox="0 0 100 100"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                className="text-brand-text"
+              >
+                {/* Warped swan neck curving into blade */}
+                <path
+                  d="M25 85 C15 75, 12 55, 20 40 C28 25, 35 15, 50 10 C55 8, 58 12, 55 18 C52 24, 48 28, 45 35 C42 42, 44 48, 50 50 C56 52, 65 48, 75 35 C85 22, 90 15, 95 12"
+                  stroke="currentColor"
+                  strokeWidth="3"
+                  strokeLinecap="round"
+                  fill="none"
+                />
+                {/* Swan body - ink splash effect */}
+                <path
+                  d="M25 85 C30 80, 40 78, 50 80 C60 82, 68 78, 72 70 C76 62, 72 55, 65 52"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  fill="none"
+                />
+                {/* Blade edge - sharp diagonal */}
+                <path
+                  d="M75 35 L95 12"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                  strokeLinecap="square"
+                />
+                {/* Ink drip accent */}
+                <circle cx="22" cy="88" r="3" fill="currentColor" />
+                <ellipse cx="30" cy="90" rx="2" ry="1.5" fill="currentColor" />
+              </svg>
               <h1 className="font-display text-display-lg">Swanblade</h1>
             </div>
 
