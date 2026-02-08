@@ -163,6 +163,18 @@ export function LibraryPanel() {
   const [filteredSounds, setFilteredSounds] = useState<LibrarySound[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
+  // Clear any browser autofill on mount
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (searchInputRef.current) {
+        searchInputRef.current.value = "";
+        setSearchQuery("");
+      }
+    }, 100);
+    return () => clearTimeout(timer);
+  }, []);
   const [sortBy, setSortBy] = useState<SortBy>("date");
   const [filterBy, setFilterBy] = useState<FilterBy>("all");
   const [selectedGroup, setSelectedGroup] = useState<string>("");
@@ -384,25 +396,27 @@ export function LibraryPanel() {
     <div className="flex flex-col gap-4">
       {/* Search and Filters */}
       <div className="flex flex-col gap-3">
-        {/* Hidden inputs to absorb autofill */}
-        <input type="text" name="fake-email" style={{ display: 'none' }} tabIndex={-1} />
-        <input type="password" name="fake-password" style={{ display: 'none' }} tabIndex={-1} />
-        <Input
-          type="search"
-          placeholder="Search sounds..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          autoComplete="off"
-          autoCorrect="off"
-          autoCapitalize="off"
-          spellCheck={false}
-          name="notasearchfield"
-          id="notanemail"
-          data-form-type="other"
-          data-lpignore="true"
-          data-1p-ignore="true"
-          aria-autocomplete="none"
-        />
+        {/* Form to isolate autofill + hidden decoys */}
+        <form autoComplete="off" onSubmit={(e) => e.preventDefault()}>
+          <input type="text" name="fake-email" autoComplete="username" style={{ position: 'absolute', left: '-9999px' }} tabIndex={-1} aria-hidden="true" />
+          <input type="password" name="fake-pass" autoComplete="current-password" style={{ position: 'absolute', left: '-9999px' }} tabIndex={-1} aria-hidden="true" />
+          <Input
+            ref={searchInputRef}
+            type="search"
+            placeholder="Search sounds..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            autoComplete="off"
+            autoCorrect="off"
+            autoCapitalize="off"
+            spellCheck={false}
+            name="q"
+            data-form-type="other"
+            data-lpignore="true"
+            data-1p-ignore="true"
+            aria-autocomplete="none"
+          />
+        </form>
 
         <div className="flex flex-wrap gap-2">
           <select
