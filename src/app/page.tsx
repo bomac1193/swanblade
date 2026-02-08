@@ -401,7 +401,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-brand-bg text-brand-text">
       {/* Header */}
-      <header className="border-b border-brand-border bg-brand-surface">
+      <header className="bg-brand-surface">
         <div className="mx-auto max-w-container px-6 py-5">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
