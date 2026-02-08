@@ -11,7 +11,7 @@ const config: Config = {
       colors: {
         // Monochrome palette (Starforge aesthetic)
         'brand-bg': '#ffe100',
-        'brand-surface': '#FFFFFF',
+        'brand-surface': '#ffe100',
         'brand-text': '#0A0A0A',
         'brand-secondary': '#6A6A6A',
         'brand-border': '#E0E0E0',
