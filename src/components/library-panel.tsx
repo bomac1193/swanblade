@@ -9,46 +9,36 @@ import { cn, secondsToTimecode } from "@/lib/utils";
 type SortBy = "date" | "name" | "liked" | "type" | "group";
 type FilterBy = "all" | "liked" | "category" | "group";
 
-// Smooth waveform component with seek support
-function SmoothWaveform({
+// Waveform component that displays actual audio data
+function AudioWaveform({
   progress,
+  peaks,
   onSeek
 }: {
   progress: number;
+  peaks: number[];
   onSeek: (percent: number) => void;
 }) {
-  // Generate smooth waveform path (static shape)
+  // Build SVG path from peaks
   const waveformPath = useMemo(() => {
-    const points: number[] = [];
-    const numPoints = 80;
+    if (peaks.length === 0) return '';
 
-    for (let i = 0; i <= numPoints; i++) {
-      const t = i / numPoints;
-      const wave1 = Math.sin(t * 15) * 0.3;
-      const wave2 = Math.sin(t * 23 + 1.5) * 0.2;
-      const wave3 = Math.sin(t * 7 + 0.8) * 0.25;
-      const noise = Math.sin(t * 47) * 0.1;
-      const envelope = Math.sin(t * Math.PI) * 0.15;
-      points.push(0.5 + wave1 + wave2 + wave3 + noise + envelope);
-    }
-
-    // Build SVG path
     let path = '';
     // Top edge
-    points.forEach((amp, i) => {
-      const x = (i / (points.length - 1)) * 100;
-      const y = 50 - amp * 35;
+    peaks.forEach((amp, i) => {
+      const x = (i / (peaks.length - 1)) * 100;
+      const y = 50 - amp * 45;
       path += i === 0 ? `M ${x} ${y}` : ` L ${x} ${y}`;
     });
-    // Bottom edge (reversed)
-    for (let i = points.length - 1; i >= 0; i--) {
-      const x = (i / (points.length - 1)) * 100;
-      const y = 50 + points[i] * 35;
+    // Bottom edge (mirrored)
+    for (let i = peaks.length - 1; i >= 0; i--) {
+      const x = (i / (peaks.length - 1)) * 100;
+      const y = 50 + peaks[i] * 45;
       path += ` L ${x} ${y}`;
     }
     path += ' Z';
     return path;
-  }, []);
+  }, [peaks]);
 
   const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -57,8 +47,16 @@ function SmoothWaveform({
     onSeek(Math.max(0, Math.min(100, percent)));
   };
 
-  // Clamp progress
   const clampedProgress = Math.max(0, Math.min(100, progress));
+
+  // Show loading state if no peaks yet
+  if (peaks.length === 0) {
+    return (
+      <div className="h-12 w-full bg-brand-bg border border-brand-border flex items-center justify-center">
+        <span className="text-body-sm text-brand-secondary">Loading waveform...</span>
+      </div>
+    );
+  }
 
   return (
     <div
@@ -74,7 +72,7 @@ function SmoothWaveform({
         <path d={waveformPath} fill="rgba(10, 10, 10, 0.2)" />
       </svg>
 
-      {/* Played portion overlay - clips the black waveform */}
+      {/* Played portion overlay */}
       <div
         className="absolute inset-0 overflow-hidden"
         style={{ width: `${clampedProgress}%` }}
@@ -98,6 +96,42 @@ function SmoothWaveform({
   );
 }
 
+// Extract waveform peaks from audio buffer
+async function extractWaveformPeaks(audioUrl: string, numPeaks: number = 100): Promise<number[]> {
+  try {
+    const response = await fetch(audioUrl);
+    const arrayBuffer = await response.arrayBuffer();
+
+    const audioContext = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
+    const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+
+    // Get the audio data from the first channel
+    const channelData = audioBuffer.getChannelData(0);
+    const samplesPerPeak = Math.floor(channelData.length / numPeaks);
+
+    const peaks: number[] = [];
+    for (let i = 0; i < numPeaks; i++) {
+      const start = i * samplesPerPeak;
+      const end = start + samplesPerPeak;
+
+      // Find the max absolute value in this chunk
+      let max = 0;
+      for (let j = start; j < end && j < channelData.length; j++) {
+        const abs = Math.abs(channelData[j]);
+        if (abs > max) max = abs;
+      }
+      peaks.push(max);
+    }
+
+    // Normalize peaks to 0-1 range
+    const maxPeak = Math.max(...peaks, 0.01);
+    return peaks.map(p => p / maxPeak);
+  } catch (error) {
+    console.error('Failed to extract waveform:', error);
+    return [];
+  }
+}
+
 export function LibraryPanel() {
   const [sounds, setSounds] = useState<LibrarySound[]>([]);
   const [filteredSounds, setFilteredSounds] = useState<LibrarySound[]>([]);
@@ -112,6 +146,7 @@ export function LibraryPanel() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
+  const [waveformPeaks, setWaveformPeaks] = useState<number[]>([]);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const loadLibrary = useCallback(async () => {
@@ -231,7 +266,7 @@ export function LibraryPanel() {
     setEditName(sound.name);
   };
 
-  const handlePlayPause = useCallback((sound: LibrarySound) => {
+  const handlePlayPause = useCallback(async (sound: LibrarySound) => {
     // If this sound is already playing, pause it
     if (playingId === sound.id && isPlaying) {
       audioRef.current?.pause();
@@ -248,8 +283,14 @@ export function LibraryPanel() {
     setPlayingId(sound.id);
     setCurrentTime(0);
     setDuration(0);
+    setWaveformPeaks([]); // Clear old waveform
 
     const audioUrl = `/api/library/audio?id=${sound.id}`;
+
+    // Load waveform data
+    extractWaveformPeaks(audioUrl, 80).then(peaks => {
+      setWaveformPeaks(peaks);
+    });
 
     if (audioRef.current) {
       audioRef.current.src = audioUrl;
@@ -504,8 +545,9 @@ export function LibraryPanel() {
                   </span>
 
                   <div className="flex-1">
-                    <SmoothWaveform
+                    <AudioWaveform
                       progress={duration > 0 ? (currentTime / duration) * 100 : 0}
+                      peaks={waveformPeaks}
                       onSeek={handleSeek}
                     />
                   </div>
