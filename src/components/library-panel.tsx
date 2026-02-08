@@ -9,7 +9,7 @@ import { cn, secondsToTimecode } from "@/lib/utils";
 type SortBy = "date" | "name" | "liked" | "type" | "group";
 type FilterBy = "all" | "liked" | "category" | "group";
 
-// Waveform component that displays actual audio data
+// Waveform component that displays actual audio data with smooth curves
 function AudioWaveform({
   progress,
   peaks,
@@ -19,25 +19,51 @@ function AudioWaveform({
   peaks: number[];
   onSeek: (percent: number) => void;
 }) {
-  // Build SVG path from peaks
+  // Build smooth SVG path from peaks using bezier curves
   const waveformPath = useMemo(() => {
     if (peaks.length === 0) return '';
 
-    let path = '';
-    // Top edge
-    peaks.forEach((amp, i) => {
-      const x = (i / (peaks.length - 1)) * 100;
-      const y = 50 - amp * 45;
-      path += i === 0 ? `M ${x} ${y}` : ` L ${x} ${y}`;
-    });
-    // Bottom edge (mirrored)
-    for (let i = peaks.length - 1; i >= 0; i--) {
-      const x = (i / (peaks.length - 1)) * 100;
-      const y = 50 + peaks[i] * 45;
-      path += ` L ${x} ${y}`;
-    }
-    path += ' Z';
-    return path;
+    // Helper to create smooth curve through points
+    const smoothPath = (points: { x: number; y: number }[]) => {
+      if (points.length < 2) return '';
+
+      let path = `M ${points[0].x} ${points[0].y}`;
+
+      for (let i = 0; i < points.length - 1; i++) {
+        const p0 = points[Math.max(0, i - 1)];
+        const p1 = points[i];
+        const p2 = points[i + 1];
+        const p3 = points[Math.min(points.length - 1, i + 2)];
+
+        // Catmull-Rom to Bezier conversion
+        const tension = 0.3;
+        const cp1x = p1.x + (p2.x - p0.x) * tension;
+        const cp1y = p1.y + (p2.y - p0.y) * tension;
+        const cp2x = p2.x - (p3.x - p1.x) * tension;
+        const cp2y = p2.y - (p3.y - p1.y) * tension;
+
+        path += ` C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${p2.x} ${p2.y}`;
+      }
+
+      return path;
+    };
+
+    // Create top and bottom point arrays
+    const topPoints = peaks.map((amp, i) => ({
+      x: (i / (peaks.length - 1)) * 100,
+      y: 50 - amp * 42
+    }));
+
+    const bottomPoints = [...peaks].reverse().map((amp, i) => ({
+      x: 100 - (i / (peaks.length - 1)) * 100,
+      y: 50 + amp * 42
+    }));
+
+    // Combine into closed path
+    const topPath = smoothPath(topPoints);
+    const bottomPath = smoothPath(bottomPoints).replace('M', 'L');
+
+    return `${topPath} ${bottomPath} Z`;
   }, [peaks]);
 
   const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -60,21 +86,21 @@ function AudioWaveform({
 
   return (
     <div
-      className="h-12 w-full bg-brand-bg border border-brand-border cursor-pointer relative overflow-hidden"
+      className="h-14 w-full bg-brand-bg border border-brand-border cursor-pointer relative overflow-hidden hover:border-brand-text transition-colors"
       onClick={handleClick}
     >
-      {/* Full waveform in gray */}
+      {/* Full waveform in light gray */}
       <svg
         viewBox="0 0 100 100"
         preserveAspectRatio="none"
         className="absolute inset-0 h-full w-full"
       >
-        <path d={waveformPath} fill="rgba(10, 10, 10, 0.2)" />
+        <path d={waveformPath} fill="rgba(10, 10, 10, 0.12)" />
       </svg>
 
-      {/* Played portion overlay */}
+      {/* Played portion overlay - amber accent */}
       <div
-        className="absolute inset-0 overflow-hidden"
+        className="absolute inset-0 overflow-hidden transition-all"
         style={{ width: `${clampedProgress}%` }}
       >
         <svg
@@ -83,13 +109,13 @@ function AudioWaveform({
           className="h-full"
           style={{ width: `${100 / (clampedProgress / 100 || 1)}%` }}
         >
-          <path d={waveformPath} fill="#0A0A0A" />
+          <path d={waveformPath} fill="#D4A853" />
         </svg>
       </div>
 
-      {/* Playhead */}
+      {/* Playhead - accent color */}
       <div
-        className="absolute top-1 bottom-1 w-0.5 bg-black"
+        className="absolute top-0 bottom-0 w-0.5 bg-[#0A0A0A] shadow-sm"
         style={{ left: `${clampedProgress}%` }}
       />
     </div>

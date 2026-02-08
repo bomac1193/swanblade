@@ -401,10 +401,35 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-brand-bg text-brand-text">
       {/* Header */}
-      <header className="border-b border-brand-border">
-        <div className="mx-auto max-w-container px-6 py-6">
+      <header className="border-b border-brand-border bg-brand-surface">
+        <div className="mx-auto max-w-container px-6 py-5">
           <div className="flex items-center justify-between">
-            <h1 className="font-display text-display-lg">Swanblade</h1>
+            <div className="flex items-center gap-4">
+              {/* Logo */}
+              <svg width="36" height="36" viewBox="0 0 100 100" fill="none" className="text-brand-text">
+                <path
+                  d="M25 85 C15 75, 12 55, 20 40 C28 25, 35 15, 50 10 C55 8, 58 12, 55 18 C52 24, 48 28, 45 35 C42 42, 44 48, 50 50 C56 52, 65 48, 75 35 C85 22, 90 15, 95 12"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                  strokeLinecap="round"
+                  fill="none"
+                />
+                <path
+                  d="M25 85 C30 80, 40 78, 50 80 C60 82, 68 78, 72 70 C76 62, 72 55, 65 52"
+                  stroke="currentColor"
+                  strokeWidth="3"
+                  strokeLinecap="round"
+                  fill="none"
+                />
+                <path d="M75 35 L95 12" stroke="currentColor" strokeWidth="5" strokeLinecap="square" />
+                <circle cx="22" cy="88" r="4" fill="currentColor" />
+                <ellipse cx="32" cy="92" rx="3" ry="2" fill="currentColor" />
+              </svg>
+              <div>
+                <h1 className="brand-title text-2xl tracking-tight">Swanblade</h1>
+                <p className="text-[11px] uppercase tracking-widest text-brand-secondary">Sound Design Lab</p>
+              </div>
+            </div>
 
             {/* Mode Toggle */}
             <nav className="flex gap-1">

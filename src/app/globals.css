@@ -2,11 +2,15 @@
 
 /**
  * SWANBLADE DESIGN SYSTEM
- * Based on Starforge aesthetic
+ * Balancing elegance (swan) with precision (blade)
  *
  * Typography Hierarchy:
- * - Canela (H1-H3): Presence, naming, orientation
- * - Söhne (H4-H6, body, UI): Structural, operational, clear
+ * - Fraunces (H1-H3): Elegant, expressive, creative presence
+ * - Inter (H4-H6, body, UI): Clean, precise, functional
+ *
+ * Color Philosophy:
+ * - Warm amber accent for creative energy (swan)
+ * - Sharp black/white contrast for precision (blade)
  */
 
 :root {
@@ -15,7 +19,9 @@
   --brand-text: #0A0A0A;
   --brand-secondary: #6A6A6A;
   --brand-border: #E0E0E0;
-  --brand-accent: #2A2A2A;
+  --brand-accent: #D4A853;
+  --brand-accent-hover: #C49643;
+  --brand-accent-subtle: rgba(212, 168, 83, 0.1);
 }
 
 /* Remove all rounded corners by default */
@@ -23,50 +29,56 @@
   border-radius: 0;
 }
 
-/* Smooth transitions - minimal */
+/* Smooth, elegant transitions */
 * {
-  transition-property: color, background-color, border-color, opacity;
-  transition-timing-function: ease;
-  transition-duration: 150ms;
+  transition-property: color, background-color, border-color, opacity, transform;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 200ms;
 }
 
 body {
   min-height: 100vh;
   background-color: var(--brand-bg);
   color: var(--brand-text);
-  font-family: 'Söhne', 'Helvetica Neue', Arial, sans-serif;
+  font-family: var(--font-inter), 'Helvetica Neue', Arial, sans-serif;
   font-weight: 400;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* PRIMARY HEADINGS: Canela (announces, never explains) */
-h1, h2, h3 {
-  font-family: 'Canela', Georgia, serif;
+/* PRIMARY HEADINGS: Fraunces (elegant, expressive) */
+h1, h2, h3,
+.font-display {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-optical-sizing: auto;
 }
 
 h1 {
   font-size: 48px;
   line-height: 56px;
-  font-weight: 500;
+  font-weight: 400;
+  font-style: normal;
+  font-variation-settings: "opsz" 72;
 }
 
 h2 {
   font-size: 32px;
   line-height: 40px;
-  font-weight: 500;
+  font-weight: 400;
+  font-variation-settings: "opsz" 48;
 }
 
 h3 {
   font-size: 24px;
   line-height: 32px;
   font-weight: 400;
+  font-variation-settings: "opsz" 32;
 }
 
-/* SECONDARY HEADINGS: Söhne (structural labels) */
+/* SECONDARY HEADINGS: Inter (clean, precise) */
 h4, h5, h6 {
-  font-family: 'Söhne', 'Helvetica Neue', Arial, sans-serif;
+  font-family: var(--font-inter), 'Helvetica Neue', Arial, sans-serif;
 }
 
 h4 {
@@ -87,9 +99,9 @@ h6 {
   font-weight: 500;
 }
 
-/* Selection */
+/* Selection - warm accent */
 ::selection {
-  background: rgba(10, 10, 10, 0.15);
+  background: var(--brand-accent-subtle);
   color: #0A0A0A;
 }
 
@@ -194,11 +206,11 @@ button:disabled {
   color: #6A6A6A;
 }
 
-/* Animations */
+/* Animations - smooth and elegant */
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(4px);
+    transform: translateY(8px);
   }
   to {
     opacity: 1;
@@ -206,11 +218,104 @@ button:disabled {
   }
 }
 
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes pulse-subtle {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+@keyframes flow {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
 .animate-fadeIn {
-  animation: fadeIn 0.2s ease-out;
+  animation: fadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.animate-slideIn {
+  animation: slideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.animate-pulse-subtle {
+  animation: pulse-subtle 2s ease-in-out infinite;
+}
+
+/* Brand title - elegant styling */
+.brand-title {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-weight: 300;
+  font-variation-settings: "opsz" 72;
+  letter-spacing: -0.02em;
+}
+
+/* Accent underline for elegance */
+.accent-underline {
+  position: relative;
+}
+
+.accent-underline::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: var(--brand-accent);
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.accent-underline:hover::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+/* Accent highlight */
+.accent-highlight {
+  color: var(--brand-accent);
+}
+
+/* Hover lift effect */
+.hover-lift {
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
 /* Audio player styling */
 audio::-webkit-media-controls-panel {
   background: #FAFAFA;
+}
+
+/* Accent border on focus */
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: var(--brand-accent) !important;
 }
