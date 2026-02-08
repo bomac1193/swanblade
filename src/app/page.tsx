@@ -425,10 +425,7 @@ export default function Home() {
                 <circle cx="22" cy="88" r="4" fill="currentColor" />
                 <ellipse cx="32" cy="92" rx="3" ry="2" fill="currentColor" />
               </svg>
-              <div>
-                <h1 className="brand-title text-2xl tracking-tight">Swanblade</h1>
-                <p className="text-[11px] uppercase tracking-widest text-brand-secondary">Sound Design Lab</p>
-              </div>
+              <h1 className="brand-title text-2xl tracking-tight">Swanblade</h1>
             </div>
 
             {/* Mode Toggle */}
