@@ -187,8 +187,8 @@ export function LibraryPanel({ onPlaySound }: LibraryPanelProps) {
 
           <button
             onClick={() => setFilterBy("all")}
-            className={`px-3 py-1.5 text-label uppercase tracking-wider transition ${
-              filterBy === "all" ? "bg-brand-text text-brand-bg" : "border border-brand-border text-brand-secondary hover:text-brand-text"
+            className={`px-3 py-1.5 text-label uppercase tracking-wider border transition ${
+              filterBy === "all" ? "border-brand-text bg-brand-text text-brand-bg" : "border-brand-border text-brand-secondary hover:border-brand-text hover:text-brand-text"
             }`}
           >
             All ({sounds.length})
@@ -196,8 +196,8 @@ export function LibraryPanel({ onPlaySound }: LibraryPanelProps) {
 
           <button
             onClick={() => setFilterBy("liked")}
-            className={`px-3 py-1.5 text-label uppercase tracking-wider transition ${
-              filterBy === "liked" ? "bg-brand-text text-brand-bg" : "border border-brand-border text-brand-secondary hover:text-brand-text"
+            className={`px-3 py-1.5 text-label uppercase tracking-wider border transition ${
+              filterBy === "liked" ? "border-brand-text bg-brand-text text-brand-bg" : "border-brand-border text-brand-secondary hover:border-brand-text hover:text-brand-text"
             }`}
           >
             Liked ({sounds.filter((s) => s.liked).length})
