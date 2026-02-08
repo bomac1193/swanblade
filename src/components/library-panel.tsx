@@ -384,19 +384,24 @@ export function LibraryPanel() {
     <div className="flex flex-col gap-4">
       {/* Search and Filters */}
       <div className="flex flex-col gap-3">
+        {/* Hidden inputs to absorb autofill */}
+        <input type="text" name="fake-email" style={{ display: 'none' }} tabIndex={-1} />
+        <input type="password" name="fake-password" style={{ display: 'none' }} tabIndex={-1} />
         <Input
           type="search"
           placeholder="Search sounds..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          autoComplete="new-password"
+          autoComplete="off"
           autoCorrect="off"
           autoCapitalize="off"
           spellCheck={false}
-          name={`search-${Date.now()}`}
+          name="notasearchfield"
+          id="notanemail"
           data-form-type="other"
           data-lpignore="true"
           data-1p-ignore="true"
+          aria-autocomplete="none"
         />
 
         <div className="flex flex-wrap gap-2">
