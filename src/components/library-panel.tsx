@@ -17,40 +17,47 @@ function SmoothWaveform({
   progress: number;
   onSeek: (percent: number) => void;
 }) {
-  const clipId = useId();
+  const waveformRef = useRef<SVGSVGElement>(null);
 
-  // Generate smooth waveform path
-  const waveformPath = useMemo(() => {
-    const points: number[] = [];
+  // Generate smooth waveform points
+  const waveformPoints = useMemo(() => {
+    const points: { x: number; y: number }[] = [];
     const numPoints = 100;
 
     for (let i = 0; i <= numPoints; i++) {
-      const x = i / numPoints;
+      const x = (i / numPoints) * 100;
+      const t = i / numPoints;
       // Combine multiple sine waves for organic look
-      const wave1 = Math.sin(x * 15) * 0.3;
-      const wave2 = Math.sin(x * 23 + 1.5) * 0.2;
-      const wave3 = Math.sin(x * 7 + 0.8) * 0.25;
-      const noise = Math.sin(x * 47) * 0.1;
-      const envelope = Math.sin(x * Math.PI) * 0.15; // Fade in/out
-      points.push(0.5 + wave1 + wave2 + wave3 + noise + envelope);
+      const wave1 = Math.sin(t * 15) * 0.3;
+      const wave2 = Math.sin(t * 23 + 1.5) * 0.2;
+      const wave3 = Math.sin(t * 7 + 0.8) * 0.25;
+      const noise = Math.sin(t * 47) * 0.1;
+      const envelope = Math.sin(t * Math.PI) * 0.15;
+      const amplitude = 0.5 + wave1 + wave2 + wave3 + noise + envelope;
+      points.push({ x, y: amplitude });
     }
+    return points;
+  }, []);
 
-    // Create smooth curve path for top half
-    const topPath = points.map((y, i) => {
-      const x = (i / points.length) * 100;
-      const yPos = 50 - y * 40;
-      return i === 0 ? `M ${x} ${yPos}` : `L ${x} ${yPos}`;
+  // Create path for the waveform
+  const createPath = (startX: number, endX: number) => {
+    const relevantPoints = waveformPoints.filter(p => p.x >= startX && p.x <= endX);
+    if (relevantPoints.length === 0) return '';
+
+    // Top half
+    const topPath = relevantPoints.map((p, i) => {
+      const yPos = 50 - p.y * 35;
+      return i === 0 ? `M ${p.x} ${yPos}` : `L ${p.x} ${yPos}`;
     }).join(' ');
 
-    // Mirror for bottom half
-    const bottomPath = [...points].reverse().map((y, i) => {
-      const x = 100 - (i / points.length) * 100;
-      const yPos = 50 + y * 40;
-      return `L ${x} ${yPos}`;
+    // Bottom half (mirrored)
+    const bottomPath = [...relevantPoints].reverse().map((p) => {
+      const yPos = 50 + p.y * 35;
+      return `L ${p.x} ${yPos}`;
     }).join(' ');
 
     return `${topPath} ${bottomPath} Z`;
-  }, []);
+  };
 
   const handleClick = (e: React.MouseEvent<SVGSVGElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -59,38 +66,34 @@ function SmoothWaveform({
     onSeek(Math.max(0, Math.min(100, percent)));
   };
 
+  const playedPath = createPath(0, progress);
+  const unplayedPath = createPath(progress, 100);
+
   return (
-    <div className="h-10 w-full bg-brand-bg border border-brand-border cursor-pointer">
+    <div className="h-12 w-full bg-brand-bg border border-brand-border cursor-pointer">
       <svg
+        ref={waveformRef}
         viewBox="0 0 100 100"
         preserveAspectRatio="none"
         className="h-full w-full"
         onClick={handleClick}
       >
-        <defs>
-          <clipPath id={clipId}>
-            <rect x="0" y="0" width={progress} height="100" />
-          </clipPath>
-        </defs>
-        {/* Unplayed portion - light gray */}
-        <path
-          d={waveformPath}
-          fill="rgba(10, 10, 10, 0.15)"
-        />
         {/* Played portion - solid black */}
-        <path
-          d={waveformPath}
-          fill="#0A0A0A"
-          clipPath={`url(#${clipId})`}
-        />
+        {playedPath && (
+          <path d={playedPath} fill="#0A0A0A" />
+        )}
+        {/* Unplayed portion - light gray */}
+        {unplayedPath && (
+          <path d={unplayedPath} fill="rgba(10, 10, 10, 0.2)" />
+        )}
         {/* Playhead line */}
         <line
           x1={progress}
-          y1="5"
+          y1="10"
           x2={progress}
-          y2="95"
+          y2="90"
           stroke="#0A0A0A"
-          strokeWidth="0.5"
+          strokeWidth="1"
         />
       </svg>
     </div>
@@ -386,7 +389,7 @@ export function LibraryPanel() {
       <audio ref={audioRef} hidden />
 
       {/* Sound List - Compact Stacked */}
-      <div className="flex flex-col gap-1 max-w-2xl">
+      <div className="flex flex-col gap-3 max-w-2xl">
         {filteredSounds.map((sound) => (
           <div
             key={sound.id}
@@ -396,22 +399,16 @@ export function LibraryPanel() {
             )}
           >
             {/* Main row - always visible */}
-            <div className="flex items-center gap-2 px-2 py-1.5">
-              {/* Play/Pause button */}
+            <div className="flex items-center gap-2 px-3 py-2">
+              {/* Play button - always shows play icon to start/select this sound */}
               <button
                 onClick={() => handlePlayPause(sound)}
-                className="flex h-7 w-7 shrink-0 items-center justify-center border border-brand-border bg-brand-bg hover:border-brand-text"
+                className="flex h-8 w-8 shrink-0 items-center justify-center border border-brand-border bg-brand-bg hover:border-brand-text"
+                title="Play"
               >
-                {playingId === sound.id && isPlaying ? (
-                  <svg width="10" height="10" viewBox="0 0 24 24" className="fill-brand-text">
-                    <rect x="6" y="5" width="4" height="14" />
-                    <rect x="14" y="5" width="4" height="14" />
-                  </svg>
-                ) : (
-                  <svg width="10" height="10" viewBox="0 0 24 24" className="fill-brand-text">
-                    <path d="M6 4l14 8-14 8z" />
-                  </svg>
-                )}
+                <svg width="12" height="12" viewBox="0 0 24 24" className="fill-brand-text">
+                  <path d="M6 4l14 8-14 8z" />
+                </svg>
               </button>
 
               {/* Name and prompt */}
@@ -423,7 +420,7 @@ export function LibraryPanel() {
                       value={editName}
                       onChange={(e) => setEditName(e.target.value)}
                       onKeyDown={(e) => e.key === "Enter" && handleRename(sound.id)}
-                      className="h-5 text-body-sm"
+                      className="h-6 text-body-sm"
                       autoFocus
                     />
                     <button onClick={() => handleRename(sound.id)} className="text-label text-brand-text">✓</button>
@@ -473,20 +470,38 @@ export function LibraryPanel() {
 
             {/* Expanded player row - shows when this sound is selected */}
             {playingId === sound.id && (
-              <div className="border-t border-brand-border px-2 py-2">
+              <div className="border-t border-brand-border px-3 py-2">
                 <div className="flex items-center gap-2">
+                  {/* Play/Pause button */}
+                  <button
+                    onClick={() => handlePlayPause(sound)}
+                    className="flex h-7 w-7 shrink-0 items-center justify-center border border-brand-border bg-brand-bg hover:border-brand-text"
+                    title={isPlaying ? "Pause" : "Play"}
+                  >
+                    {isPlaying ? (
+                      <svg width="10" height="10" viewBox="0 0 24 24" className="fill-brand-text">
+                        <rect x="6" y="5" width="4" height="14" />
+                        <rect x="14" y="5" width="4" height="14" />
+                      </svg>
+                    ) : (
+                      <svg width="10" height="10" viewBox="0 0 24 24" className="fill-brand-text">
+                        <path d="M6 4l14 8-14 8z" />
+                      </svg>
+                    )}
+                  </button>
+
                   {/* Stop button */}
                   <button
                     onClick={handleStop}
-                    className="flex h-6 w-6 shrink-0 items-center justify-center border border-brand-border bg-brand-bg hover:border-brand-text"
+                    className="flex h-7 w-7 shrink-0 items-center justify-center border border-brand-border bg-brand-bg hover:border-brand-text"
                     title="Stop"
                   >
-                    <svg width="8" height="8" viewBox="0 0 24 24" className="fill-brand-text">
+                    <svg width="10" height="10" viewBox="0 0 24 24" className="fill-brand-text">
                       <rect x="5" y="5" width="14" height="14" />
                     </svg>
                   </button>
 
-                  <span className="text-body-sm text-brand-secondary w-8 text-right shrink-0">
+                  <span className="text-body-sm text-brand-secondary w-10 text-right shrink-0">
                     {secondsToTimecode(currentTime)}
                   </span>
 
