@@ -363,6 +363,12 @@ export function LibraryPanel() {
           placeholder="Search sounds..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
+          autoComplete="off"
+          autoCorrect="off"
+          autoCapitalize="off"
+          spellCheck={false}
+          name="sound-search"
+          data-form-type="other"
         />
 
         <div className="flex flex-wrap gap-2">
