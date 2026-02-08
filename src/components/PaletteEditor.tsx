@@ -72,8 +72,8 @@ export function PaletteEditor({ value, onChange, onCreateFromDNA }: PaletteEdito
           onClick={() => handlePresetSelect("none")}
           className={`px-3 py-1.5 text-label uppercase tracking-wider border transition ${
             !value
-              ? "border-brand-text bg-brand-text text-brand-bg"
-              : "border-brand-border text-brand-secondary hover:border-brand-text hover:text-brand-text"
+              ? "border-[#0A0A0A] bg-[#0A0A0A] text-[#FAFAFA]"
+              : "border-[#E0E0E0] text-[#6A6A6A] hover:border-[#0A0A0A] hover:text-[#0A0A0A]"
           }`}
         >
           No Palette
@@ -85,8 +85,8 @@ export function PaletteEditor({ value, onChange, onCreateFromDNA }: PaletteEdito
             onClick={() => handlePresetSelect(id)}
             className={`px-3 py-1.5 text-label uppercase tracking-wider border transition ${
               value?.name === preset.name
-                ? "border-brand-text bg-brand-text text-brand-bg"
-                : "border-brand-border text-brand-secondary hover:border-brand-text hover:text-brand-text"
+                ? "border-[#0A0A0A] bg-[#0A0A0A] text-[#FAFAFA]"
+                : "border-[#E0E0E0] text-[#6A6A6A] hover:border-[#0A0A0A] hover:text-[#0A0A0A]"
             }`}
           >
             {preset.name}
@@ -105,8 +105,8 @@ export function PaletteEditor({ value, onChange, onCreateFromDNA }: PaletteEdito
                 onClick={() => handleSavedSelect(p.id)}
                 className={`px-3 py-1.5 text-label uppercase tracking-wider border transition ${
                   value?.id === p.id
-                    ? "border-brand-text bg-brand-text text-brand-bg"
-                    : "border-brand-border text-brand-secondary hover:border-brand-text hover:text-brand-text"
+                    ? "border-[#0A0A0A] bg-[#0A0A0A] text-[#FAFAFA]"
+                    : "border-[#E0E0E0] text-[#6A6A6A] hover:border-[#0A0A0A] hover:text-[#0A0A0A]"
                 }`}
               >
                 {p.name}

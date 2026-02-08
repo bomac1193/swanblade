@@ -420,8 +420,8 @@ export default function Home() {
                 onClick={() => setMode("generate")}
                 className={`px-4 py-2 uppercase-label border transition ${
                   mode === "generate"
-                    ? "border-brand-text bg-brand-text text-brand-bg"
-                    : "border-brand-border bg-transparent text-brand-secondary hover:border-brand-text hover:text-brand-text"
+                    ? "border-[#0A0A0A] bg-[#0A0A0A] text-[#FAFAFA]"
+                    : "border-[#E0E0E0] bg-transparent text-[#6A6A6A] hover:border-[#0A0A0A] hover:text-[#0A0A0A]"
                 }`}
               >
                 Generate
@@ -430,8 +430,8 @@ export default function Home() {
                 onClick={() => setMode("game-audio")}
                 className={`px-4 py-2 uppercase-label border transition ${
                   mode === "game-audio"
-                    ? "border-brand-text bg-brand-text text-brand-bg"
-                    : "border-brand-border bg-transparent text-brand-secondary hover:border-brand-text hover:text-brand-text"
+                    ? "border-[#0A0A0A] bg-[#0A0A0A] text-[#FAFAFA]"
+                    : "border-[#E0E0E0] bg-transparent text-[#6A6A6A] hover:border-[#0A0A0A] hover:text-[#0A0A0A]"
                 }`}
               >
                 Game Audio
@@ -440,8 +440,8 @@ export default function Home() {
                 onClick={() => setMode("library")}
                 className={`px-4 py-2 uppercase-label border transition ${
                   mode === "library"
-                    ? "border-brand-text bg-brand-text text-brand-bg"
-                    : "border-brand-border bg-transparent text-brand-secondary hover:border-brand-text hover:text-brand-text"
+                    ? "border-[#0A0A0A] bg-[#0A0A0A] text-[#FAFAFA]"
+                    : "border-[#E0E0E0] bg-transparent text-[#6A6A6A] hover:border-[#0A0A0A] hover:text-[#0A0A0A]"
                 }`}
               >
                 Library
