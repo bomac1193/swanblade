@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 
-export type ProviderId = "replicate" | "elevenlabs" | "stability" | "openai" | "fal" | "suno";
+export type ProviderId = "replicate" | "elevenlabs" | "stability" | "openai" | "fal" | "suno" | "starforge";
 
 export interface Provider {
   id: ProviderId;
@@ -14,6 +14,14 @@ export interface Provider {
 }
 
 export const PROVIDERS: Provider[] = [
+  {
+    id: "starforge",
+    name: "Starforge LoRA",
+    description: "Your trained Sonic Identity model with o8 provenance",
+    strengths: ["Custom Style", "LoRA", "Sonic DNA", "Provenance"],
+    goodFor: ["custom", "lora", "trained", "identity", "signature", "style"],
+    available: true,
+  },
   {
     id: "suno",
     name: "VocalForge",
