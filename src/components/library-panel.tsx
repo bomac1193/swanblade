@@ -109,7 +109,7 @@ function AudioWaveform({
           className="h-full"
           style={{ width: `${100 / (clampedProgress / 100 || 1)}%` }}
         >
-          <path d={waveformPath} fill="#DC2626" />
+          <path d={waveformPath} fill="#0A0A0A" />
         </svg>
       </div>
 

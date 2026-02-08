@@ -19,9 +19,9 @@
   --brand-text: #0A0A0A;
   --brand-secondary: #6A6A6A;
   --brand-border: #E0E0E0;
-  --brand-accent: #DC2626;
-  --brand-accent-hover: #B91C1C;
-  --brand-accent-subtle: rgba(220, 38, 38, 0.1);
+  --brand-accent: #0A0A0A;
+  --brand-accent-hover: #2A2A2A;
+  --brand-accent-subtle: rgba(10, 10, 10, 0.08);
 }
 
 /* Remove all rounded corners by default */
