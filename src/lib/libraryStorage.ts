@@ -8,6 +8,10 @@ export interface LibrarySound extends SoundGeneration {
   group?: string;
   downloadedAt: string;
   fileName: string;
+  // Lineage tracking
+  parentId?: string;
+  lineageId?: string;
+  generation?: number;
 }
 
 export interface Library {

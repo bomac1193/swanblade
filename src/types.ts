@@ -105,3 +105,109 @@ export interface StemBundleRef {
   paletteId?: string;
   createdAt: string;
 }
+
+// ==================== Sound Lineage Types ====================
+
+export interface SoundLineage {
+  id: string;
+  rootSoundId: string;
+  name: string;
+  createdAt: string;
+  updatedAt: string;
+  totalGenerations: number;
+  totalVariations: number;
+}
+
+export interface LineageNode {
+  soundId: string;
+  parentId: string | null;
+  lineageId: string;
+  generation: number;
+  variationType: VariationType;
+  parameterShifts?: ParameterShift[];
+  createdAt: string;
+}
+
+export type VariationType =
+  | "root"
+  | "parameter_shift"
+  | "style_transfer"
+  | "combine"
+  | "evolve"
+  | "mutate";
+
+export interface ParameterShift {
+  parameter: "intensity" | "texture" | "brightness" | "noisiness" | "bpm";
+  originalValue: number;
+  newValue: number;
+  shiftAmount: number;
+}
+
+export interface VariationRequest {
+  parentSoundId: string;
+  variationType: VariationType;
+  count: number;
+  parameterShifts?: Partial<Record<ParameterShift["parameter"], number>>;
+  combineWithSoundId?: string;
+  evolutionStrength?: number;
+  mutationRate?: number;
+  preserveCore?: boolean;
+}
+
+export interface VariationResult {
+  sounds: SoundGeneration[];
+  lineageId: string;
+  generation: number;
+}
+
+// ==================== Sound Transform Types ====================
+
+export interface TransformRequest {
+  sourceAudioUrl: string;
+  transformPrompt: string;
+  preserveRhythm?: boolean;
+  preservePitch?: boolean;
+  preserveTimbre?: boolean;
+  transformStrength?: number;
+}
+
+export interface TransformResult {
+  audioUrl: string;
+  provenanceCid?: string;
+  transformApplied: string;
+}
+
+// ==================== Voice Fusion Types ====================
+
+export type VoiceFusionType =
+  | "creature"
+  | "alien_language"
+  | "effort"
+  | "ambient_vocal"
+  | "choir"
+  | "processed";
+
+export interface VoiceFusionRequest {
+  type: VoiceFusionType;
+  prompt: string;
+  baseVoiceId?: string;
+  creatureType?: string;
+  emotionalIntensity?: number;
+  alienLanguageParams?: {
+    syllablePattern: string;
+    tonality: "tonal" | "atonal" | "whispered";
+  };
+  effortType?: "attack" | "hit" | "jump" | "climb" | "death" | "custom";
+  layerWithSound?: string;
+  duration?: number;
+}
+
+export interface VoiceFusionResult {
+  audioUrl: string;
+  provenanceCid?: string;
+  voiceMetadata: {
+    type: VoiceFusionType;
+    duration: number;
+    layers?: string[];
+  };
+}
