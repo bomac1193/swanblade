@@ -48,8 +48,8 @@ export function GameStateSelector({
                   onClick={() => onChange(value === state ? null : state)}
                   className={`px-3 py-1.5 text-label uppercase tracking-wider border transition ${
                     value === state
-                      ? "border-[#0A0A0A] bg-[#0A0A0A] text-[#FAFAFA]"
-                      : "border-[#E0E0E0] text-[#6A6A6A] hover:border-[#0A0A0A] hover:text-[#0A0A0A]"
+                      ? "border-brand-text bg-brand-text text-brand-bg"
+                      : "border-brand-border text-brand-secondary hover:border-brand-text hover:text-brand-text"
                   }`}
                 >
                   {state}

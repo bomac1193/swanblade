@@ -124,7 +124,7 @@ h6 {
 /* Selection - warm accent */
 ::selection {
   background: var(--brand-accent-subtle);
-  color: #0A0A0A;
+  color: var(--brand-text);
 }
 
 /* Custom scrollbar - minimal */
@@ -133,15 +133,15 @@ h6 {
 }
 
 ::-webkit-scrollbar-track {
-  background: #FAFAFA;
+  background: var(--brand-bg);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #E0E0E0;
+  background: var(--brand-border);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #6A6A6A;
+  background: var(--brand-secondary);
 }
 
 /* Focus states */
@@ -152,7 +152,7 @@ h6 {
 button:focus-visible,
 input:focus-visible,
 textarea:focus-visible {
-  outline: 1px solid #0A0A0A;
+  outline: 1px solid var(--brand-text);
   outline-offset: 2px;
 }
 
@@ -171,15 +171,15 @@ button:disabled {
 }
 
 .card {
-  background: #FFFFFF;
-  border: 1px solid #E0E0E0;
+  background: var(--brand-surface);
+  border: 1px solid var(--brand-border);
   padding: 24px;
 }
 
 .btn-primary {
-  background: #0A0A0A;
-  color: #FAFAFA;
-  border: 1px solid #0A0A0A;
+  background: var(--brand-text);
+  color: var(--brand-bg);
+  border: 1px solid var(--brand-text);
   padding: 12px 24px;
   font-size: 11px;
   font-weight: 500;
@@ -189,14 +189,14 @@ button:disabled {
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: #2A2A2A;
-  border-color: #2A2A2A;
+  background: var(--brand-secondary);
+  border-color: var(--brand-secondary);
 }
 
 .btn-secondary {
   background: transparent;
-  color: #0A0A0A;
-  border: 1px solid #E0E0E0;
+  color: var(--brand-text);
+  border: 1px solid var(--brand-border);
   padding: 12px 24px;
   font-size: 11px;
   font-weight: 500;
@@ -206,26 +206,26 @@ button:disabled {
 }
 
 .btn-secondary:hover:not(:disabled) {
-  border-color: #0A0A0A;
+  border-color: var(--brand-text);
 }
 
 .input-field {
-  background: #FAFAFA;
-  border: 1px solid #E0E0E0;
+  background: var(--brand-bg);
+  border: 1px solid var(--brand-border);
   padding: 12px 16px;
   font-size: 14px;
   font-weight: 400;
-  color: #0A0A0A;
+  color: var(--brand-text);
   width: 100%;
 }
 
 .input-field:focus {
-  border-color: #0A0A0A;
-  background: #FFFFFF;
+  border-color: var(--brand-text);
+  background: var(--brand-surface);
 }
 
 .input-field::placeholder {
-  color: #6A6A6A;
+  color: var(--brand-secondary);
 }
 
 /* Animations - smooth and elegant */
@@ -332,7 +332,7 @@ button:disabled {
 
 /* Audio player styling */
 audio::-webkit-media-controls-panel {
-  background: #FAFAFA;
+  background: var(--brand-bg);
 }
 
 /* Accent border on focus */

@@ -96,7 +96,7 @@ function AudioWaveform({
         preserveAspectRatio="none"
         className="absolute inset-0 h-full w-full"
       >
-        <path d={waveformPath} fill="rgba(10, 10, 10, 0.12)" />
+        <path d={waveformPath} className="fill-brand-text/20" />
       </svg>
 
       {/* Played portion overlay - amber accent */}
@@ -116,7 +116,7 @@ function AudioWaveform({
 
       {/* Playhead - accent color */}
       <div
-        className="absolute top-0 bottom-0 w-0.5 bg-[#0A0A0A] shadow-sm"
+        className="absolute top-0 bottom-0 w-0.5 bg-brand-text shadow-sm"
         style={{ left: `${clampedProgress}%` }}
       />
     </div>

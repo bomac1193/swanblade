@@ -50,7 +50,7 @@ export function Spectrogram({ audioUrl, isPlaying, className }: SpectrogramProps
       analyser.getByteFrequencyData(dataArray);
 
       // Clear canvas
-      ctx.fillStyle = "rgba(10, 10, 10, 0.1)";
+      ctx.fillStyle = "var(--brand-bg)";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       // Draw frequency bars
@@ -134,7 +134,7 @@ export function Spectrogram({ audioUrl, isPlaying, className }: SpectrogramProps
   }
 
   return (
-    <div className={cn("bg-[#0A0A0A] border border-brand-border overflow-hidden", className)}>
+    <div className={cn("bg-brand-bg border border-brand-border overflow-hidden", className)}>
       <canvas
         ref={canvasRef}
         width={400}
@@ -167,8 +167,9 @@ export function StaticSpectrogram({
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    // Clear
-    ctx.fillStyle = "#0A0A0A";
+    // Clear - get computed style for theme awareness
+    const computedStyle = getComputedStyle(document.documentElement);
+    ctx.fillStyle = computedStyle.getPropertyValue('--brand-bg').trim() || "#0A0A0A";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     // Draw peaks as bars
@@ -195,7 +196,7 @@ export function StaticSpectrogram({
       ref={canvasRef}
       width={400}
       height={48}
-      className={cn("w-full h-12 bg-[#0A0A0A] border border-brand-border", className)}
+      className={cn("w-full h-12 bg-brand-bg border border-brand-border", className)}
     />
   );
 }
