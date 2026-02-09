@@ -21,7 +21,7 @@ const EXCHANGE_RATES: Record<Currency, number> = {
 const PLANS = [
   {
     name: "Professional",
-    priceUSD: 149,
+    priceUSD: 111,
     interval: "month",
     description: "For individual sound designers and composers working on commercial projects.",
     includes: "Unlimited generations, all export formats, commercial license, priority rendering",
