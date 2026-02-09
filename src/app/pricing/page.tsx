@@ -20,25 +20,31 @@ const EXCHANGE_RATES: Record<Currency, number> = {
 
 const PLANS = [
   {
-    name: "Free",
-    priceUSD: 0,
-    description: "10 generations/month, MP3 export",
-  },
-  {
-    name: "Pro",
-    priceUSD: 29,
-    description: "500 generations/month, all formats, commercial license",
-    highlighted: true,
+    name: "Professional",
+    priceUSD: 149,
+    interval: "month",
+    description: "For individual sound designers and composers working on commercial projects.",
+    includes: "Unlimited generations, all export formats, commercial license, priority rendering",
   },
   {
     name: "Studio",
-    priceUSD: 99,
-    description: "Unlimited, team workspaces, game engine plugins",
+    priceUSD: 449,
+    interval: "month",
+    description: "For teams shipping games, films, or interactive media.",
+    includes: "Everything in Professional, plus 5 seats, shared palettes, Wwise/FMOD integration, dedicated support",
+    highlighted: true,
+  },
+  {
+    name: "Enterprise",
+    priceUSD: null,
+    interval: null,
+    description: "For large studios with custom requirements.",
+    includes: "Unlimited seats, on-premise option, custom model training, SLA, dedicated account manager",
   },
 ];
 
-function formatPrice(priceUSD: number, currency: Currency): string {
-  if (priceUSD === 0) return "Free";
+function formatPrice(priceUSD: number | null, currency: Currency): string {
+  if (priceUSD === null) return "Custom";
   const converted = Math.round(priceUSD * EXCHANGE_RATES[currency]);
   return `${CURRENCY_SYMBOLS[currency]}${converted}`;
 }
@@ -50,21 +56,32 @@ export default function PricingPage() {
     <MarketingLayout>
       {/* Hero */}
       <section className="py-32 px-6">
-        <div className="max-w-3xl mx-auto text-center">
-          <h1 className="text-5xl md:text-6xl font-display mb-8">
-            Pricing
+        <div className="max-w-2xl mx-auto">
+          <p
+            className="text-xs uppercase tracking-[0.3em] text-white/30 mb-6"
+            style={{ fontFamily: "Sohne, sans-serif" }}
+          >
+            Investment
+          </p>
+          <h1 className="text-4xl font-display mb-8">
+            Priced for professionals.
           </h1>
+          <p className="text-white/50 leading-relaxed" style={{ fontFamily: "Sohne, sans-serif" }}>
+            We don&apos;t offer a free tier. If you&apos;re exploring or unsure,
+            this isn&apos;t the right tool yet. When you&apos;re ready to invest
+            in your audio, we&apos;re here.
+          </p>
 
           {/* Currency Toggle */}
-          <div className="inline-flex bg-white/5 border border-white/10">
+          <div className="mt-8 inline-flex border border-white/10">
             {(["USD", "GBP", "EUR"] as Currency[]).map((c) => (
               <button
                 key={c}
                 onClick={() => setCurrency(c)}
-                className={`px-4 py-2 text-sm font-medium transition ${
+                className={`px-4 py-2 text-xs uppercase tracking-widest transition ${
                   currency === c
                     ? "bg-white/10 text-white"
-                    : "text-white/40 hover:text-white"
+                    : "text-white/30 hover:text-white"
                 }`}
                 style={{ fontFamily: "Sohne, sans-serif" }}
               >
@@ -77,56 +94,63 @@ export default function PricingPage() {
 
       {/* Plans */}
       <section className="py-16 px-6 border-t border-white/10">
-        <div className="max-w-3xl mx-auto space-y-6">
+        <div className="max-w-2xl mx-auto space-y-8">
           {PLANS.map((plan) => (
             <div
               key={plan.name}
-              className={`p-6 border flex items-center justify-between ${
+              className={`p-8 border ${
                 plan.highlighted
-                  ? "border-[#66023C] bg-[#66023C]/5"
+                  ? "border-[#66023C]"
                   : "border-white/10"
               }`}
             >
-              <div>
-                <h2 className="text-xl font-display">{plan.name}</h2>
-                <p className="text-white/50 mt-1" style={{ fontFamily: "Sohne, sans-serif" }}>
-                  {plan.description}
-                </p>
-              </div>
-              <div className="text-right">
-                <span className="text-3xl font-display">
-                  {formatPrice(plan.priceUSD, currency)}
-                </span>
-                {plan.priceUSD > 0 && (
-                  <span className="text-white/40 text-sm ml-1" style={{ fontFamily: "Sohne, sans-serif" }}>
-                    /mo
+              <div className="flex items-start justify-between mb-6">
+                <div>
+                  <h2 className="text-xl font-display">{plan.name}</h2>
+                  <p className="text-white/40 text-sm mt-1" style={{ fontFamily: "Sohne, sans-serif" }}>
+                    {plan.description}
+                  </p>
+                </div>
+                <div className="text-right">
+                  <span className="text-3xl font-display">
+                    {formatPrice(plan.priceUSD, currency)}
                   </span>
-                )}
+                  {plan.interval && (
+                    <span className="text-white/30 text-sm ml-1" style={{ fontFamily: "Sohne, sans-serif" }}>
+                      /{plan.interval}
+                    </span>
+                  )}
+                </div>
               </div>
+              <p className="text-white/50 text-sm" style={{ fontFamily: "Sohne, sans-serif" }}>
+                {plan.includes}
+              </p>
             </div>
           ))}
         </div>
+      </section>
 
-        {/* Enterprise Note */}
-        <div className="max-w-3xl mx-auto mt-12 text-center">
-          <p className="text-white/40" style={{ fontFamily: "Sohne, sans-serif" }}>
-            Need more? <a href="mailto:hello@swanblade.com" className="text-white hover:text-[#66023C] transition">Contact us</a> for enterprise pricing.
+      {/* Annual Note */}
+      <section className="py-8 px-6">
+        <div className="max-w-2xl mx-auto">
+          <p className="text-white/30 text-sm" style={{ fontFamily: "Sohne, sans-serif" }}>
+            Annual billing available. Two months included.
           </p>
         </div>
       </section>
 
       {/* CTA */}
       <section className="py-32 px-6 border-t border-white/10">
-        <div className="max-w-3xl mx-auto text-center">
+        <div className="max-w-2xl mx-auto text-center">
+          <p className="text-white/40 mb-6" style={{ fontFamily: "Sohne, sans-serif" }}>
+            Ready to elevate your audio?
+          </p>
           <Link
             href="/studio"
-            className="inline-flex items-center gap-3 bg-white text-black px-8 py-4 text-lg font-semibold hover:bg-white/90 transition"
+            className="inline-block border border-white/30 text-white px-8 py-4 text-xs uppercase tracking-widest hover:bg-white hover:text-black transition"
             style={{ fontFamily: "Sohne, sans-serif" }}
           >
-            Start Free
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-              <path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
+            Apply for Access
           </Link>
         </div>
       </section>

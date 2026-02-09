@@ -3,71 +3,99 @@
 import Link from "next/link";
 import MarketingLayout from "@/components/MarketingLayout";
 
-const FEATURES = [
-  {
-    title: "Generate",
-    description: "Create production-ready sounds from text. Describe what you need, get instant results.",
-  },
-  {
-    title: "Transform",
-    description: "Upload audio and reshape it with words. Turn any sound into something new.",
-  },
-  {
-    title: "Export",
-    description: "One-click export to Unity, Unreal, Wwise, and FMOD. Ready for your game engine.",
-  },
-  {
-    title: "Collaborate",
-    description: "Share palettes with your team. Real-time sync, approval workflows, role-based access.",
-  },
-];
-
 export default function FeaturesPage() {
   return (
     <MarketingLayout>
       {/* Hero */}
       <section className="py-32 px-6">
-        <div className="max-w-3xl mx-auto text-center">
-          <h1 className="text-5xl md:text-6xl font-display mb-8">
-            What Swanblade Does
+        <div className="max-w-2xl mx-auto">
+          <p
+            className="text-xs uppercase tracking-[0.3em] text-white/30 mb-6"
+            style={{ fontFamily: "Sohne, sans-serif" }}
+          >
+            Capabilities
+          </p>
+          <h1 className="text-4xl font-display mb-8">
+            Built for studios that ship.
           </h1>
-          <p className="text-xl text-white/60" style={{ fontFamily: "Sohne, sans-serif" }}>
-            Sound design tools that get out of your way.
+          <p className="text-white/50 leading-relaxed" style={{ fontFamily: "Sohne, sans-serif" }}>
+            Swanblade is not a toy. It&apos;s not for hobbyists exploring sound design
+            on weekends. It&apos;s for professionals under deadline who need production-ready
+            audio without the wait.
           </p>
         </div>
       </section>
 
-      {/* Features - Simple List */}
+      {/* What It Does */}
       <section className="py-16 px-6 border-t border-white/10">
-        <div className="max-w-3xl mx-auto space-y-16">
-          {FEATURES.map((feature, i) => (
-            <div key={feature.title} className="flex gap-8">
-              <span className="text-white/20 text-sm font-mono" style={{ fontFamily: "Sohne, sans-serif" }}>
-                0{i + 1}
-              </span>
-              <div>
-                <h2 className="text-2xl font-display mb-3">{feature.title}</h2>
-                <p className="text-lg text-white/60" style={{ fontFamily: "Sohne, sans-serif" }}>
-                  {feature.description}
-                </p>
-              </div>
+        <div className="max-w-2xl mx-auto space-y-12">
+          <div>
+            <h2 className="text-xl font-display mb-3">Generate</h2>
+            <p className="text-white/50" style={{ fontFamily: "Sohne, sans-serif" }}>
+              Describe what you need. Get broadcast-quality results in seconds, not days.
+              No sample library diving. No endless tweaking.
+            </p>
+          </div>
+          <div>
+            <h2 className="text-xl font-display mb-3">Transform</h2>
+            <p className="text-white/50" style={{ fontFamily: "Sohne, sans-serif" }}>
+              Take existing audio and reshape it with language. Turn a field recording
+              into something otherworldly while preserving what matters.
+            </p>
+          </div>
+          <div>
+            <h2 className="text-xl font-display mb-3">Ship</h2>
+            <p className="text-white/50" style={{ fontFamily: "Sohne, sans-serif" }}>
+              One-click export to Wwise, FMOD, Unity, Unreal. Stems, metadata,
+              implementation-ready. Your middleware, not ours.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Who This Is For */}
+      <section className="py-16 px-6 border-t border-white/10">
+        <div className="max-w-2xl mx-auto">
+          <p
+            className="text-xs uppercase tracking-[0.3em] text-white/30 mb-6"
+            style={{ fontFamily: "Sohne, sans-serif" }}
+          >
+            Fit
+          </p>
+
+          <div className="space-y-8">
+            <div>
+              <h3 className="text-lg font-display mb-3 text-white">This is for you if:</h3>
+              <ul className="space-y-2 text-white/50" style={{ fontFamily: "Sohne, sans-serif" }}>
+                <li>You&apos;re shipping a game or film with real deadlines</li>
+                <li>You know what good audio sounds like</li>
+                <li>You value your time more than learning another tool</li>
+                <li>You need results, not experiments</li>
+              </ul>
             </div>
-          ))}
+
+            <div>
+              <h3 className="text-lg font-display mb-3 text-white/40">This is not for you if:</h3>
+              <ul className="space-y-2 text-white/30" style={{ fontFamily: "Sohne, sans-serif" }}>
+                <li>You&apos;re looking for the cheapest option</li>
+                <li>You want tutorials and hand-holding</li>
+                <li>You&apos;re not sure what you need yet</li>
+                <li>&quot;Good enough&quot; is good enough</li>
+              </ul>
+            </div>
+          </div>
         </div>
       </section>
 
       {/* CTA */}
       <section className="py-32 px-6 border-t border-white/10">
-        <div className="max-w-3xl mx-auto text-center">
+        <div className="max-w-2xl mx-auto text-center">
           <Link
-            href="/studio"
-            className="inline-flex items-center gap-3 bg-white text-black px-8 py-4 text-lg font-semibold hover:bg-white/90 transition"
+            href="/pricing"
+            className="inline-block border border-white/30 text-white px-8 py-4 text-xs uppercase tracking-widest hover:bg-white hover:text-black transition"
             style={{ fontFamily: "Sohne, sans-serif" }}
           >
-            Try It Now
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-              <path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
+            View Pricing
           </Link>
         </div>
       </section>

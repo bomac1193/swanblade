@@ -20,23 +20,21 @@ export function MarketingLayout({ children }: MarketingLayoutProps) {
   return (
     <div className="min-h-screen bg-[#0A0A0A] text-white">
       {/* Navigation */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-[#0A0A0A]/80 backdrop-blur-md border-b border-white/10">
-        <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
-          {/* Logo */}
-          <Link href="/" className="font-display text-lg">
+      <header className="fixed top-0 left-0 right-0 z-50 bg-[#0A0A0A]/90 backdrop-blur-md border-b border-white/5">
+        <div className="max-w-3xl mx-auto px-6 py-5 flex items-center justify-between">
+          <Link href="/" className="font-display text-lg tracking-wide">
             Swanblade
           </Link>
 
-          {/* Nav Links */}
-          <nav className="flex items-center gap-8">
+          <nav className="flex items-center gap-10">
             {NAV_LINKS.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
-                className={`text-sm transition ${
+                className={`text-xs uppercase tracking-widest transition ${
                   pathname === link.href
                     ? "text-white"
-                    : "text-white/50 hover:text-white"
+                    : "text-white/40 hover:text-white"
                 }`}
                 style={{ fontFamily: "Sohne, sans-serif" }}
               >
@@ -45,24 +43,30 @@ export function MarketingLayout({ children }: MarketingLayoutProps) {
             ))}
             <Link
               href="/studio"
-              className="bg-white text-black px-4 py-2 text-sm hover:bg-white/90 transition"
+              className="border border-white/30 text-white px-5 py-2 text-xs uppercase tracking-widest hover:bg-white hover:text-black transition"
               style={{ fontFamily: "Sohne, sans-serif" }}
             >
-              Studio
+              Enter
             </Link>
           </nav>
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="pt-16">{children}</main>
+      <main className="pt-20">{children}</main>
 
-      {/* Footer - Minimal */}
-      <footer className="border-t border-white/10 py-8 px-6">
-        <div className="max-w-4xl mx-auto flex items-center justify-between text-sm text-white/30" style={{ fontFamily: "Sohne, sans-serif" }}>
-          <span>&copy; {new Date().getFullYear()} Swanblade</span>
-          <a href="mailto:hello@swanblade.com" className="hover:text-white transition">
-            hello@swanblade.com
+      {/* Footer */}
+      <footer className="border-t border-white/5 py-12 px-6">
+        <div className="max-w-3xl mx-auto flex items-center justify-between">
+          <span className="text-xs text-white/20 uppercase tracking-widest" style={{ fontFamily: "Sohne, sans-serif" }}>
+            &copy; {new Date().getFullYear()} Swanblade
+          </span>
+          <a
+            href="mailto:studio@swanblade.com"
+            className="text-xs text-white/20 uppercase tracking-widest hover:text-white transition"
+            style={{ fontFamily: "Sohne, sans-serif" }}
+          >
+            studio@swanblade.com
           </a>
         </div>
       </footer>
