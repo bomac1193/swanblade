@@ -1,0 +1,42 @@
+{
+  "name": "Swanblade",
+  "short_name": "Swanblade",
+  "description": "AI-powered sound design tool for game audio",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0A0A0A",
+  "theme_color": "#66023C",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["music", "productivity", "utilities"],
+  "shortcuts": [
+    {
+      "name": "Generate Sound",
+      "url": "/?mode=generate",
+      "description": "Generate a new sound"
+    },
+    {
+      "name": "Game Audio",
+      "url": "/?mode=game-audio",
+      "description": "Create game audio bundles"
+    },
+    {
+      "name": "Library",
+      "url": "/?mode=library",
+      "description": "Browse your sound library"
+    }
+  ]
+}

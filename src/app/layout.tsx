@@ -17,6 +17,19 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "Swanblade — Sound Design Lab",
   description: "Prompt-driven audio generation with game-state awareness.",
+  manifest: "/manifest.json",
+  themeColor: "#66023C",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "Swanblade",
+  },
+  viewport: {
+    width: "device-width",
+    initialScale: 1,
+    maximumScale: 1,
+    userScalable: false,
+  },
 };
 
 export default function RootLayout({

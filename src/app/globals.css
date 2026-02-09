@@ -319,3 +319,104 @@ textarea:focus,
 select:focus {
   border-color: var(--brand-accent) !important;
 }
+
+/* ==================== RESPONSIVE STYLES ==================== */
+
+/* Mobile-first responsive adjustments */
+@media (max-width: 768px) {
+  h1 {
+    font-size: 32px;
+    line-height: 40px;
+  }
+
+  h2 {
+    font-size: 24px;
+    line-height: 32px;
+  }
+
+  h3 {
+    font-size: 20px;
+    line-height: 28px;
+  }
+
+  .max-w-container {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  /* Stack grid layouts on mobile */
+  .lg\:grid-cols-2 {
+    grid-template-columns: 1fr;
+  }
+
+  /* Full width buttons on mobile */
+  nav.flex.gap-1 {
+    flex-wrap: wrap;
+  }
+
+  nav.flex.gap-1 button {
+    flex: 1 1 auto;
+    min-width: calc(50% - 4px);
+  }
+
+  /* Collapsible panels on mobile */
+  .card {
+    padding: 12px;
+  }
+
+  /* Touch-friendly tap targets */
+  button, 
+  a,
+  input,
+  select {
+    min-height: 44px;
+  }
+
+  /* Hide secondary buttons on very small screens */
+  .hide-on-mobile {
+    display: none;
+  }
+}
+
+/* Tablet adjustments */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .max-w-container {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+}
+
+/* Large screen optimizations */
+@media (min-width: 1536px) {
+  .max-w-container {
+    max-width: 1440px;
+  }
+}
+
+/* Dark mode responsive adjustments */
+[data-theme="dark"] audio::-webkit-media-controls-panel {
+  background: #141414;
+}
+
+/* Reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Print styles */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  
+  body {
+    background: white;
+    color: black;
+  }
+}
