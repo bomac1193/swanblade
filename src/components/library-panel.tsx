@@ -5,6 +5,7 @@ import { LibrarySound } from "@/lib/libraryStorage";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { cn, secondsToTimecode } from "@/lib/utils";
+import { ProvenanceLookup } from "./provenance-lookup";
 
 type SortBy = "date" | "name" | "liked" | "type" | "group";
 type FilterBy = "all" | "liked" | "category" | "group";
@@ -467,6 +468,9 @@ export function LibraryPanel() {
             </select>
           )}
         </div>
+
+        {/* Provenance Verification */}
+        <ProvenanceLookup className="mt-2" />
       </div>
 
       {/* Hidden audio element */}

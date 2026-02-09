@@ -12,6 +12,35 @@ interface O8IdentityPanelProps {
   className?: string;
 }
 
+// Skeleton loader component
+function Skeleton({ className }: { className?: string }) {
+  return (
+    <div
+      className={cn(
+        "animate-pulse bg-brand-border",
+        className
+      )}
+    />
+  );
+}
+
+// Identity skeleton for loading state
+function IdentitySkeleton() {
+  return (
+    <div className="px-4 py-3 border-b border-brand-border last:border-b-0">
+      <div className="flex items-center justify-between">
+        <div className="space-y-2">
+          <Skeleton className="h-4 w-32" />
+          <div className="flex gap-2">
+            <Skeleton className="h-4 w-16" />
+            <Skeleton className="h-4 w-12" />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // Sonic palette visualizer
 function SonicPaletteViz({ palette }: { palette: SonicPalette }) {
   const bands = [
@@ -121,22 +150,73 @@ export function O8IdentityPanel({ onIdentityChange, className }: O8IdentityPanel
       {expanded && (
         <div className="border-t border-brand-border">
           {loading ? (
-            <div className="p-4 text-center">
-              <p className="text-body-sm text-brand-secondary">Connecting to Starforge...</p>
+            <div className="max-h-64 overflow-y-auto">
+              <IdentitySkeleton />
+              <IdentitySkeleton />
+              <IdentitySkeleton />
             </div>
           ) : error ? (
             <div className="p-4">
-              <p className="text-body-sm text-status-error">{error}</p>
-              <Button variant="secondary" size="sm" onClick={loadIdentities} className="mt-2">
-                Retry
-              </Button>
+              <div className="flex items-start gap-3">
+                <div className="w-8 h-8 border border-status-error/30 bg-status-error/10 flex items-center justify-center flex-shrink-0">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="text-status-error">
+                    <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.5" />
+                    <path d="M12 7v6M12 16v1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                  </svg>
+                </div>
+                <div className="flex-1">
+                  <p className="text-body-sm font-medium text-status-error">Connection Failed</p>
+                  <p className="text-body-sm text-brand-secondary mt-1">
+                    {error === "Failed to connect to Starforge"
+                      ? "Starforge server is not responding. Check that it's running on localhost:3001."
+                      : error}
+                  </p>
+                  <div className="mt-3 flex gap-2">
+                    <Button variant="secondary" size="sm" onClick={loadIdentities}>
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" className="mr-1.5">
+                        <path d="M3 12a9 9 0 1 1 9 9M3 12V3m0 9h9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                      </svg>
+                      Retry
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setError(null)}
+                      className="text-brand-secondary"
+                    >
+                      Work Offline
+                    </Button>
+                  </div>
+                </div>
+              </div>
             </div>
           ) : identities.length === 0 ? (
-            <div className="p-4 text-center">
-              <p className="text-body-sm text-brand-secondary">No identities found</p>
-              <p className="text-body-sm text-brand-secondary/60 mt-1">
-                Create an identity in Starforge first
-              </p>
+            <div className="p-4">
+              <div className="flex items-start gap-3">
+                <div className="w-8 h-8 border border-brand-border bg-brand-bg flex items-center justify-center flex-shrink-0">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="text-brand-secondary">
+                    <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.5" strokeDasharray="4 2" />
+                    <path d="M12 8v4M12 14v2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                  </svg>
+                </div>
+                <div className="flex-1">
+                  <p className="text-body-sm font-medium text-brand-text">No Identities Found</p>
+                  <p className="text-body-sm text-brand-secondary mt-1">
+                    Create a Sonic Identity in Starforge to personalize your sound generation.
+                  </p>
+                  <a
+                    href="http://localhost:3001"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 mt-3 text-body-sm text-[#66023C] hover:underline"
+                  >
+                    Open Starforge
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
+                      <path d="M7 17L17 7M17 7H7M17 7v10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  </a>
+                </div>
+              </div>
             </div>
           ) : (
             <div className="max-h-64 overflow-y-auto">

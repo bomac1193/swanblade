@@ -17,6 +17,7 @@ import type { SoundPalette } from "@/lib/soundPalette";
 import type { StemBundle } from "@/lib/stemGenerator";
 import type { O8Identity, O8Provenance } from "@/lib/o8/types";
 import { generateSoundName } from "@/lib/utils";
+import { useKeyboardShortcuts, getShortcutsList } from "@/hooks/useKeyboardShortcuts";
 
 type AppMode = "generate" | "game-audio" | "library";
 
@@ -145,6 +146,9 @@ export default function Home() {
     setO8Identity(identity);
     setO8PromptModifier(promptModifier);
   }, []);
+
+  // Keyboard shortcuts state
+  const [showShortcuts, setShowShortcuts] = useState(false);
 
   const toast = useCallback((message: string, tone: ToastItem["tone"] = "neutral") => {
     const id = crypto.randomUUID();
@@ -417,6 +421,59 @@ export default function Home() {
       setIsGenerating(false);
     }
   };
+
+  // Keyboard shortcuts
+  const shortcuts = useMemo(
+    () => [
+      {
+        key: "g",
+        description: "Generate sound",
+        action: () => {
+          if (mode === "generate") runGeneration();
+          else if (mode === "game-audio") runGameAudioGeneration();
+        },
+      },
+      {
+        key: "s",
+        ctrl: true,
+        description: "Save to library",
+        action: () => {
+          if (currentSound?.status === "ready") saveToLibrary();
+        },
+      },
+      {
+        key: "1",
+        description: "Switch to Generate mode",
+        action: () => setMode("generate"),
+      },
+      {
+        key: "2",
+        description: "Switch to Game Audio mode",
+        action: () => setMode("game-audio"),
+      },
+      {
+        key: "3",
+        description: "Switch to Library",
+        action: () => setMode("library"),
+      },
+      {
+        key: "?",
+        description: "Show keyboard shortcuts",
+        action: () => setShowShortcuts((prev) => !prev),
+      },
+      {
+        key: "Escape",
+        description: "Close dialogs",
+        action: () => {
+          setShowShortcuts(false);
+          setShowStemExport(false);
+        },
+      },
+    ],
+    [mode, currentSound?.status]
+  );
+
+  useKeyboardShortcuts(shortcuts);
 
   return (
     <div className="min-h-screen bg-brand-bg text-brand-text">
@@ -994,6 +1051,44 @@ export default function Home() {
           </div>
         )}
       </main>
+
+      {/* Keyboard Shortcuts Modal */}
+      {showShortcuts && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+          onClick={() => setShowShortcuts(false)}
+        >
+          <div
+            className="bg-brand-surface border border-brand-border p-6 max-w-md w-full mx-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-display text-display-sm">Keyboard Shortcuts</h3>
+              <button
+                onClick={() => setShowShortcuts(false)}
+                className="text-brand-secondary hover:text-brand-text"
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                  <path d="M6 6l12 12M6 18L18 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                </svg>
+              </button>
+            </div>
+            <div className="space-y-2">
+              {getShortcutsList(shortcuts).map(({ key, description }) => (
+                <div key={key} className="flex items-center justify-between py-2 border-b border-brand-border last:border-b-0">
+                  <span className="text-body text-brand-text">{description}</span>
+                  <kbd className="px-2 py-1 bg-brand-bg border border-brand-border text-body-sm font-mono">
+                    {key}
+                  </kbd>
+                </div>
+              ))}
+            </div>
+            <p className="mt-4 text-body-sm text-brand-secondary text-center">
+              Press <kbd className="px-1 bg-brand-bg border border-brand-border">?</kbd> anytime to toggle this menu
+            </p>
+          </div>
+        </div>
+      )}
 
       <ToastStack items={toasts} onDismiss={(id) => setToasts((prev) => prev.filter((t) => t.id !== id))} />
     </div>

@@ -40,6 +40,27 @@ const GAME_STATES = [
   'menu',
 ];
 
+const BURN_THE_SQUARE_URL = process.env.NEXT_PUBLIC_BTS_URL || 'http://localhost:3002';
+
+// Generate deep link for Burn the Square
+function generateDeepLink(params: {
+  soundId: string;
+  soundName: string;
+  stems: StemType[];
+  gameState: string;
+  format: string;
+}): string {
+  const searchParams = new URLSearchParams({
+    source: 'swanblade',
+    soundId: params.soundId,
+    name: params.soundName,
+    stems: params.stems.join(','),
+    state: params.gameState,
+    format: params.format,
+  });
+  return `${BURN_THE_SQUARE_URL}/import?${searchParams.toString()}`;
+}
+
 export function StemExportPanel({
   soundId,
   soundName,
@@ -184,14 +205,33 @@ export function StemExportPanel({
       {/* Export Button */}
       <div className="p-4">
         {exported ? (
-          <div className="flex items-center justify-center gap-2 py-3 bg-[#66023C]/10 text-[#66023C]">
-            <svg width="20" height="20" viewBox="0 0 24 24">
-              <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.5" fill="none" />
-              <path d="M8 12l2.5 2.5L16 9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-            </svg>
-            <span className="text-body font-medium">
-              Exported to Burn the Square
-            </span>
+          <div className="space-y-3">
+            <div className="flex items-center justify-center gap-2 py-3 bg-[#66023C]/10 text-[#66023C]">
+              <svg width="20" height="20" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.5" fill="none" />
+                <path d="M8 12l2.5 2.5L16 9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+              </svg>
+              <span className="text-body font-medium">
+                Exported to Burn the Square
+              </span>
+            </div>
+            <a
+              href={generateDeepLink({
+                soundId,
+                soundName,
+                stems: stems.filter((s) => s.enabled).map((s) => s.type),
+                gameState: targetState,
+                format,
+              })}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center gap-2 w-full py-2 border border-[#66023C] text-[#66023C] hover:bg-[#66023C] hover:text-white transition-colors"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                <path d="M7 17L17 7M17 7H7M17 7v10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+              <span className="text-body-sm font-medium">Open in Burn the Square</span>
+            </a>
           </div>
         ) : (
           <Button
