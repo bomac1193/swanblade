@@ -373,7 +373,7 @@ export default function Home() {
 
     const trimmedPrompt = prompt.trim();
     if (!trimmedPrompt) {
-      toast("Enter a prompt to generate.", "error");
+      toast("Enter a brief to generate.", "error");
       return;
     }
 
@@ -738,9 +738,9 @@ export default function Home() {
                   />
                 </div>
 
-                {/* Optional Prompt */}
+                {/* Optional Brief */}
                 <div className="mt-4">
-                  <p className="text-body-sm text-brand-secondary">Style Keywords (Optional)</p>
+                  <p className="text-body-sm text-brand-secondary">Style Direction (Optional)</p>
                   <textarea
                     className="input-field mt-2"
                     rows={2}
@@ -858,13 +858,13 @@ export default function Home() {
           <div className="grid gap-6 lg:grid-cols-2">
             {/* Left: Controls */}
             <div className="space-y-6">
-              {/* Prompt */}
+              {/* Brief */}
               <div className="card">
-                <h4 className="text-heading-sm text-brand-text">Prompt</h4>
+                <h4 className="text-heading-sm text-brand-text">Brief</h4>
                 <textarea
                   className="input-field mt-3"
                   rows={4}
-                  placeholder="Describe the sound you want to generate..."
+                  placeholder="Describe the sound you need..."
                   value={prompt}
                   onChange={(e) => setPrompt(e.target.value)}
                   disabled={isGenerating}
@@ -1181,7 +1181,7 @@ export default function Home() {
               ) : (
                 <div className="mt-4 py-12 text-center">
                   <p className="text-body text-brand-secondary">
-                    Enter a prompt and generate to create audio.
+                    Enter a brief and generate to create audio.
                   </p>
                 </div>
               )}
