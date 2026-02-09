@@ -39,9 +39,7 @@ export function Frame2147241533({ className, children }: Frame2147241533Props) {
                 />
               </svg>
             </div>
-            <span
-              className="text-white text-lg font-semibold tracking-tight font-display"
-            >
+            <span className="text-white text-lg font-semibold tracking-tight font-display">
               Swanblade
             </span>
           </div>
@@ -84,9 +82,7 @@ export function Frame2147241533({ className, children }: Frame2147241533Props) {
       <main className="flex-1 flex flex-col items-center justify-center px-8">
         <div className="text-center max-w-3xl pointer-events-auto">
           {/* Headline */}
-          <h1
-            className="text-6xl md:text-7xl font-bold text-white leading-tight mb-6 font-display"
-          >
+          <h1 className="text-6xl md:text-7xl font-bold text-white leading-tight mb-6 font-display">
             Burn The Square
           </h1>
 

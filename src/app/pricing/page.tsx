@@ -147,7 +147,7 @@ export default function PricingPage() {
                 style={{ fontFamily: "Sohne, sans-serif" }}
               >
                 Annual
-                <span className="text-xs px-1.5 py-0.5 bg-emerald-500/20 text-emerald-400 font-normal">
+                <span className="text-xs px-1.5 py-0.5 bg-[#66023C]-500/20 text-[#66023C]-400 font-normal">
                   Save 17%
                 </span>
               </button>
@@ -191,7 +191,7 @@ export default function PricingPage() {
                 }`}
               >
                 {plan.highlighted && (
-                  <div className="text-xs font-semibold text-emerald-400 uppercase tracking-wider mb-3" style={{ fontFamily: "Sohne, sans-serif" }}>
+                  <div className="text-xs font-semibold text-[#66023C]-400 uppercase tracking-wider mb-3" style={{ fontFamily: "Sohne, sans-serif" }}>
                     Most Popular
                   </div>
                 )}
@@ -210,7 +210,7 @@ export default function PricingPage() {
                 <ul className="space-y-2 mb-6">
                   {plan.features.map((feature) => (
                     <li key={feature} className="flex items-start gap-2 text-sm text-white/70" style={{ fontFamily: "Sohne, sans-serif" }}>
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="text-emerald-400 mt-0.5 flex-shrink-0">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="text-[#66023C]-400 mt-0.5 flex-shrink-0">
                         <path d="M5 13l4 4L19 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                       </svg>
                       {feature}

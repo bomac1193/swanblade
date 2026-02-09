@@ -178,7 +178,7 @@ export default function FeaturesPage() {
           <h1 className="text-5xl md:text-6xl font-display mb-6">
             Everything You Need for
             <br />
-            <span className="bg-gradient-to-r from-violet-400 via-pink-400 to-orange-400 bg-clip-text text-transparent">
+            <span className="text-[#66023C]">
               Professional Sound Design
             </span>
           </h1>
