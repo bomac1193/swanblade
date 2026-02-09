@@ -16,9 +16,9 @@ export function Frame2147241533({ className, children }: Frame2147241533Props) {
       {/* Top Navigation */}
       <header className="pointer-events-auto">
         <div className="flex items-center justify-between px-8 py-6">
-          <span className="text-white text-lg font-display tracking-wide">
-            Swanblade
-          </span>
+          <Link href="/" className="text-white/60 text-sm font-mono tracking-wider hover:text-white transition">
+            SB
+          </Link>
           <nav className="flex items-center gap-10">
             <Link
               href="/features"
@@ -61,14 +61,14 @@ export function Frame2147241533({ className, children }: Frame2147241533Props) {
           >
             For Professional Sound Designers
           </p>
-          <h1 className="text-5xl md:text-6xl text-white leading-tight mb-8 font-display">
-            Burn The Square
+          <h1 className="text-6xl md:text-7xl text-white leading-tight mb-8 font-display tracking-tight">
+            Swanblade
           </h1>
           <p
-            className="text-white/50 mb-12 max-w-md mx-auto"
+            className="text-white/40 mb-12 max-w-md mx-auto text-lg"
             style={{ fontFamily: "Sohne, sans-serif" }}
           >
-            The instrument for those who refuse to compromise on audio.
+            Forge sounds that don't exist yet.
           </p>
           <Link
             href="/apply"
