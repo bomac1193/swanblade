@@ -18,6 +18,11 @@ import type { StemBundle } from "@/lib/stemGenerator";
 import type { O8Identity, O8Provenance } from "@/lib/o8/types";
 import { generateSoundName } from "@/lib/utils";
 import { useKeyboardShortcuts, getShortcutsList } from "@/hooks/useKeyboardShortcuts";
+import { useTheme } from "@/hooks/useTheme";
+import { useGenerationHistory } from "@/hooks/useGenerationHistory";
+import { GenerationHistory, HistoryControls } from "@/components/generation-history";
+import { usePresets } from "@/hooks/usePresets";
+import { PresetsPanel } from "@/components/presets-panel";
 
 type AppMode = "generate" | "game-audio" | "library";
 
@@ -149,6 +154,59 @@ export default function Home() {
 
   // Keyboard shortcuts state
   const [showShortcuts, setShowShortcuts] = useState(false);
+
+  // Theme
+  const { toggleTheme, isDark } = useTheme();
+
+  // Generation history
+  const {
+    history: generationHistory,
+    currentIndex: historyIndex,
+    addToHistory,
+    canUndo,
+    canRedo,
+    undo,
+    redo,
+    goTo: goToHistory,
+    clearHistory,
+  } = useGenerationHistory();
+
+  const handleUndo = useCallback(() => {
+    const sound = undo();
+    if (sound) setCurrentSound(sound);
+  }, [undo]);
+
+  const handleRedo = useCallback(() => {
+    const sound = redo();
+    if (sound) setCurrentSound(sound);
+  }, [redo]);
+
+  const handleHistorySelect = useCallback((index: number) => {
+    const sound = goToHistory(index);
+    if (sound) setCurrentSound(sound);
+  }, [goToHistory]);
+
+  // Presets
+  const { presets, savePreset, deletePreset } = usePresets();
+
+  const handleSavePreset = useCallback((name: string) => {
+    savePreset({
+      name,
+      prompt,
+      provider: selectedProvider,
+      lengthSeconds,
+      palette: selectedPalette,
+      gameState: selectedGameState,
+    });
+  }, [savePreset, prompt, selectedProvider, lengthSeconds, selectedPalette, selectedGameState]);
+
+  const handleLoadPreset = useCallback((preset: { prompt: string; provider: string; lengthSeconds: number; palette?: unknown; gameState?: unknown }) => {
+    setPrompt(preset.prompt);
+    setSelectedProvider(preset.provider as ProviderId);
+    setLengthSeconds(preset.lengthSeconds);
+    if (preset.palette) setSelectedPalette(preset.palette as SoundPalette);
+    if (preset.gameState) setSelectedGameState(preset.gameState as GameState);
+  }, []);
 
   const toast = useCallback((message: string, tone: ToastItem["tone"] = "neutral") => {
     const id = crypto.randomUUID();
@@ -360,9 +418,14 @@ export default function Home() {
       }
 
       const data = (await response.json()) as { audioUrl: string; provenanceCid?: string };
-      setCurrentSound((prev) =>
-        prev ? { ...prev, audioUrl: data.audioUrl, status: "ready", provenanceCid: data.provenanceCid } : prev
-      );
+      const completedSound = {
+        ...pendingSound,
+        audioUrl: data.audioUrl,
+        status: "ready" as const,
+        provenanceCid: data.provenanceCid,
+      };
+      setCurrentSound(completedSound);
+      addToHistory(completedSound);
       toast("Generation complete.", "success");
     } catch (error) {
       setCurrentSound((prev) =>
@@ -462,6 +525,24 @@ export default function Home() {
         action: () => setShowShortcuts((prev) => !prev),
       },
       {
+        key: "d",
+        description: "Toggle dark mode",
+        action: toggleTheme,
+      },
+      {
+        key: "z",
+        ctrl: true,
+        description: "Undo (previous generation)",
+        action: handleUndo,
+      },
+      {
+        key: "z",
+        ctrl: true,
+        shift: true,
+        description: "Redo (next generation)",
+        action: handleRedo,
+      },
+      {
         key: "Escape",
         description: "Close dialogs",
         action: () => {
@@ -470,7 +551,7 @@ export default function Home() {
         },
       },
     ],
-    [mode, currentSound?.status]
+    [mode, currentSound?.status, toggleTheme, handleUndo, handleRedo]
   );
 
   useKeyboardShortcuts(shortcuts);
@@ -511,8 +592,8 @@ export default function Home() {
                 onClick={() => setMode("generate")}
                 className={`px-4 py-2 uppercase-label border transition ${
                   mode === "generate"
-                    ? "border-[#0A0A0A] bg-[#0A0A0A] text-[#FAFAFA]"
-                    : "border-[#E0E0E0] bg-transparent text-[#6A6A6A] hover:border-[#0A0A0A] hover:text-[#0A0A0A]"
+                    ? "border-brand-text bg-brand-text text-brand-bg"
+                    : "border-brand-border bg-transparent text-brand-secondary hover:border-brand-text hover:text-brand-text"
                 }`}
               >
                 Generate
@@ -521,8 +602,8 @@ export default function Home() {
                 onClick={() => setMode("game-audio")}
                 className={`px-4 py-2 uppercase-label border transition ${
                   mode === "game-audio"
-                    ? "border-[#0A0A0A] bg-[#0A0A0A] text-[#FAFAFA]"
-                    : "border-[#E0E0E0] bg-transparent text-[#6A6A6A] hover:border-[#0A0A0A] hover:text-[#0A0A0A]"
+                    ? "border-brand-text bg-brand-text text-brand-bg"
+                    : "border-brand-border bg-transparent text-brand-secondary hover:border-brand-text hover:text-brand-text"
                 }`}
               >
                 Game Audio
@@ -531,13 +612,43 @@ export default function Home() {
                 onClick={() => setMode("library")}
                 className={`px-4 py-2 uppercase-label border transition ${
                   mode === "library"
-                    ? "border-[#0A0A0A] bg-[#0A0A0A] text-[#FAFAFA]"
-                    : "border-[#E0E0E0] bg-transparent text-[#6A6A6A] hover:border-[#0A0A0A] hover:text-[#0A0A0A]"
+                    ? "border-brand-text bg-brand-text text-brand-bg"
+                    : "border-brand-border bg-transparent text-brand-secondary hover:border-brand-text hover:text-brand-text"
                 }`}
               >
                 Library
               </button>
             </nav>
+
+            {/* Theme & Help */}
+            <div className="flex items-center gap-2">
+              <button
+                onClick={toggleTheme}
+                className="p-2 border border-brand-border hover:border-brand-text text-brand-secondary hover:text-brand-text transition"
+                title={isDark ? "Switch to light mode" : "Switch to dark mode"}
+              >
+                {isDark ? (
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                    <circle cx="12" cy="12" r="5" stroke="currentColor" strokeWidth="1.5" />
+                    <path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                  </svg>
+                ) : (
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                    <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                )}
+              </button>
+              <button
+                onClick={() => setShowShortcuts(true)}
+                className="p-2 border border-brand-border hover:border-brand-text text-brand-secondary hover:text-brand-text transition"
+                title="Keyboard shortcuts (?)"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                  <rect x="2" y="4" width="20" height="16" rx="2" stroke="currentColor" strokeWidth="1.5" />
+                  <path d="M6 8h.01M10 8h.01M14 8h.01M18 8h.01M8 12h.01M12 12h.01M16 12h.01M6 16h12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                </svg>
+              </button>
+            </div>
           </div>
         </div>
       </header>
@@ -765,6 +876,15 @@ export default function Home() {
                 </div>
               </div>
 
+              {/* Presets */}
+              <PresetsPanel
+                presets={presets}
+                onSelect={handleLoadPreset}
+                onSave={handleSavePreset}
+                onDelete={deletePreset}
+                className="card p-0"
+              />
+
               {/* References */}
               <div className="card">
                 <h4 className="text-heading-sm text-brand-text">Audio References</h4>
@@ -924,10 +1044,19 @@ export default function Home() {
             </div>
 
             {/* Right: Result */}
-            <div className="card">
-              <h4 className="text-heading-sm text-brand-text">Output</h4>
+            <div className="space-y-4">
+              <div className="card">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-heading-sm text-brand-text">Output</h4>
+                  <HistoryControls
+                    canUndo={canUndo}
+                    canRedo={canRedo}
+                    onUndo={handleUndo}
+                    onRedo={handleRedo}
+                  />
+                </div>
 
-              {currentSound ? (
+                {currentSound ? (
                 <div className="mt-4">
                   <div className="border-b border-brand-border pb-4">
                     <p className="uppercase-label text-brand-secondary">{currentSound.status}</p>
@@ -1047,6 +1176,15 @@ export default function Home() {
                   </p>
                 </div>
               )}
+              </div>
+
+              {/* Generation History */}
+              <GenerationHistory
+                history={generationHistory}
+                currentIndex={historyIndex}
+                onSelect={handleHistorySelect}
+                onClear={clearHistory}
+              />
             </div>
           </div>
         )}

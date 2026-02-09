@@ -10,13 +10,22 @@
  */
 
 export const colors = {
-  // Base palette
+  // Base palette - Light mode
   brand: {
     bg: '#FAFAFA',
     surface: '#FFFFFF',
     text: '#0A0A0A',
     secondary: '#6A6A6A',
     border: '#E0E0E0',
+  },
+
+  // Base palette - Dark mode
+  brandDark: {
+    bg: '#0A0A0A',
+    surface: '#141414',
+    text: '#FAFAFA',
+    secondary: '#A0A0A0',
+    border: '#2A2A2A',
   },
 
   // Tyrian Purple - historically accurate royal purple
@@ -185,6 +194,27 @@ export function generateCSSVariables(): string {
   --transition-fast: ${transitions.duration.fast};
   --transition-normal: ${transitions.duration.normal};
   --transition-easing: ${transitions.easing.default};
+}
+
+/* Dark mode */
+[data-theme="dark"] {
+  --color-brand-bg: ${colors.brandDark.bg};
+  --color-brand-surface: ${colors.brandDark.surface};
+  --color-brand-text: ${colors.brandDark.text};
+  --color-brand-secondary: ${colors.brandDark.secondary};
+  --color-brand-border: ${colors.brandDark.border};
+  --color-accent-subtle: rgba(102, 2, 60, 0.2);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --color-brand-bg: ${colors.brandDark.bg};
+    --color-brand-surface: ${colors.brandDark.surface};
+    --color-brand-text: ${colors.brandDark.text};
+    --color-brand-secondary: ${colors.brandDark.secondary};
+    --color-brand-border: ${colors.brandDark.border};
+    --color-accent-subtle: rgba(102, 2, 60, 0.2);
+  }
 }
 `.trim();
 }
