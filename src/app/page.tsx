@@ -557,103 +557,95 @@ export default function Home() {
   useKeyboardShortcuts(shortcuts);
 
   return (
-    <div className="min-h-screen bg-brand-bg text-brand-text">
-      {/* Header */}
-      <header className="border-b border-brand-border bg-brand-surface">
-        <div className="mx-auto max-w-container px-6 py-5">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              {/* Logo */}
-              <svg width="36" height="36" viewBox="0 0 100 100" fill="none" className="text-brand-text">
-                <path
-                  d="M25 85 C15 75, 12 55, 20 40 C28 25, 35 15, 50 10 C55 8, 58 12, 55 18 C52 24, 48 28, 45 35 C42 42, 44 48, 50 50 C56 52, 65 48, 75 35 C85 22, 90 15, 95 12"
-                  stroke="currentColor"
-                  strokeWidth="4"
-                  strokeLinecap="round"
-                  fill="none"
-                />
-                <path
-                  d="M25 85 C30 80, 40 78, 50 80 C60 82, 68 78, 72 70 C76 62, 72 55, 65 52"
-                  stroke="currentColor"
-                  strokeWidth="3"
-                  strokeLinecap="round"
-                  fill="none"
-                />
-                <path d="M75 35 L95 12" stroke="currentColor" strokeWidth="5" strokeLinecap="square" />
-                <circle cx="22" cy="88" r="4" fill="currentColor" />
-                <ellipse cx="32" cy="92" rx="3" ry="2" fill="currentColor" />
-              </svg>
-              <h1 className="brand-title text-2xl tracking-tight">Swanblade</h1>
-            </div>
-
-            {/* Mode Toggle */}
-            <nav className="flex gap-1">
-              <button
-                onClick={() => setMode("generate")}
-                className={`px-4 py-2 uppercase-label border transition ${
-                  mode === "generate"
-                    ? "border-brand-text bg-brand-text text-brand-bg"
-                    : "border-brand-border bg-transparent text-brand-secondary hover:border-brand-text hover:text-brand-text"
-                }`}
-              >
-                Generate
-              </button>
-              <button
-                onClick={() => setMode("game-audio")}
-                className={`px-4 py-2 uppercase-label border transition ${
-                  mode === "game-audio"
-                    ? "border-brand-text bg-brand-text text-brand-bg"
-                    : "border-brand-border bg-transparent text-brand-secondary hover:border-brand-text hover:text-brand-text"
-                }`}
-              >
-                Game Audio
-              </button>
-              <button
-                onClick={() => setMode("library")}
-                className={`px-4 py-2 uppercase-label border transition ${
-                  mode === "library"
-                    ? "border-brand-text bg-brand-text text-brand-bg"
-                    : "border-brand-border bg-transparent text-brand-secondary hover:border-brand-text hover:text-brand-text"
-                }`}
-              >
-                Library
-              </button>
-            </nav>
-
-            {/* Theme & Help */}
-            <div className="flex items-center gap-2">
-              <button
-                onClick={toggleTheme}
-                className="p-2 border border-brand-border hover:border-brand-text text-brand-secondary hover:text-brand-text transition"
-                title={isDark ? "Switch to light mode" : "Switch to dark mode"}
-              >
-                {isDark ? (
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                    <circle cx="12" cy="12" r="5" stroke="currentColor" strokeWidth="1.5" />
-                    <path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                  </svg>
-                ) : (
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                    <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                )}
-              </button>
-              <button
-                onClick={() => setShowShortcuts(true)}
-                className="p-2 border border-brand-border hover:border-brand-text text-brand-secondary hover:text-brand-text transition"
-                title="Keyboard shortcuts (?)"
-              >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                  <rect x="2" y="4" width="20" height="16" rx="2" stroke="currentColor" strokeWidth="1.5" />
-                  <path d="M6 8h.01M10 8h.01M14 8h.01M18 8h.01M8 12h.01M12 12h.01M16 12h.01M6 16h12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                </svg>
-              </button>
-            </div>
-          </div>
+    <div className="min-h-screen bg-brand-bg text-brand-text flex">
+      {/* Sidebar */}
+      <aside className="fixed left-0 top-0 h-screen w-48 bg-brand-surface border-r border-brand-border flex flex-col z-50">
+        {/* Logo */}
+        <div className="p-4 border-b border-brand-border">
+          <span className="font-display text-lg tracking-tight">Swanblade</span>
         </div>
-      </header>
 
-      <main className="mx-auto max-w-container px-6 py-8">
+        {/* Navigation */}
+        <nav className="flex-1 py-4">
+          <button
+            onClick={() => setMode("generate")}
+            className={`w-full flex items-center gap-3 px-4 py-3 transition ${
+              mode === "generate"
+                ? "bg-brand-text text-brand-bg"
+                : "text-brand-secondary hover:bg-brand-border hover:text-brand-text"
+            }`}
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="shrink-0">
+              <path d="M12 3v18M3 12h18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+            </svg>
+            <span className="text-body">Generate</span>
+          </button>
+          <button
+            onClick={() => setMode("game-audio")}
+            className={`w-full flex items-center gap-3 px-4 py-3 transition ${
+              mode === "game-audio"
+                ? "bg-brand-text text-brand-bg"
+                : "text-brand-secondary hover:bg-brand-border hover:text-brand-text"
+            }`}
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="shrink-0">
+              <rect x="6" y="3" width="12" height="18" rx="2" stroke="currentColor" strokeWidth="1.5" />
+              <circle cx="12" cy="14" r="3" stroke="currentColor" strokeWidth="1.5" />
+              <path d="M10 7h4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+            </svg>
+            <span className="text-body">Game Audio</span>
+          </button>
+          <button
+            onClick={() => setMode("library")}
+            className={`w-full flex items-center gap-3 px-4 py-3 transition ${
+              mode === "library"
+                ? "bg-brand-text text-brand-bg"
+                : "text-brand-secondary hover:bg-brand-border hover:text-brand-text"
+            }`}
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="shrink-0">
+              <path d="M4 19.5A2.5 2.5 0 016.5 17H20" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z" stroke="currentColor" strokeWidth="1.5" />
+            </svg>
+            <span className="text-body">Library</span>
+          </button>
+        </nav>
+
+        {/* Bottom Actions */}
+        <div className="border-t border-brand-border py-4">
+          <button
+            onClick={toggleTheme}
+            className="w-full flex items-center gap-3 px-4 py-3 text-brand-secondary hover:bg-brand-border hover:text-brand-text transition"
+          >
+            {isDark ? (
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="shrink-0">
+                <circle cx="12" cy="12" r="5" stroke="currentColor" strokeWidth="1.5" />
+                <path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+              </svg>
+            ) : (
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="shrink-0">
+                <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            )}
+            <span className="text-body">
+              {isDark ? "Light Mode" : "Dark Mode"}
+            </span>
+          </button>
+          <button
+            onClick={() => setShowShortcuts(true)}
+            className="w-full flex items-center gap-3 px-4 py-3 text-brand-secondary hover:bg-brand-border hover:text-brand-text transition"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="shrink-0">
+              <rect x="2" y="4" width="20" height="16" rx="2" stroke="currentColor" strokeWidth="1.5" />
+              <path d="M6 8h.01M10 8h.01M14 8h.01M18 8h.01M8 12h.01M12 12h.01M16 12h.01M6 16h12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+            </svg>
+            <span className="text-body">Shortcuts</span>
+          </button>
+        </div>
+      </aside>
+
+      {/* Main Content */}
+      <main className="flex-1 ml-48 px-8 py-8">
         {mode === "library" ? (
           <div className="card">
             <LibraryPanel />

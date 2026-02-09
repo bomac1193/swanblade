@@ -87,16 +87,16 @@ function AudioWaveform({
 
   return (
     <div
-      className="h-14 w-full bg-brand-bg border border-brand-border cursor-pointer relative overflow-hidden hover:border-brand-text transition-colors"
+      className="h-14 w-full bg-brand-surface border border-brand-border/30 cursor-pointer relative overflow-hidden"
       onClick={handleClick}
     >
       {/* Full waveform in light gray */}
       <svg
         viewBox="0 0 100 100"
         preserveAspectRatio="none"
-        className="absolute inset-0 h-full w-full"
+        className="absolute inset-0 h-full w-full text-brand-text"
       >
-        <path d={waveformPath} className="fill-brand-text/20" />
+        <path d={waveformPath} fill="currentColor" opacity="0.2" />
       </svg>
 
       {/* Played portion overlay - amber accent */}
@@ -502,7 +502,7 @@ export function LibraryPanel() {
                 className="flex h-8 w-8 shrink-0 items-center justify-center border border-brand-border bg-brand-bg hover:border-brand-text"
                 title="Play"
               >
-                <svg width="12" height="12" viewBox="0 0 24 24" className="fill-brand-text">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" className="text-brand-text">
                   <path d="M6 4l14 8-14 8z" />
                 </svg>
               </button>
@@ -575,12 +575,12 @@ export function LibraryPanel() {
                     title={isPlaying ? "Pause" : "Play"}
                   >
                     {isPlaying ? (
-                      <svg width="10" height="10" viewBox="0 0 24 24" className="fill-brand-text">
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" className="text-brand-text">
                         <rect x="6" y="5" width="4" height="14" />
                         <rect x="14" y="5" width="4" height="14" />
                       </svg>
                     ) : (
-                      <svg width="10" height="10" viewBox="0 0 24 24" className="fill-brand-text">
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" className="text-brand-text">
                         <path d="M6 4l14 8-14 8z" />
                       </svg>
                     )}
@@ -592,7 +592,7 @@ export function LibraryPanel() {
                     className="flex h-7 w-7 shrink-0 items-center justify-center border border-brand-border bg-brand-bg hover:border-brand-text"
                     title="Stop"
                   >
-                    <svg width="10" height="10" viewBox="0 0 24 24" className="fill-brand-text">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" className="text-brand-text">
                       <rect x="5" y="5" width="14" height="14" />
                     </svg>
                   </button>
