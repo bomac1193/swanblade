@@ -22,7 +22,7 @@ export function Frame2147241533({ className, children }: Frame2147241533Props) {
         <div className="flex items-center justify-between px-8 py-6">
           {/* Logo */}
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-white/10 backdrop-blur-sm rounded-lg flex items-center justify-center border border-white/20">
+            <div className="w-8 h-8 bg-white/10 backdrop-blur-sm flex items-center justify-center border border-white/20">
               <svg
                 width="18"
                 height="18"
@@ -40,8 +40,7 @@ export function Frame2147241533({ className, children }: Frame2147241533Props) {
               </svg>
             </div>
             <span
-              className="text-white text-lg font-semibold tracking-tight"
-              style={{ fontFamily: "Fraunces, Georgia, serif" }}
+              className="text-white text-lg font-semibold tracking-tight font-display"
             >
               Swanblade
             </span>
@@ -49,27 +48,31 @@ export function Frame2147241533({ className, children }: Frame2147241533Props) {
 
           {/* Nav Links */}
           <nav className="flex items-center gap-8">
-            <a
-              href="#features"
+            <Link
+              href="/features"
               className="text-white/70 hover:text-white text-sm font-medium transition"
+              style={{ fontFamily: "Sohne, sans-serif" }}
             >
               Features
-            </a>
-            <a
-              href="#pricing"
+            </Link>
+            <Link
+              href="/pricing"
               className="text-white/70 hover:text-white text-sm font-medium transition"
+              style={{ fontFamily: "Sohne, sans-serif" }}
             >
               Pricing
-            </a>
-            <a
-              href="#about"
+            </Link>
+            <Link
+              href="/about"
               className="text-white/70 hover:text-white text-sm font-medium transition"
+              style={{ fontFamily: "Sohne, sans-serif" }}
             >
               About
-            </a>
+            </Link>
             <Link
               href="/studio"
               className="bg-white text-black px-5 py-2 text-sm font-medium hover:bg-white/90 transition"
+              style={{ fontFamily: "Sohne, sans-serif" }}
             >
               Open Studio
             </Link>
@@ -80,28 +83,18 @@ export function Frame2147241533({ className, children }: Frame2147241533Props) {
       {/* Main Content Area */}
       <main className="flex-1 flex flex-col items-center justify-center px-8">
         <div className="text-center max-w-3xl pointer-events-auto">
-          {/* Badge */}
-          <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-4 py-1.5 mb-8">
-            <span className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
-            <span className="text-white/80 text-xs font-medium tracking-wide uppercase">
-              AI-Powered Sound Design
-            </span>
-          </div>
-
           {/* Headline */}
           <h1
-            className="text-6xl md:text-7xl font-bold text-white leading-tight mb-6"
-            style={{ fontFamily: "Fraunces, Georgia, serif" }}
+            className="text-6xl md:text-7xl font-bold text-white leading-tight mb-6 font-display"
           >
-            Sound Design
-            <br />
-            <span className="bg-gradient-to-r from-violet-400 via-pink-400 to-orange-400 bg-clip-text text-transparent">
-              Reimagined
-            </span>
+            Burn The Square
           </h1>
 
           {/* Subheadline */}
-          <p className="text-xl text-white/70 max-w-2xl mx-auto mb-10 leading-relaxed">
+          <p
+            className="text-xl text-white/70 max-w-2xl mx-auto mb-10 leading-relaxed"
+            style={{ fontFamily: "Sohne, sans-serif" }}
+          >
             Create game-ready audio with AI. Generate variations, transform
             sounds, and export directly to Unity, Unreal, Wwise, or FMOD.
           </p>
@@ -111,6 +104,7 @@ export function Frame2147241533({ className, children }: Frame2147241533Props) {
             <Link
               href="/studio"
               className="group bg-white text-black px-8 py-4 text-lg font-semibold hover:bg-white/90 transition flex items-center gap-3"
+              style={{ fontFamily: "Sohne, sans-serif" }}
             >
               Start Creating
               <svg
@@ -129,12 +123,13 @@ export function Frame2147241533({ className, children }: Frame2147241533Props) {
                 />
               </svg>
             </Link>
-            <a
-              href="#demo"
+            <Link
+              href="/features"
               className="border border-white/30 text-white px-8 py-4 text-lg font-semibold hover:bg-white/10 transition"
+              style={{ fontFamily: "Sohne, sans-serif" }}
             >
-              Watch Demo
-            </a>
+              Learn More
+            </Link>
           </div>
         </div>
 
@@ -153,7 +148,8 @@ export function Frame2147241533({ className, children }: Frame2147241533Props) {
           ].map((feature) => (
             <div
               key={feature.label}
-              className="flex items-center gap-2 bg-white/5 backdrop-blur-sm border border-white/10 rounded-full px-4 py-2"
+              className="flex items-center gap-2 bg-white/5 backdrop-blur-sm border border-white/10 px-4 py-2"
+              style={{ fontFamily: "Sohne, sans-serif" }}
             >
               {feature.icon === "waveform" && (
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="text-white/60">
