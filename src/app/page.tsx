@@ -557,25 +557,39 @@ export default function Home() {
   useKeyboardShortcuts(shortcuts);
 
   return (
-    <div className="min-h-screen bg-brand-bg text-brand-text flex flex-col">
+    <div
+      className="min-h-screen flex flex-col"
+      style={{
+        backgroundColor: isDark ? '#0A0A0A' : '#F5F5F5',
+        color: isDark ? '#FAFAFA' : '#0A0A0A'
+      }}
+    >
       {/* Header */}
-      <header className="border-b border-brand-border bg-brand-surface">
-        <div className="mx-auto flex max-w-[1800px] items-center justify-between px-6 py-3">
+      <header
+        style={{
+          backgroundColor: isDark ? '#141414' : '#FFFFFF',
+          borderBottom: isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(0,0,0,0.1)'
+        }}
+      >
+        <div className="mx-auto flex max-w-[1800px] items-center justify-between px-6 py-4">
           {/* Left: Logo */}
-          <h1 className="font-display text-lg font-semibold tracking-tight">
+          <span
+            className="text-[13px] font-semibold tracking-tight"
+            style={{ fontFamily: 'Fraunces, Georgia, serif', color: isDark ? '#FFFFFF' : '#000000' }}
+          >
             Swanblade
-          </h1>
+          </span>
 
           {/* Center/Right: Tab Navigation */}
           <div className="flex items-center gap-6">
             <nav className="flex items-center gap-1">
               <button
                 onClick={() => setMode("generate")}
-                className={`flex items-center gap-2 px-4 py-2 text-sm font-medium transition ${
-                  mode === "generate"
-                    ? "bg-brand-text text-brand-bg"
-                    : "text-brand-secondary hover:bg-brand-bg hover:text-brand-text"
-                }`}
+                className="flex items-center gap-2 px-4 py-2 text-sm font-medium transition-all duration-150"
+                style={{
+                  backgroundColor: mode === "generate" ? (isDark ? '#FFFFFF' : '#000000') : 'transparent',
+                  color: mode === "generate" ? (isDark ? '#000000' : '#FFFFFF') : '#737373'
+                }}
               >
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
                   <path d="M12 3v18M3 12h18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
@@ -584,11 +598,11 @@ export default function Home() {
               </button>
               <button
                 onClick={() => setMode("game-audio")}
-                className={`flex items-center gap-2 px-4 py-2 text-sm font-medium transition ${
-                  mode === "game-audio"
-                    ? "bg-brand-text text-brand-bg"
-                    : "text-brand-secondary hover:bg-brand-bg hover:text-brand-text"
-                }`}
+                className="flex items-center gap-2 px-4 py-2 text-sm font-medium transition-all duration-150"
+                style={{
+                  backgroundColor: mode === "game-audio" ? (isDark ? '#FFFFFF' : '#000000') : 'transparent',
+                  color: mode === "game-audio" ? (isDark ? '#000000' : '#FFFFFF') : '#737373'
+                }}
               >
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
                   <rect x="6" y="3" width="12" height="18" rx="2" stroke="currentColor" strokeWidth="1.5" />
@@ -598,11 +612,11 @@ export default function Home() {
               </button>
               <button
                 onClick={() => setMode("library")}
-                className={`flex items-center gap-2 px-4 py-2 text-sm font-medium transition ${
-                  mode === "library"
-                    ? "bg-brand-text text-brand-bg"
-                    : "text-brand-secondary hover:bg-brand-bg hover:text-brand-text"
-                }`}
+                className="flex items-center gap-2 px-4 py-2 text-sm font-medium transition-all duration-150"
+                style={{
+                  backgroundColor: mode === "library" ? (isDark ? '#FFFFFF' : '#000000') : 'transparent',
+                  color: mode === "library" ? (isDark ? '#000000' : '#FFFFFF') : '#737373'
+                }}
               >
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
                   <path d="M4 19.5A2.5 2.5 0 016.5 17H20" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
@@ -616,7 +630,8 @@ export default function Home() {
             <div className="flex items-center gap-2">
               <button
                 onClick={toggleTheme}
-                className="p-2 text-brand-secondary hover:text-brand-text transition"
+                className="p-2 transition"
+                style={{ color: '#737373' }}
                 title={isDark ? "Switch to light mode" : "Switch to dark mode"}
               >
                 {isDark ? (
@@ -632,7 +647,8 @@ export default function Home() {
               </button>
               <button
                 onClick={() => setShowShortcuts(true)}
-                className="p-2 text-brand-secondary hover:text-brand-text transition"
+                className="p-2 transition"
+                style={{ color: '#737373' }}
                 title="Keyboard shortcuts"
               >
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
@@ -646,7 +662,7 @@ export default function Home() {
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 mx-auto max-w-[1800px] w-full p-8">
+      <main className="flex-1 mx-auto max-w-[1800px] w-full px-6 pt-12 pb-8">
         {mode === "library" ? (
           <div className="card">
             <LibraryPanel />

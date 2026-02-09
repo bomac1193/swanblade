@@ -12,50 +12,34 @@ function getSystemTheme(): "light" | "dark" {
 }
 
 function getStoredTheme(): Theme {
-  if (typeof window === "undefined") return "system";
+  if (typeof window === "undefined") return "light";
   const stored = localStorage.getItem(STORAGE_KEY);
-  if (stored === "light" || stored === "dark" || stored === "system") {
+  if (stored === "light" || stored === "dark") {
     return stored;
   }
-  return "system";
+  return "light";
 }
 
 export function useTheme() {
-  const [theme, setThemeState] = useState<Theme>("system");
+  const [theme, setThemeState] = useState<Theme>("light");
   const [resolvedTheme, setResolvedTheme] = useState<"light" | "dark">("light");
 
-  // Initialize theme on mount
+  // Initialize theme on mount - always default to light
   useEffect(() => {
     const stored = getStoredTheme();
     setThemeState(stored);
 
-    const resolved = stored === "system" ? getSystemTheme() : stored;
+    // Only use stored value, never system preference
+    const resolved = stored === "light" || stored === "dark" ? stored : "light";
     setResolvedTheme(resolved);
     document.documentElement.setAttribute("data-theme", resolved);
   }, []);
 
-  // Listen for system theme changes
-  useEffect(() => {
-    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
-
-    const handleChange = () => {
-      if (theme === "system") {
-        const newResolved = getSystemTheme();
-        setResolvedTheme(newResolved);
-        document.documentElement.setAttribute("data-theme", newResolved);
-      }
-    };
-
-    mediaQuery.addEventListener("change", handleChange);
-    return () => mediaQuery.removeEventListener("change", handleChange);
-  }, [theme]);
-
   const setTheme = useCallback((newTheme: Theme) => {
-    setThemeState(newTheme);
-    localStorage.setItem(STORAGE_KEY, newTheme);
-
-    const resolved = newTheme === "system" ? getSystemTheme() : newTheme;
+    const resolved = newTheme === "light" || newTheme === "dark" ? newTheme : "light";
+    setThemeState(resolved);
     setResolvedTheme(resolved);
+    localStorage.setItem(STORAGE_KEY, resolved);
     document.documentElement.setAttribute("data-theme", resolved);
   }, []);
 

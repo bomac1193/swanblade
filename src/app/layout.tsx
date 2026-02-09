@@ -32,17 +32,16 @@ export const metadata: Metadata = {
   },
 };
 
-// Script to prevent flash of wrong theme
+// Script to prevent flash of wrong theme - reset to light mode
 const themeScript = `
   (function() {
     try {
-      var theme = localStorage.getItem('swanblade-theme');
-      if (theme === 'dark' || (theme !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-        document.documentElement.setAttribute('data-theme', 'dark');
-      } else {
-        document.documentElement.setAttribute('data-theme', 'light');
-      }
-    } catch (e) {}
+      // Force reset to light mode
+      localStorage.removeItem('swanblade-theme');
+      document.documentElement.setAttribute('data-theme', 'light');
+    } catch (e) {
+      document.documentElement.setAttribute('data-theme', 'light');
+    }
   })();
 `;
 
@@ -56,7 +55,7 @@ export default function RootLayout({
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
-      <body className="antialiased bg-brand-bg text-brand-text">
+      <body className="antialiased">
         {children}
       </body>
     </html>
