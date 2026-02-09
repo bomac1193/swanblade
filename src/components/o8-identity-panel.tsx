@@ -96,7 +96,7 @@ export function O8IdentityPanel({ onIdentityChange, className }: O8IdentityPanel
             </svg>
           </div>
           <div>
-            <p className="text-label uppercase tracking-wider text-brand-secondary">o8 Identity</p>
+            <p className="text-label uppercase tracking-wider text-brand-secondary">∞8 Identity</p>
             {selectedIdentity ? (
               <p className="text-body-sm font-medium text-brand-text">
                 {selectedIdentity.creator.name}

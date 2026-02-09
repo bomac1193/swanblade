@@ -374,7 +374,7 @@ PROVENANCE INFORMATION
 ----------------------
 ${
   hasProvenance
-    ? `This audio bundle has verifiable provenance through the o8 protocol.
+    ? `This audio bundle has verifiable provenance through the ∞8 protocol.
 All stems can be traced to their origin and verified on-chain.
 
 Identity: ${bundle.manifest.provenance.identityId || "Not specified"}
@@ -388,7 +388,7 @@ ${bundle.stems
 
 Verify at: https://verify.o8.audio/{CID}`
     : `This audio bundle does not have on-chain provenance.
-Consider stamping with o8 protocol for full attribution tracking.`
+Consider stamping with ∞8 protocol for full attribution tracking.`
 }
 
 USAGE RIGHTS

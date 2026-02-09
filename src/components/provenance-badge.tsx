@@ -34,7 +34,7 @@ export function ProvenanceBadge({ provenance, provenanceResult, className }: Pro
           <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.5" fill="none" />
           <path d="M8 12l2.5 2.5L16 9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
-        <span className="text-body-sm text-brand-text">o8 Verified</span>
+        <span className="text-body-sm text-brand-text">∞8 Verified</span>
         <svg
           width="12"
           height="12"
@@ -174,7 +174,7 @@ export function ProvenanceStampButton({
           <circle cx="12" cy="12" r="4" stroke="currentColor" strokeWidth="1.5" />
         </svg>
       )}
-      <span className="text-body-sm">Stamp with o8</span>
+      <span className="text-body-sm">Stamp with ∞8</span>
     </button>
   );
 }

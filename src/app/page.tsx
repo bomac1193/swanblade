@@ -9,9 +9,13 @@ import { LibraryPanel } from "@/components/library-panel";
 import { ProviderSelector, type ProviderId, recommendProvider } from "@/components/provider-selector";
 import { PaletteEditor } from "@/components/PaletteEditor";
 import { GameStateSelector } from "@/components/GameStateSelector";
+import { O8IdentityPanel } from "@/components/o8-identity-panel";
+import { ProvenanceBadge, ProvenanceStampButton } from "@/components/provenance-badge";
+import { StemExportPanel } from "@/components/stem-export-panel";
 import type { AudioReferencePayload, SoundGeneration, SoundCategory, GameState } from "@/types";
 import type { SoundPalette } from "@/lib/soundPalette";
 import type { StemBundle } from "@/lib/stemGenerator";
+import type { O8Identity, O8Provenance } from "@/lib/o8/types";
 import { generateSoundName } from "@/lib/utils";
 
 type AppMode = "generate" | "game-audio" | "library";
@@ -130,6 +134,17 @@ export default function Home() {
   const [selectedGameState, setSelectedGameState] = useState<GameState | null>(null);
   const [currentBundle, setCurrentBundle] = useState<StemBundle | null>(null);
   const [showAdvanced, setShowAdvanced] = useState(false);
+
+  // o8 Identity state
+  const [o8Identity, setO8Identity] = useState<O8Identity | null>(null);
+  const [o8PromptModifier, setO8PromptModifier] = useState<string>("");
+  const [currentProvenance, setCurrentProvenance] = useState<O8Provenance | null>(null);
+  const [showStemExport, setShowStemExport] = useState(false);
+
+  const handleIdentityChange = useCallback((identity: O8Identity | null, promptModifier: string) => {
+    setO8Identity(identity);
+    setO8PromptModifier(promptModifier);
+  }, []);
 
   const toast = useCallback((message: string, tone: ToastItem["tone"] = "neutral") => {
     const id = crypto.randomUUID();
@@ -300,12 +315,17 @@ export default function Home() {
       return;
     }
 
+    // Combine user prompt with o8 identity modifier
+    const fullPrompt = o8PromptModifier
+      ? `${trimmedPrompt}. Style: ${o8PromptModifier}`
+      : trimmedPrompt;
+
     const seedValue = DEFAULT_PARAMETERS.seed ?? Math.floor(Math.random() * 1000);
     const requestParameters = { ...DEFAULT_PARAMETERS, lengthSeconds, seed: seedValue };
     const pendingSound: SoundGeneration = {
       id: crypto.randomUUID(),
       name: generateSoundName(trimmedPrompt),
-      prompt: trimmedPrompt,
+      prompt: fullPrompt,
       createdAt: new Date().toISOString(),
       audioUrl: null,
       status: "pending",
@@ -474,6 +494,12 @@ export default function Home() {
           <div className="grid gap-6 lg:grid-cols-2">
             {/* Left: Controls */}
             <div className="space-y-6">
+              {/* ∞8 Identity */}
+              <O8IdentityPanel
+                onIdentityChange={handleIdentityChange}
+                className="card p-0"
+              />
+
               <div className="card">
                 <h4 className="text-heading-sm text-brand-text">Game State</h4>
                 <p className="mt-1 text-body-sm text-brand-secondary">
@@ -605,6 +631,40 @@ export default function Home() {
                     <p className="text-body-sm text-brand-secondary">
                       Bundle ID: {currentBundle.id}
                     </p>
+
+                    {/* Bundle Provenance */}
+                    <div className="mt-3">
+                      {o8Identity ? (
+                        <div className="flex items-center gap-2 text-[#66023C]">
+                          <svg width="14" height="14" viewBox="0 0 24 24">
+                            <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.5" fill="none" />
+                            <path d="M8 12l2.5 2.5L16 9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                          </svg>
+                          <span className="text-body-sm">
+                            Created by {o8Identity.creator.name}
+                          </span>
+                        </div>
+                      ) : (
+                        <p className="text-body-sm text-brand-secondary">
+                          Connect an ∞8 identity to stamp provenance
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Export all stems to Burn the Square */}
+                    {currentBundle.stems.length > 0 && (
+                      <button
+                        onClick={() => toast(`Exported ${currentBundle.stems.length} stems to Burn the Square.`, "success")}
+                        className="mt-3 w-full border border-[#66023C] bg-[#66023C]/10 px-4 py-2 text-[#66023C] transition-colors hover:bg-[#66023C] hover:text-white"
+                      >
+                        <span className="flex items-center justify-center gap-2">
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                            <path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                          </svg>
+                          Export to Burn the Square
+                        </span>
+                      </button>
+                    )}
                   </div>
                 </div>
               ) : (
@@ -694,6 +754,12 @@ export default function Home() {
                   </div>
                 )}
               </div>
+
+              {/* ∞8 Identity */}
+              <O8IdentityPanel
+                onIdentityChange={handleIdentityChange}
+                className="card p-0"
+              />
 
               {/* Parameters */}
               <div className="card">
@@ -840,6 +906,37 @@ export default function Home() {
                         audioUrl={currentSound.audioUrl}
                         disabled={currentSound.status !== "ready"}
                       />
+
+                      {/* Provenance */}
+                      {currentSound.status === "ready" && (
+                        <div className="flex items-center justify-between border border-brand-border p-3">
+                          {currentProvenance ? (
+                            <ProvenanceBadge provenance={currentProvenance} />
+                          ) : (
+                            <ProvenanceStampButton
+                              identityId={o8Identity?.identity_id ?? "anonymous"}
+                              prompt={currentSound.prompt}
+                              audioFingerprint={`swanblade-${currentSound.id}-${Date.now()}`}
+                              parameters={{
+                                lengthSeconds: currentSound.lengthSeconds,
+                                type: currentSound.type,
+                                provider: selectedProvider,
+                              }}
+                              provider={selectedProvider}
+                              onStamped={(result) => {
+                                setCurrentProvenance({
+                                  identity_id: o8Identity?.identity_id ?? "anonymous",
+                                  fingerprint: result.declaration_cid,
+                                  timestamp: new Date().toISOString(),
+                                  content_type: "audio",
+                                });
+                                toast("Audio stamped with provenance.", "success");
+                              }}
+                            />
+                          )}
+                        </div>
+                      )}
+
                       <button
                         onClick={saveToLibrary}
                         disabled={currentSound.status !== "ready"}
@@ -847,6 +944,42 @@ export default function Home() {
                       >
                         Save to Library
                       </button>
+
+                      {/* Stem Export to Burn the Square */}
+                      {currentSound.status === "ready" && currentSound.audioUrl && (
+                        <div className="border-t border-brand-border pt-3">
+                          <button
+                            onClick={() => setShowStemExport(!showStemExport)}
+                            className="flex w-full items-center justify-between text-left"
+                          >
+                            <span className="uppercase-label text-brand-secondary">
+                              Export to Burn the Square
+                            </span>
+                            <svg
+                              width="12"
+                              height="12"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              className={`text-brand-secondary transition-transform ${showStemExport ? "rotate-180" : ""}`}
+                            >
+                              <path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                            </svg>
+                          </button>
+                          {showStemExport && (
+                            <div className="mt-3">
+                              <StemExportPanel
+                                soundId={currentSound.id}
+                                soundName={currentSound.name}
+                                audioUrl={currentSound.audioUrl}
+                                onExport={(config) => {
+                                  toast(`Exported ${config.stems.length} stems to Burn the Square.`, "success");
+                                  setShowStemExport(false);
+                                }}
+                              />
+                            </div>
+                          )}
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>

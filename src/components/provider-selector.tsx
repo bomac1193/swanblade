@@ -17,7 +17,7 @@ export const PROVIDERS: Provider[] = [
   {
     id: "starforge",
     name: "Starforge LoRA",
-    description: "Your trained Sonic Identity model with o8 provenance",
+    description: "Your trained Sonic Identity model with ∞8 provenance",
     strengths: ["Custom Style", "LoRA", "Sonic DNA", "Provenance"],
     goodFor: ["custom", "lora", "trained", "identity", "signature", "style"],
     available: true,
