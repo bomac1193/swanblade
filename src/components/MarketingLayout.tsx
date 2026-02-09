@@ -42,11 +42,11 @@ export function MarketingLayout({ children }: MarketingLayoutProps) {
               </Link>
             ))}
             <Link
-              href="/studio"
+              href="/apply"
               className="border border-white/30 text-white px-5 py-2 text-xs uppercase tracking-widest hover:bg-white hover:text-black transition"
               style={{ fontFamily: "Sohne, sans-serif" }}
             >
-              Enter
+              Apply
             </Link>
           </nav>
         </div>

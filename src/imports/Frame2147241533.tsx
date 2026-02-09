@@ -42,11 +42,11 @@ export function Frame2147241533({ className, children }: Frame2147241533Props) {
               About
             </Link>
             <Link
-              href="/studio"
+              href="/apply"
               className="border border-white/30 text-white px-5 py-2 text-xs uppercase tracking-widest hover:bg-white hover:text-black transition"
               style={{ fontFamily: "Sohne, sans-serif" }}
             >
-              Enter
+              Apply
             </Link>
           </nav>
         </div>
@@ -71,11 +71,11 @@ export function Frame2147241533({ className, children }: Frame2147241533Props) {
             The instrument for those who refuse to compromise on audio.
           </p>
           <Link
-            href="/studio"
+            href="/apply"
             className="inline-block border border-white/30 text-white px-8 py-4 text-xs uppercase tracking-widest hover:bg-white hover:text-black transition"
             style={{ fontFamily: "Sohne, sans-serif" }}
           >
-            Request Access
+            Apply for Membership
           </Link>
         </div>
         {children}

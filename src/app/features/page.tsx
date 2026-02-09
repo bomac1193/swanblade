@@ -90,12 +90,17 @@ export default function FeaturesPage() {
       {/* CTA */}
       <section className="py-32 px-6 border-t border-white/10">
         <div className="max-w-2xl mx-auto text-center">
+          <p
+            className="font-mono text-xs text-white/20 tracking-wider mb-6"
+          >
+            Powered by Obsidian Engine
+          </p>
           <Link
-            href="/pricing"
+            href="/apply"
             className="inline-block border border-white/30 text-white px-8 py-4 text-xs uppercase tracking-widest hover:bg-white hover:text-black transition"
             style={{ fontFamily: "Sohne, sans-serif" }}
           >
-            View Pricing
+            Apply for Membership
           </Link>
         </div>
       </section>

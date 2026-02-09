@@ -1,0 +1,217 @@
+"use client";
+
+import { useState } from "react";
+import Link from "next/link";
+
+export default function ApplyPage() {
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    role: "",
+    project: "",
+    website: "",
+    referral: "",
+  });
+  const [submitted, setSubmitted] = useState(false);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    // In production, this would submit to an API
+    setSubmitted(true);
+  };
+
+  if (submitted) {
+    return (
+      <div className="min-h-screen bg-[#0A0A0A] text-white flex items-center justify-center px-6">
+        <div className="max-w-md text-center">
+          <p
+            className="text-xs uppercase tracking-[0.3em] text-white/30 mb-6"
+            style={{ fontFamily: "Sohne, sans-serif" }}
+          >
+            Application Received
+          </p>
+          <h1 className="text-3xl font-display mb-6">We'll be in touch.</h1>
+          <p className="text-white/50 mb-8" style={{ fontFamily: "Sohne, sans-serif" }}>
+            Applications are reviewed weekly. If approved, you'll receive
+            your member credentials via email.
+          </p>
+          <Link
+            href="/"
+            className="text-xs uppercase tracking-widest text-white/40 hover:text-white transition"
+            style={{ fontFamily: "Sohne, sans-serif" }}
+          >
+            Return
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-[#0A0A0A] text-white">
+      {/* Header */}
+      <header className="px-6 py-6">
+        <Link href="/" className="font-display text-lg tracking-wide">
+          Swanblade
+        </Link>
+      </header>
+
+      {/* Form */}
+      <main className="max-w-lg mx-auto px-6 py-16">
+        <p
+          className="text-xs uppercase tracking-[0.3em] text-white/30 mb-6"
+          style={{ fontFamily: "Sohne, sans-serif" }}
+        >
+          Membership Application
+        </p>
+        <h1 className="text-3xl font-display mb-4">Apply for Access</h1>
+        <p className="text-white/50 mb-12" style={{ fontFamily: "Sohne, sans-serif" }}>
+          Swanblade is for professionals shipping real projects.
+          Tell us about yourself.
+        </p>
+
+        {/* Seats remaining */}
+        <div className="border border-white/10 p-4 mb-12">
+          <p
+            className="text-xs uppercase tracking-widest text-white/30 mb-1 font-mono"
+            style={{ fontFamily: "monospace" }}
+          >
+            Q1 2026
+          </p>
+          <p className="text-white/70" style={{ fontFamily: "Sohne, sans-serif" }}>
+            <span className="text-white font-display text-xl">47</span> seats remaining
+          </p>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-8">
+          <div>
+            <label
+              className="block text-xs uppercase tracking-widest text-white/40 mb-2"
+              style={{ fontFamily: "Sohne, sans-serif" }}
+            >
+              Name
+            </label>
+            <input
+              type="text"
+              required
+              value={formData.name}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              className="w-full bg-transparent border-b border-white/20 py-3 text-white focus:border-white focus:outline-none transition"
+              style={{ fontFamily: "Sohne, sans-serif" }}
+            />
+          </div>
+
+          <div>
+            <label
+              className="block text-xs uppercase tracking-widest text-white/40 mb-2"
+              style={{ fontFamily: "Sohne, sans-serif" }}
+            >
+              Email
+            </label>
+            <input
+              type="email"
+              required
+              value={formData.email}
+              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+              className="w-full bg-transparent border-b border-white/20 py-3 text-white focus:border-white focus:outline-none transition"
+              style={{ fontFamily: "Sohne, sans-serif" }}
+            />
+          </div>
+
+          <div>
+            <label
+              className="block text-xs uppercase tracking-widest text-white/40 mb-2"
+              style={{ fontFamily: "Sohne, sans-serif" }}
+            >
+              Role
+            </label>
+            <select
+              required
+              value={formData.role}
+              onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+              className="w-full bg-transparent border-b border-white/20 py-3 text-white focus:border-white focus:outline-none transition appearance-none"
+              style={{ fontFamily: "Sohne, sans-serif" }}
+            >
+              <option value="" className="bg-[#0A0A0A]">Select</option>
+              <option value="sound-designer" className="bg-[#0A0A0A]">Sound Designer</option>
+              <option value="composer" className="bg-[#0A0A0A]">Composer</option>
+              <option value="audio-director" className="bg-[#0A0A0A]">Audio Director</option>
+              <option value="game-developer" className="bg-[#0A0A0A]">Game Developer</option>
+              <option value="post-production" className="bg-[#0A0A0A]">Post-Production</option>
+              <option value="other" className="bg-[#0A0A0A]">Other</option>
+            </select>
+          </div>
+
+          <div>
+            <label
+              className="block text-xs uppercase tracking-widest text-white/40 mb-2"
+              style={{ fontFamily: "Sohne, sans-serif" }}
+            >
+              What are you working on?
+            </label>
+            <textarea
+              required
+              rows={3}
+              value={formData.project}
+              onChange={(e) => setFormData({ ...formData, project: e.target.value })}
+              placeholder="Current project, studio, or context"
+              className="w-full bg-transparent border-b border-white/20 py-3 text-white focus:border-white focus:outline-none transition resize-none placeholder:text-white/20"
+              style={{ fontFamily: "Sohne, sans-serif" }}
+            />
+          </div>
+
+          <div>
+            <label
+              className="block text-xs uppercase tracking-widest text-white/40 mb-2"
+              style={{ fontFamily: "Sohne, sans-serif" }}
+            >
+              Portfolio / Website
+              <span className="text-white/20 normal-case tracking-normal ml-2">Optional</span>
+            </label>
+            <input
+              type="url"
+              value={formData.website}
+              onChange={(e) => setFormData({ ...formData, website: e.target.value })}
+              placeholder="https://"
+              className="w-full bg-transparent border-b border-white/20 py-3 text-white focus:border-white focus:outline-none transition placeholder:text-white/20"
+              style={{ fontFamily: "Sohne, sans-serif" }}
+            />
+          </div>
+
+          <div>
+            <label
+              className="block text-xs uppercase tracking-widest text-white/40 mb-2"
+              style={{ fontFamily: "Sohne, sans-serif" }}
+            >
+              Invite Code
+              <span className="text-white/20 normal-case tracking-normal ml-2">If you have one</span>
+            </label>
+            <input
+              type="text"
+              value={formData.referral}
+              onChange={(e) => setFormData({ ...formData, referral: e.target.value.toUpperCase() })}
+              placeholder="SB-XXXX-XXXX"
+              className="w-full bg-transparent border-b border-white/20 py-3 text-white focus:border-white focus:outline-none transition placeholder:text-white/20 font-mono uppercase tracking-wider"
+            />
+          </div>
+
+          <div className="pt-8">
+            <button
+              type="submit"
+              className="w-full border border-white/30 text-white py-4 text-xs uppercase tracking-widest hover:bg-white hover:text-black transition"
+              style={{ fontFamily: "Sohne, sans-serif" }}
+            >
+              Submit Application
+            </button>
+          </div>
+        </form>
+
+        <p className="mt-8 text-xs text-white/20 text-center" style={{ fontFamily: "Sohne, sans-serif" }}>
+          Applications are reviewed in order received.
+          <br />
+          Invite codes receive priority review.
+        </p>
+      </main>
+    </div>
+  );
+}

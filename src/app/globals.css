@@ -2,16 +2,26 @@
 
 /**
  * SWANBLADE DESIGN SYSTEM
- * Balancing elegance (swan) with precision (blade)
  *
- * Typography Hierarchy:
- * - Fraunces (H1-H3): Elegant, expressive, creative presence
- * - Sohne (H4-H6, body, UI): Clean, precise, functional
+ * A cult brand for professional sound designers.
+ * Forged by Obsidian Engine.
  *
- * Color Philosophy:
- * - Warm magenta accent for creative energy
- * - Sharp black/white contrast for precision
+ * Typography:
+ * - Fraunces: Display/Headers
+ * - Sohne: Body/UI
+ * - Monospace: Serial numbers, timestamps, codes
+ *
+ * Philosophy:
+ * - Minimal, not minimalist
+ * - Exclusive, not exclusionary
+ * - Professional, not pretentious
  */
+
+/* Monospace for serial numbers and codes */
+.font-mono {
+  font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Mono', 'Droid Sans Mono', 'Source Code Pro', monospace;
+  font-feature-settings: 'tnum' 1;
+}
 
 /* Sohne - Klim Type Foundry */
 @font-face {
