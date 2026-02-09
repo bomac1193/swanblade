@@ -79,7 +79,7 @@ function AudioWaveform({
   // Show loading state if no peaks yet
   if (peaks.length === 0) {
     return (
-      <div className="h-12 w-full bg-brand-bg border border-brand-border flex items-center justify-center">
+      <div className="h-12 w-full bg-transparent border-subtle flex items-center justify-center">
         <span className="text-body-sm text-brand-secondary">Loading waveform...</span>
       </div>
     );
@@ -87,7 +87,7 @@ function AudioWaveform({
 
   return (
     <div
-      className="h-14 w-full bg-brand-surface border border-brand-border/30 cursor-pointer relative overflow-hidden"
+      className="h-14 w-full bg-transparent border-subtle cursor-pointer relative overflow-hidden"
       onClick={handleClick}
     >
       {/* Full waveform in light gray */}
@@ -423,7 +423,7 @@ export function LibraryPanel() {
           <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value as SortBy)}
-            className="border border-brand-border bg-brand-bg px-3 py-1.5 text-body text-brand-text"
+            className="border-subtle bg-brand-bg px-3 py-1.5 text-body text-brand-secondary"
           >
             <option value="date">Newest First</option>
             <option value="name">Name A-Z</option>
@@ -434,8 +434,8 @@ export function LibraryPanel() {
 
           <button
             onClick={() => setFilterBy("all")}
-            className={`px-3 py-1.5 text-label uppercase tracking-wider border transition ${
-              filterBy === "all" ? "border-brand-text bg-brand-text text-brand-bg" : "border-brand-border text-brand-secondary hover:border-brand-text hover:text-brand-text"
+            className={`px-3 py-1.5 text-body-sm transition ${
+              filterBy === "all" ? "border border-brand-text bg-brand-text text-brand-bg" : "border-subtle text-brand-secondary hover:text-brand-text"
             }`}
           >
             All ({sounds.length})
@@ -443,8 +443,8 @@ export function LibraryPanel() {
 
           <button
             onClick={() => setFilterBy("liked")}
-            className={`px-3 py-1.5 text-label uppercase tracking-wider border transition ${
-              filterBy === "liked" ? "border-brand-text bg-brand-text text-brand-bg" : "border-brand-border text-brand-secondary hover:border-brand-text hover:text-brand-text"
+            className={`px-3 py-1.5 text-body-sm transition ${
+              filterBy === "liked" ? "border border-brand-text bg-brand-text text-brand-bg" : "border-subtle text-brand-secondary hover:text-brand-text"
             }`}
           >
             Liked ({sounds.filter((s) => s.liked).length})
@@ -457,7 +457,7 @@ export function LibraryPanel() {
                 setSelectedGroup(e.target.value);
                 setFilterBy("group");
               }}
-              className="border border-brand-border bg-brand-bg px-3 py-1.5 text-body text-brand-text"
+              className="border-subtle bg-brand-bg px-3 py-1.5 text-body text-brand-secondary"
             >
               <option value="">All Groups</option>
               {groups.map((group) => (
@@ -490,8 +490,8 @@ export function LibraryPanel() {
           <div
             key={sound.id}
             className={cn(
-              "border border-brand-border bg-brand-surface transition",
-              playingId === sound.id && "border-brand-text"
+              "border-subtle bg-brand-bg transition",
+              playingId === sound.id && "border border-brand-text"
             )}
           >
             {/* Main row - always visible */}
@@ -499,7 +499,7 @@ export function LibraryPanel() {
               {/* Play button - always shows play icon to start/select this sound */}
               <button
                 onClick={() => handlePlayPause(sound)}
-                className="flex h-8 w-8 shrink-0 items-center justify-center border border-brand-border bg-brand-bg hover:border-brand-text"
+                className="flex h-8 w-8 shrink-0 items-center justify-center border-subtle bg-transparent hover:border-brand-text"
                 title="Play"
               >
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" className="text-brand-text">
@@ -566,12 +566,12 @@ export function LibraryPanel() {
 
             {/* Expanded player row - shows when this sound is selected */}
             {playingId === sound.id && (
-              <div className="border-t border-brand-border px-3 py-2">
+              <div className="border-subtle-t px-3 py-2">
                 <div className="flex items-center gap-2">
                   {/* Play/Pause button */}
                   <button
                     onClick={() => handlePlayPause(sound)}
-                    className="flex h-7 w-7 shrink-0 items-center justify-center border border-brand-border bg-brand-bg hover:border-brand-text"
+                    className="flex h-7 w-7 shrink-0 items-center justify-center border-subtle bg-transparent hover:border-brand-text"
                     title={isPlaying ? "Pause" : "Play"}
                   >
                     {isPlaying ? (
@@ -589,7 +589,7 @@ export function LibraryPanel() {
                   {/* Stop button */}
                   <button
                     onClick={handleStop}
-                    className="flex h-7 w-7 shrink-0 items-center justify-center border border-brand-border bg-brand-bg hover:border-brand-text"
+                    className="flex h-7 w-7 shrink-0 items-center justify-center border-subtle bg-transparent hover:border-brand-text"
                     title="Stop"
                   >
                     <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" className="text-brand-text">

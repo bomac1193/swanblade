@@ -6,9 +6,9 @@ type Size = "sm" | "md" | "lg" | "icon";
 
 const variantClasses: Record<Variant, string> = {
   primary: "bg-brand-text text-brand-bg border border-brand-text hover:bg-brand-accent hover:border-brand-accent",
-  secondary: "bg-transparent text-brand-text border border-brand-border hover:border-brand-text",
+  secondary: "bg-transparent text-brand-text border border-brand-border/30 hover:border-brand-text",
   ghost: "bg-transparent text-brand-secondary hover:text-brand-text hover:bg-brand-border/30",
-  outline: "border border-brand-border text-brand-text hover:border-brand-text",
+  outline: "border border-brand-border/30 text-brand-text hover:border-brand-text",
   danger: "bg-status-error text-white border border-status-error hover:opacity-90",
 };
 

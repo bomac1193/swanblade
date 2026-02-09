@@ -46,7 +46,7 @@ export function SoundParametersPanel({ value, onChange }: SoundParametersPanelPr
   };
 
   return (
-    <div className="flex h-full flex-col gap-6 border border-brand-border bg-brand-surface p-6">
+    <div className="flex h-full flex-col gap-6 border border-brand-border/30 bg-brand-surface p-6">
       <div>
         <p className="text-label uppercase tracking-wider text-brand-secondary">Sound Parameters</p>
         <h3 className="mt-2 font-display text-display-md text-brand-text">Designer Controls</h3>
@@ -57,7 +57,7 @@ export function SoundParametersPanel({ value, onChange }: SoundParametersPanelPr
         <select
           value={value.type}
           onChange={(event) => onChange("type", event.target.value as SoundCategory)}
-          className="w-full border border-brand-border bg-brand-bg px-4 py-3 text-body text-brand-text"
+          className="w-full border border-brand-border/30 bg-brand-bg px-4 py-3 text-body text-brand-text"
         >
           {SOUND_TYPES.map((type) => (
             <option key={type} value={type}>
@@ -122,7 +122,7 @@ export function SoundParametersPanel({ value, onChange }: SoundParametersPanelPr
               type="button"
               onClick={() => onChange("lengthSeconds", seconds)}
               className={cn(
-                "border border-brand-border py-2 text-label uppercase tracking-wider text-brand-secondary transition",
+                "border border-brand-border/30 py-2 text-label uppercase tracking-wider text-brand-secondary transition",
                 value.lengthSeconds === seconds && "border-brand-text bg-brand-text text-brand-bg",
               )}
             >
@@ -136,14 +136,14 @@ export function SoundParametersPanel({ value, onChange }: SoundParametersPanelPr
         <button
           type="button"
           onClick={() => setAdvancedOpen((prev) => !prev)}
-          className="flex w-full items-center justify-between border border-brand-border px-4 py-3 text-body text-brand-secondary"
+          className="flex w-full items-center justify-between border border-brand-border/30 px-4 py-3 text-body text-brand-secondary"
         >
           Advanced Parameters
           <span className="text-label uppercase tracking-wider text-brand-secondary">{advancedOpen ? "Hide" : "Show"}</span>
         </button>
 
         {advancedOpen && (
-          <div className="space-y-3 border border-brand-border p-4">
+          <div className="space-y-3 border border-brand-border/30 p-4">
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <p className="text-label uppercase tracking-wider text-brand-secondary">BPM</p>
@@ -164,7 +164,7 @@ export function SoundParametersPanel({ value, onChange }: SoundParametersPanelPr
                 <select
                   value={value.key ?? ""}
                   onChange={(event) => onChange("key", event.target.value || undefined)}
-                  className="w-full border border-brand-border bg-brand-bg px-4 py-3 text-body text-brand-text"
+                  className="w-full border border-brand-border/30 bg-brand-bg px-4 py-3 text-body text-brand-text"
                 >
                   <option value="">—</option>
                   {KEY_OPTIONS.map((key) => (

@@ -6,12 +6,45 @@
  *
  * Typography Hierarchy:
  * - Fraunces (H1-H3): Elegant, expressive, creative presence
- * - Inter (H4-H6, body, UI): Clean, precise, functional
+ * - Sohne (H4-H6, body, UI): Clean, precise, functional
  *
  * Color Philosophy:
- * - Warm amber accent for creative energy (swan)
- * - Sharp black/white contrast for precision (blade)
+ * - Warm magenta accent for creative energy
+ * - Sharp black/white contrast for precision
  */
+
+/* Sohne - Klim Type Foundry */
+@font-face {
+  font-family: 'Sohne';
+  src: url('/fonts/TestSohne-Buch-BF663d89cd32e6a.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Sohne';
+  src: url('/fonts/TestSohne-Kraftig-BF663d89cd37e26.otf') format('opentype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Sohne';
+  src: url('/fonts/TestSohne-Halbfett-BF663d89cd2d67b.otf') format('opentype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Sohne';
+  src: url('/fonts/TestSohne-Fett-BF663d89cca89ff.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
 
 :root {
   --brand-bg: #FAFAFA;
@@ -19,6 +52,7 @@
   --brand-text: #0A0A0A;
   --brand-secondary: #6A6A6A;
   --brand-border: #E0E0E0;
+  --brand-border-rgb: 224, 224, 224;
   --brand-accent: #66023C;
   --brand-accent-hover: #520230;
   --brand-accent-subtle: rgba(102, 2, 60, 0.1);
@@ -31,6 +65,7 @@
   --brand-text: #FAFAFA;
   --brand-secondary: #A0A0A0;
   --brand-border: #2A2A2A;
+  --brand-border-rgb: 42, 42, 42;
   --brand-accent-subtle: rgba(102, 2, 60, 0.25);
 }
 
@@ -42,6 +77,7 @@
     --brand-text: #FAFAFA;
     --brand-secondary: #A0A0A0;
     --brand-border: #2A2A2A;
+    --brand-border-rgb: 42, 42, 42;
     --brand-accent-subtle: rgba(102, 2, 60, 0.25);
   }
 }
@@ -62,7 +98,7 @@ body {
   min-height: 100vh;
   background-color: var(--brand-bg);
   color: var(--brand-text);
-  font-family: var(--font-inter), 'Helvetica Neue', Arial, sans-serif;
+  font-family: 'Sohne', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   font-weight: 400;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
@@ -98,9 +134,9 @@ h3 {
   font-variation-settings: "opsz" 32;
 }
 
-/* SECONDARY HEADINGS: Inter (clean, precise) */
+/* SECONDARY HEADINGS: Sohne (clean, precise) */
 h4, h5, h6 {
-  font-family: var(--font-inter), 'Helvetica Neue', Arial, sans-serif;
+  font-family: 'Sohne', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 h4 {
@@ -171,9 +207,34 @@ button:disabled {
 }
 
 .card {
-  background: var(--brand-surface);
-  border: 1px solid var(--brand-border);
+  background: transparent;
+  border: 1px solid rgba(128, 128, 128, 0.15);
   padding: 24px;
+}
+
+/* Subtle border utilities - use CSS variable RGB values */
+.border-subtle {
+  border: 1px solid rgba(var(--brand-border-rgb), 0.2);
+}
+
+.border-subtle:hover {
+  border-color: rgba(var(--brand-border-rgb), 0.4);
+}
+
+.border-subtle-t {
+  border-top: 1px solid rgba(var(--brand-border-rgb), 0.2);
+}
+
+.border-subtle-b {
+  border-bottom: 1px solid rgba(var(--brand-border-rgb), 0.2);
+}
+
+.border-subtle-l {
+  border-left: 1px solid rgba(var(--brand-border-rgb), 0.2);
+}
+
+.border-subtle-r {
+  border-right: 1px solid rgba(var(--brand-border-rgb), 0.2);
 }
 
 .btn-primary {
@@ -196,7 +257,7 @@ button:disabled {
 .btn-secondary {
   background: transparent;
   color: var(--brand-text);
-  border: 1px solid var(--brand-border);
+  border: 1px solid rgba(128, 128, 128, 0.2);
   padding: 12px 24px;
   font-size: 11px;
   font-weight: 500;
@@ -206,12 +267,12 @@ button:disabled {
 }
 
 .btn-secondary:hover:not(:disabled) {
-  border-color: var(--brand-text);
+  border-color: rgba(128, 128, 128, 0.4);
 }
 
 .input-field {
   background: var(--brand-bg);
-  border: 1px solid var(--brand-border);
+  border: 1px solid rgba(128, 128, 128, 0.15);
   padding: 12px 16px;
   font-size: 14px;
   font-weight: 400;
@@ -220,7 +281,7 @@ button:disabled {
 }
 
 .input-field:focus {
-  border-color: var(--brand-text);
+  border-color: rgba(128, 128, 128, 0.4);
   background: var(--brand-surface);
 }
 

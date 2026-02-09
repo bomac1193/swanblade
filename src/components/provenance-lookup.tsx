@@ -52,8 +52,8 @@ export function ProvenanceLookup({ className, onResult }: ProvenanceLookupProps)
   };
 
   return (
-    <div className={cn("border border-brand-border bg-brand-surface", className)}>
-      <div className="px-4 py-3 border-b border-brand-border">
+    <div className={cn("border border-brand-border/30 bg-brand-surface", className)}>
+      <div className="px-4 py-3 border-b border-brand-border/30">
         <p className="text-label uppercase tracking-wider text-brand-secondary">
           Verify Provenance
         </p>
@@ -67,7 +67,7 @@ export function ProvenanceLookup({ className, onResult }: ProvenanceLookupProps)
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleLookup()}
             placeholder="Enter CID or audio fingerprint..."
-            className="flex-1 px-3 py-2 border border-brand-border bg-brand-bg text-body text-brand-text placeholder:text-brand-secondary focus:outline-none focus:border-brand-text"
+            className="flex-1 px-3 py-2 border border-brand-border/30 bg-brand-bg text-body text-brand-text placeholder:text-brand-secondary focus:outline-none focus:border-brand-text"
             disabled={loading}
           />
           <Button
@@ -112,7 +112,7 @@ export function ProvenanceLookup({ className, onResult }: ProvenanceLookupProps)
                   <span className="text-body font-medium">∞8 Verified</span>
                 </div>
 
-                <div className="border border-brand-border divide-y divide-brand-border">
+                <div className="border border-brand-border/30 divide-y divide-brand-border">
                   <div className="flex justify-between px-3 py-2">
                     <span className="text-body-sm text-brand-secondary">Identity</span>
                     <span className="text-body-sm text-brand-text font-mono">

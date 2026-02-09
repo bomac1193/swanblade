@@ -9,12 +9,12 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Use CSS variables for theme support
+        // Use CSS variables for theme support with alpha channel support
         'brand-bg': 'var(--brand-bg)',
         'brand-surface': 'var(--brand-surface)',
         'brand-text': 'var(--brand-text)',
         'brand-secondary': 'var(--brand-secondary)',
-        'brand-border': 'var(--brand-border)',
+        'brand-border': 'rgb(var(--brand-border-rgb) / <alpha-value>)',
         'brand-accent': 'var(--brand-accent)',
 
         // Status colors
@@ -25,9 +25,10 @@ const config: Config = {
       },
       fontFamily: {
         // PRIMARY HEADINGS (H1-H3): Presence, naming, orientation
-        display: ['Canela', 'Georgia', 'serif'],
+        display: ['Fraunces', 'Georgia', 'Times New Roman', 'serif'],
         // SECONDARY HEADINGS & BODY: Structural, operational, clear
-        sans: ['Söhne', 'Helvetica Neue', 'Arial', 'sans-serif'],
+        sans: ['Sohne', 'Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif'],
+        ui: ['Sohne', 'Inter', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
       },
       fontSize: {
         // H1-H3: Canela (announces, never explains)

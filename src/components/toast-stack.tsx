@@ -18,7 +18,7 @@ interface ToastStackProps {
 const toneClasses: Record<ToastTone, string> = {
   success: "border-brand-text bg-brand-surface text-brand-text",
   error: "border-status-error bg-brand-surface text-status-error",
-  neutral: "border-brand-border bg-brand-surface text-brand-text",
+  neutral: "border-brand-border/30 bg-brand-surface text-brand-text",
 };
 
 export function ToastStack({ items, onDismiss }: ToastStackProps) {

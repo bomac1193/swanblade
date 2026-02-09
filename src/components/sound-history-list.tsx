@@ -13,7 +13,7 @@ interface SoundHistoryListProps {
 export function SoundHistoryList({ items, selectedId, onSelect }: SoundHistoryListProps) {
   if (!items.length) {
     return (
-      <div className="flex h-full flex-col items-center justify-center border border-dashed border-brand-border bg-brand-surface p-6 text-center">
+      <div className="flex h-full flex-col items-center justify-center border border-dashed border-brand-border/30 bg-brand-surface p-6 text-center">
         <p className="text-body text-brand-secondary">Describe a sound and I&apos;ll design it.</p>
         <p className="mt-2 text-body-sm text-brand-secondary/60">Your sound history will live here.</p>
       </div>
@@ -28,7 +28,7 @@ export function SoundHistoryList({ items, selectedId, onSelect }: SoundHistoryLi
           type="button"
           onClick={() => onSelect(sound.id)}
           className={cn(
-            "w-full border border-brand-border p-4 text-left transition hover:border-brand-text",
+            "w-full border border-brand-border/30 p-4 text-left transition hover:border-brand-text",
             selectedId === sound.id && "border-brand-text bg-brand-bg",
           )}
         >

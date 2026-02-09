@@ -48,7 +48,7 @@ export function BatchGeneration({
   }, [prompt, count, generating, onGenerate]);
 
   return (
-    <div className={cn("border border-brand-border bg-brand-surface", className)}>
+    <div className={cn("border border-brand-border/30 bg-brand-surface", className)}>
       <div
         className="flex items-center justify-between px-4 py-3 cursor-pointer hover:bg-brand-bg transition-colors"
         onClick={() => setExpanded(!expanded)}
@@ -77,7 +77,7 @@ export function BatchGeneration({
       </div>
 
       {expanded && (
-        <div className="border-t border-brand-border p-4">
+        <div className="border-t border-brand-border/30 p-4">
           {/* Count Selection */}
           <div className="mb-4">
             <p className="text-label uppercase tracking-wider text-brand-secondary mb-2">
@@ -93,7 +93,7 @@ export function BatchGeneration({
                     "px-4 py-2 border text-body-sm transition-colors",
                     count === n
                       ? "border-[#66023C] bg-[#66023C] text-white"
-                      : "border-brand-border text-brand-secondary hover:border-brand-text"
+                      : "border-brand-border/30 text-brand-secondary hover:border-brand-text"
                   )}
                 >
                   {n}
@@ -143,7 +143,7 @@ export function BatchGeneration({
                   <button
                     key={sound.id}
                     onClick={() => onSelect(sound)}
-                    className="p-3 border border-brand-border hover:border-[#66023C] text-left transition-colors group"
+                    className="p-3 border border-brand-border/30 hover:border-[#66023C] text-left transition-colors group"
                   >
                     <div className="flex items-center justify-between">
                       <span className="text-body-sm font-medium text-brand-text">
@@ -156,7 +156,7 @@ export function BatchGeneration({
                             ? "bg-status-success/10 border-status-success/20 text-status-success"
                             : sound.status === "error"
                             ? "bg-status-error/10 border-status-error/20 text-status-error"
-                            : "bg-brand-bg border-brand-border text-brand-secondary"
+                            : "bg-brand-bg border-brand-border/30 text-brand-secondary"
                         )}
                       >
                         {sound.status}

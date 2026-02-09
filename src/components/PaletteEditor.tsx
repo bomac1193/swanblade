@@ -53,13 +53,13 @@ export function PaletteEditor({ value, onChange, onCreateFromDNA }: PaletteEdito
   };
 
   return (
-    <div className="border border-brand-border bg-brand-surface p-4">
+    <div>
       <div className="flex items-center justify-between">
-        <p className="text-label uppercase tracking-wider text-brand-secondary">Sound Palette</p>
+        <p className="text-body-sm text-brand-secondary">Sound Palette</p>
         {value && (
           <button
             onClick={() => onChange(null)}
-            className="text-label uppercase tracking-wider text-brand-secondary hover:text-brand-text"
+            className="text-body-sm text-brand-secondary hover:text-brand-text"
           >
             Clear
           </button>
@@ -70,10 +70,10 @@ export function PaletteEditor({ value, onChange, onCreateFromDNA }: PaletteEdito
       <div className="mt-3 flex flex-wrap gap-2">
         <button
           onClick={() => handlePresetSelect("none")}
-          className={`px-3 py-1.5 text-label uppercase tracking-wider border transition ${
+          className={`px-3 py-1.5 text-[10px] uppercase tracking-wider transition ${
             !value
-              ? "border-brand-text bg-brand-text text-brand-bg"
-              : "border-brand-border text-brand-secondary hover:border-brand-text hover:text-brand-text"
+              ? "border border-brand-text bg-brand-text text-brand-bg"
+              : "btn-secondary"
           }`}
         >
           No Palette
@@ -83,10 +83,10 @@ export function PaletteEditor({ value, onChange, onCreateFromDNA }: PaletteEdito
           <button
             key={id}
             onClick={() => handlePresetSelect(id)}
-            className={`px-3 py-1.5 text-label uppercase tracking-wider border transition ${
+            className={`px-3 py-1.5 text-[10px] uppercase tracking-wider transition ${
               value?.name === preset.name
-                ? "border-brand-text bg-brand-text text-brand-bg"
-                : "border-brand-border text-brand-secondary hover:border-brand-text hover:text-brand-text"
+                ? "border border-brand-text bg-brand-text text-brand-bg"
+                : "btn-secondary"
             }`}
           >
             {preset.name}
@@ -97,16 +97,16 @@ export function PaletteEditor({ value, onChange, onCreateFromDNA }: PaletteEdito
       {/* Saved Palettes */}
       {savedPalettes.length > 0 && (
         <div className="mt-3">
-          <p className="text-label uppercase tracking-wider text-brand-secondary">Saved Palettes</p>
+          <p className="text-body-sm text-brand-secondary">Saved Palettes</p>
           <div className="mt-2 flex flex-wrap gap-2">
             {savedPalettes.map((p) => (
               <button
                 key={p.id}
                 onClick={() => handleSavedSelect(p.id)}
-                className={`px-3 py-1.5 text-label uppercase tracking-wider border transition ${
+                className={`px-3 py-1.5 text-[10px] uppercase tracking-wider transition ${
                   value?.id === p.id
-                    ? "border-brand-text bg-brand-text text-brand-bg"
-                    : "border-brand-border text-brand-secondary hover:border-brand-text hover:text-brand-text"
+                    ? "border border-brand-text bg-brand-text text-brand-bg"
+                    : "btn-secondary"
                 }`}
               >
                 {p.name}
@@ -119,7 +119,7 @@ export function PaletteEditor({ value, onChange, onCreateFromDNA }: PaletteEdito
       {/* Current Palette Details */}
       {value && (
         <div className="mt-4 space-y-3">
-          <div className="border border-brand-border bg-brand-bg p-3">
+          <div className="border border-brand-border/30 bg-brand-bg p-3">
             <p className="text-body-lg font-medium text-brand-text">{value.name}</p>
             <p className="mt-1 text-body-sm text-brand-secondary">{value.description}</p>
 
@@ -153,7 +153,7 @@ export function PaletteEditor({ value, onChange, onCreateFromDNA }: PaletteEdito
           </button>
 
           {showCustomEditor && (
-            <div className="space-y-3 border border-brand-border bg-brand-bg p-3">
+            <div className="space-y-3 border border-brand-border/30 bg-brand-bg p-3">
               {/* BPM Range */}
               {value.constraints.bpmRange && (
                 <ConstraintSlider
@@ -209,12 +209,12 @@ export function PaletteEditor({ value, onChange, onCreateFromDNA }: PaletteEdito
                   placeholder="Palette name..."
                   value={customName}
                   onChange={(e) => setCustomName(e.target.value)}
-                  className="flex-1 border border-brand-border bg-brand-surface px-3 py-1.5 text-body text-brand-text placeholder:text-brand-secondary focus:border-brand-text focus:outline-none"
+                  className="flex-1 border border-brand-border/30 bg-brand-surface px-3 py-1.5 text-body text-brand-text placeholder:text-brand-secondary focus:border-brand-text focus:outline-none"
                 />
                 <button
                   onClick={savePalette}
                   disabled={!customName.trim()}
-                  className="bg-brand-text px-4 py-1.5 text-label uppercase tracking-wider text-brand-bg disabled:opacity-40"
+                  className="bg-brand-text px-4 py-1.5 text-body-sm text-brand-bg disabled:opacity-40"
                 >
                   Save
                 </button>
@@ -228,7 +228,7 @@ export function PaletteEditor({ value, onChange, onCreateFromDNA }: PaletteEdito
       {onCreateFromDNA && (
         <button
           onClick={onCreateFromDNA}
-          className="mt-3 w-full border border-dashed border-brand-border py-2 text-label uppercase tracking-wider text-brand-secondary hover:border-brand-text hover:text-brand-text"
+          className="mt-3 w-full border border-dashed border-brand-border/30 py-2 text-body-sm text-brand-secondary hover:border-brand-text hover:text-brand-text"
         >
           + Create from Sound DNA
         </button>

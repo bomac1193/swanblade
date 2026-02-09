@@ -125,7 +125,7 @@ export function Spectrogram({ audioUrl, isPlaying, className }: SpectrogramProps
 
   if (!audioUrl) {
     return (
-      <div className={cn("bg-brand-bg border border-brand-border", className)}>
+      <div className={cn("bg-brand-bg border border-brand-border/30", className)}>
         <div className="h-24 flex items-center justify-center">
           <p className="text-body-sm text-brand-secondary">No audio loaded</p>
         </div>
@@ -134,7 +134,7 @@ export function Spectrogram({ audioUrl, isPlaying, className }: SpectrogramProps
   }
 
   return (
-    <div className={cn("bg-brand-bg border border-brand-border overflow-hidden", className)}>
+    <div className={cn("bg-brand-bg border border-brand-border/30 overflow-hidden", className)}>
       <canvas
         ref={canvasRef}
         width={400}
@@ -196,7 +196,7 @@ export function StaticSpectrogram({
       ref={canvasRef}
       width={400}
       height={48}
-      className={cn("w-full h-12 bg-brand-bg border border-brand-border", className)}
+      className={cn("w-full h-12 bg-brand-bg border border-brand-border/30", className)}
     />
   );
 }

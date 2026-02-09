@@ -27,7 +27,7 @@ function Skeleton({ className }: { className?: string }) {
 // Identity skeleton for loading state
 function IdentitySkeleton() {
   return (
-    <div className="px-4 py-3 border-b border-brand-border last:border-b-0">
+    <div className="px-4 py-3 border-b border-brand-border/30 last:border-b-0">
       <div className="flex items-center justify-between">
         <div className="space-y-2">
           <Skeleton className="h-4 w-32" />
@@ -63,7 +63,7 @@ function SonicPaletteViz({ palette }: { palette: SonicPalette }) {
               style={{ height: `${band.value * 100}%` }}
             />
           </div>
-          <span className="text-[9px] text-brand-secondary uppercase">{band.label}</span>
+          <span className="text-[9px] text-brand-secondary">{band.label}</span>
         </div>
       ))}
     </div>
@@ -111,21 +111,21 @@ export function O8IdentityPanel({ onIdentityChange, className }: O8IdentityPanel
   };
 
   return (
-    <div className={cn("border border-brand-border bg-brand-surface", className)}>
+    <div className={cn("border border-brand-border/30/30", className)}>
       {/* Header */}
       <div
         className="flex items-center justify-between px-4 py-3 cursor-pointer hover:bg-brand-bg transition-colors"
         onClick={() => setExpanded(!expanded)}
       >
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 border border-brand-border bg-brand-bg flex items-center justify-center">
+          <div className="w-8 h-8 border border-brand-border/30 bg-brand-bg flex items-center justify-center">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="text-[#66023C]">
               <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.5" />
               <circle cx="12" cy="12" r="4" fill="currentColor" />
             </svg>
           </div>
           <div>
-            <p className="text-label uppercase tracking-wider text-brand-secondary">∞8 Identity</p>
+            <p className="text-body-sm text-brand-secondary">∞8 Identity</p>
             {selectedIdentity ? (
               <p className="text-body-sm font-medium text-brand-text">
                 {selectedIdentity.creator.name}
@@ -148,7 +148,7 @@ export function O8IdentityPanel({ onIdentityChange, className }: O8IdentityPanel
 
       {/* Expanded Content */}
       {expanded && (
-        <div className="border-t border-brand-border">
+        <div className="border-t border-brand-border/30">
           {loading ? (
             <div className="max-h-64 overflow-y-auto">
               <IdentitySkeleton />
@@ -193,7 +193,7 @@ export function O8IdentityPanel({ onIdentityChange, className }: O8IdentityPanel
           ) : identities.length === 0 ? (
             <div className="p-4">
               <div className="flex items-start gap-3">
-                <div className="w-8 h-8 border border-brand-border bg-brand-bg flex items-center justify-center flex-shrink-0">
+                <div className="w-8 h-8 border border-brand-border/30 bg-brand-bg flex items-center justify-center flex-shrink-0">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="text-brand-secondary">
                     <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.5" strokeDasharray="4 2" />
                     <path d="M12 8v4M12 14v2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
@@ -225,7 +225,7 @@ export function O8IdentityPanel({ onIdentityChange, className }: O8IdentityPanel
                   key={identity.identity_id}
                   onClick={() => handleSelect(identity)}
                   className={cn(
-                    "px-4 py-3 cursor-pointer border-b border-brand-border last:border-b-0 transition-colors",
+                    "px-4 py-3 cursor-pointer border-b border-brand-border/30 last:border-b-0 transition-colors",
                     selectedIdentity?.identity_id === identity.identity_id
                       ? "bg-[#66023C]/10"
                       : "hover:bg-brand-bg"
@@ -270,8 +270,8 @@ export function O8IdentityPanel({ onIdentityChange, className }: O8IdentityPanel
 
       {/* Selected Identity Details */}
       {selectedIdentity && !expanded && selectedIdentity.dna?.audio && (
-        <div className="border-t border-brand-border px-4 py-3">
-          <p className="text-label uppercase tracking-wider text-brand-secondary mb-2">
+        <div className="border-t border-brand-border/30 px-4 py-3">
+          <p className="text-body-sm text-brand-secondary mb-2">
             Sonic Palette
           </p>
           <SonicPaletteViz palette={selectedIdentity.dna.audio.sonic_palette} />

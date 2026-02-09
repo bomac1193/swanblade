@@ -106,9 +106,9 @@ export function StemExportPanel({
   const enabledCount = stems.filter((s) => s.enabled).length;
 
   return (
-    <div className={cn("border border-brand-border bg-brand-surface", className)}>
+    <div className={cn("border border-brand-border/30 bg-brand-surface", className)}>
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-brand-border">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-brand-border/30">
         <div>
           <p className="text-label uppercase tracking-wider text-brand-secondary">
             Export to Burn the Square
@@ -121,7 +121,7 @@ export function StemExportPanel({
       </div>
 
       {/* Stem Selection */}
-      <div className="p-4 border-b border-brand-border">
+      <div className="p-4 border-b border-brand-border/30">
         <p className="text-label uppercase tracking-wider text-brand-secondary mb-3">
           Stem Layers
         </p>
@@ -138,13 +138,13 @@ export function StemExportPanel({
                   "flex items-center gap-2 px-3 py-2 border transition-colors text-left",
                   isEnabled
                     ? "border-[#66023C] bg-[#66023C]/10 text-brand-text"
-                    : "border-brand-border text-brand-secondary hover:border-brand-text"
+                    : "border-brand-border/30 text-brand-secondary hover:border-brand-text"
                 )}
               >
                 <div
                   className={cn(
                     "w-3 h-3 border",
-                    isEnabled ? "bg-[#66023C] border-[#66023C]" : "border-brand-border"
+                    isEnabled ? "bg-[#66023C] border-[#66023C]" : "border-brand-border/30"
                   )}
                 />
                 <div>
@@ -157,7 +157,7 @@ export function StemExportPanel({
       </div>
 
       {/* Game State Target */}
-      <div className="p-4 border-b border-brand-border">
+      <div className="p-4 border-b border-brand-border/30">
         <p className="text-label uppercase tracking-wider text-brand-secondary mb-3">
           Primary Game State
         </p>
@@ -170,7 +170,7 @@ export function StemExportPanel({
                 "px-3 py-1.5 border text-body-sm uppercase tracking-wider transition-colors",
                 targetState === state
                   ? "border-[#66023C] bg-[#66023C] text-white"
-                  : "border-brand-border text-brand-secondary hover:border-brand-text"
+                  : "border-brand-border/30 text-brand-secondary hover:border-brand-text"
               )}
             >
               {state}
@@ -180,7 +180,7 @@ export function StemExportPanel({
       </div>
 
       {/* Format Selection */}
-      <div className="p-4 border-b border-brand-border">
+      <div className="p-4 border-b border-brand-border/30">
         <p className="text-label uppercase tracking-wider text-brand-secondary mb-3">
           Format
         </p>
@@ -193,7 +193,7 @@ export function StemExportPanel({
                 "px-4 py-2 border text-body-sm uppercase tracking-wider transition-colors",
                 format === f
                   ? "border-brand-text bg-brand-text text-brand-bg"
-                  : "border-brand-border text-brand-secondary hover:border-brand-text"
+                  : "border-brand-border/30 text-brand-secondary hover:border-brand-text"
               )}
             >
               {f}

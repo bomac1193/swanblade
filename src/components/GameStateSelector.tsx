@@ -23,13 +23,13 @@ export function GameStateSelector({
   const selectedConfig = value ? GAME_STATE_CONFIGS[value] : null;
 
   return (
-    <div className="border border-brand-border bg-brand-surface p-4">
+    <div>
       <div className="flex items-center justify-between">
-        <p className="text-label uppercase tracking-wider text-brand-secondary">Game State</p>
+        <p className="text-body-sm text-brand-secondary">Game State</p>
         {value && (
           <button
             onClick={() => onChange(null)}
-            className="text-label uppercase tracking-wider text-brand-secondary hover:text-brand-text"
+            className="text-body-sm text-brand-secondary hover:text-brand-text"
           >
             Clear
           </button>
@@ -40,16 +40,16 @@ export function GameStateSelector({
       <div className="mt-3 space-y-3">
         {Object.entries(GAME_STATE_CATEGORIES).map(([category, states]) => (
           <div key={category}>
-            <p className="text-label uppercase tracking-wider text-brand-secondary/60">{category}</p>
+            <p className="text-body-sm text-brand-secondary/60">{category}</p>
             <div className="mt-1 flex flex-wrap gap-2">
               {states.map((state) => (
                 <button
                   key={state}
                   onClick={() => onChange(value === state ? null : state)}
-                  className={`px-3 py-1.5 text-label uppercase tracking-wider border transition ${
+                  className={`px-3 py-1.5 text-[10px] uppercase tracking-wider transition ${
                     value === state
-                      ? "border-brand-text bg-brand-text text-brand-bg"
-                      : "border-brand-border text-brand-secondary hover:border-brand-text hover:text-brand-text"
+                      ? "border border-brand-text bg-brand-text text-brand-bg"
+                      : "btn-secondary"
                   }`}
                 >
                   {state}
@@ -62,7 +62,7 @@ export function GameStateSelector({
 
       {/* Selected State Details */}
       {showDetails && selectedConfig && value && (
-        <div className="mt-4 border border-brand-border bg-brand-bg p-3">
+        <div className="mt-4 border border-brand-border/30 bg-brand-bg p-3">
           <div>
             <p className="text-body-lg font-medium capitalize text-brand-text">{value}</p>
             <p className="text-body-sm text-brand-secondary">{selectedConfig.description}</p>
@@ -97,7 +97,7 @@ export function GameStateSelector({
             {selectedConfig.promptKeywords.map((keyword) => (
               <span
                 key={keyword}
-                className="bg-brand-border px-2 py-0.5 text-label text-brand-text"
+                className="bg-brand-border px-2 py-0.5 text-body-sm text-brand-text"
               >
                 {keyword}
               </span>
@@ -106,7 +106,7 @@ export function GameStateSelector({
 
           {/* Default Stems */}
           <div className="mt-3">
-            <p className="text-label uppercase tracking-wider text-brand-secondary">
+            <p className="text-body-sm text-brand-secondary">
               Default Stems
             </p>
             <div className="mt-1 flex flex-wrap gap-1">
@@ -115,7 +115,7 @@ export function GameStateSelector({
                 .map(([stem, volume]) => (
                   <span
                     key={stem}
-                    className="bg-brand-text px-2 py-0.5 text-label text-brand-bg"
+                    className="bg-brand-text px-2 py-0.5 text-body-sm text-brand-bg"
                   >
                     {stem} ({Math.round(volume * 100)}%)
                   </span>
@@ -139,7 +139,7 @@ function ModifierBadge({ label, value, suffix }: ModifierBadgeProps) {
   const isNegative = value < 0;
 
   return (
-    <div className="flex items-center justify-between bg-brand-surface px-2 py-1 border border-brand-border">
+    <div className="flex items-center justify-between bg-brand-surface px-2 py-1 border border-brand-border/30">
       <span className="text-brand-secondary">{label}</span>
       <span
         className={
@@ -171,7 +171,7 @@ export function GameStateBadge({
   return (
     <button
       onClick={onClick}
-      className="bg-brand-text px-2 py-0.5 text-label uppercase tracking-wider text-brand-bg hover:bg-brand-accent"
+      className="bg-brand-text px-2 py-0.5 text-body-sm text-brand-bg hover:bg-brand-accent"
     >
       {state}
     </button>

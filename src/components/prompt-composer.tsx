@@ -13,7 +13,7 @@ interface PromptComposerProps {
 
 export function PromptComposer({ value, onChange, onSubmit, suggestions, isGenerating }: PromptComposerProps) {
   return (
-    <div className="border border-brand-border bg-brand-surface p-6">
+    <div className="border border-brand-border/30 bg-brand-surface p-6">
       <p className="text-label uppercase tracking-wider text-brand-secondary">Prompt Composer</p>
       <Textarea
         rows={3}
@@ -29,7 +29,7 @@ export function PromptComposer({ value, onChange, onSubmit, suggestions, isGener
             key={suggestion}
             type="button"
             onClick={() => onChange(suggestion)}
-            className="border border-brand-border px-4 py-2 text-label uppercase tracking-wider text-brand-secondary transition hover:border-brand-text hover:text-brand-text"
+            className="border border-brand-border/30 px-4 py-2 text-label uppercase tracking-wider text-brand-secondary transition hover:border-brand-text hover:text-brand-text"
           >
             {suggestion}
           </button>

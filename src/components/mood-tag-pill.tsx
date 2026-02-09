@@ -15,7 +15,7 @@ export function MoodTagPill({ active, className, children, ...props }: MoodTagPi
         "border px-4 py-2 text-label uppercase tracking-wider transition-all",
         active
           ? "border-brand-text bg-brand-text text-brand-bg"
-          : "border-brand-border bg-transparent text-brand-secondary hover:border-brand-text hover:text-brand-text",
+          : "border-brand-border/30 bg-transparent text-brand-secondary hover:border-brand-text hover:text-brand-text",
         className,
       )}
       {...props}

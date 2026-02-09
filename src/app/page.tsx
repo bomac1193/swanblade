@@ -94,21 +94,21 @@ function readFileAsBase64(file: File): Promise<string> {
 
 function ReferenceClipCard({ clip, onRemove }: { clip: ReferenceClip; onRemove: (id: string) => void }) {
   return (
-    <div className="border border-brand-border bg-brand-surface p-4">
+    <div className="border border-brand-border/30 bg-brand-surface p-4">
       <div className="flex items-center justify-between gap-3">
         <div>
           <p className="text-body font-medium text-brand-text">{clip.name}</p>
-          <p className="uppercase-label text-brand-secondary">{formatDisplayBytes(clip.size)}</p>
+          <p className="text-body-sm text-brand-secondary">{formatDisplayBytes(clip.size)}</p>
         </div>
         <button
           type="button"
           onClick={() => onRemove(clip.id)}
-          className="uppercase-label text-brand-secondary hover:text-brand-text"
+          className="text-body-sm text-brand-secondary hover:text-brand-text"
         >
           Remove
         </button>
       </div>
-      <div className="mt-3 border border-brand-border bg-brand-bg p-2">
+      <div className="mt-3 border border-brand-border/30 bg-brand-bg p-2">
         <audio
           controls
           src={clip.previewUrl}
@@ -557,95 +557,96 @@ export default function Home() {
   useKeyboardShortcuts(shortcuts);
 
   return (
-    <div className="min-h-screen bg-brand-bg text-brand-text flex">
-      {/* Sidebar */}
-      <aside className="fixed left-0 top-0 h-screen w-48 bg-brand-surface border-r border-brand-border flex flex-col z-50">
-        {/* Logo */}
-        <div className="p-4 border-b border-brand-border">
-          <span className="font-display text-lg tracking-tight">Swanblade</span>
-        </div>
+    <div className="min-h-screen bg-brand-bg text-brand-text flex flex-col">
+      {/* Header */}
+      <header className="border-b border-brand-border bg-brand-surface">
+        <div className="mx-auto flex max-w-[1800px] items-center justify-between px-6 py-3">
+          {/* Left: Logo */}
+          <h1 className="font-display text-lg font-semibold tracking-tight">
+            Swanblade
+          </h1>
 
-        {/* Navigation */}
-        <nav className="flex-1 py-4">
-          <button
-            onClick={() => setMode("generate")}
-            className={`w-full flex items-center gap-3 px-4 py-3 transition ${
-              mode === "generate"
-                ? "bg-brand-text text-brand-bg"
-                : "text-brand-secondary hover:bg-brand-border hover:text-brand-text"
-            }`}
-          >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="shrink-0">
-              <path d="M12 3v18M3 12h18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-            </svg>
-            <span className="text-body">Generate</span>
-          </button>
-          <button
-            onClick={() => setMode("game-audio")}
-            className={`w-full flex items-center gap-3 px-4 py-3 transition ${
-              mode === "game-audio"
-                ? "bg-brand-text text-brand-bg"
-                : "text-brand-secondary hover:bg-brand-border hover:text-brand-text"
-            }`}
-          >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="shrink-0">
-              <rect x="6" y="3" width="12" height="18" rx="2" stroke="currentColor" strokeWidth="1.5" />
-              <circle cx="12" cy="14" r="3" stroke="currentColor" strokeWidth="1.5" />
-              <path d="M10 7h4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-            </svg>
-            <span className="text-body">Game Audio</span>
-          </button>
-          <button
-            onClick={() => setMode("library")}
-            className={`w-full flex items-center gap-3 px-4 py-3 transition ${
-              mode === "library"
-                ? "bg-brand-text text-brand-bg"
-                : "text-brand-secondary hover:bg-brand-border hover:text-brand-text"
-            }`}
-          >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="shrink-0">
-              <path d="M4 19.5A2.5 2.5 0 016.5 17H20" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z" stroke="currentColor" strokeWidth="1.5" />
-            </svg>
-            <span className="text-body">Library</span>
-          </button>
-        </nav>
+          {/* Center/Right: Tab Navigation */}
+          <div className="flex items-center gap-6">
+            <nav className="flex items-center gap-1">
+              <button
+                onClick={() => setMode("generate")}
+                className={`flex items-center gap-2 px-4 py-2 text-sm font-medium transition ${
+                  mode === "generate"
+                    ? "bg-brand-text text-brand-bg"
+                    : "text-brand-secondary hover:bg-brand-bg hover:text-brand-text"
+                }`}
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                  <path d="M12 3v18M3 12h18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                </svg>
+                Generate
+              </button>
+              <button
+                onClick={() => setMode("game-audio")}
+                className={`flex items-center gap-2 px-4 py-2 text-sm font-medium transition ${
+                  mode === "game-audio"
+                    ? "bg-brand-text text-brand-bg"
+                    : "text-brand-secondary hover:bg-brand-bg hover:text-brand-text"
+                }`}
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                  <rect x="6" y="3" width="12" height="18" rx="2" stroke="currentColor" strokeWidth="1.5" />
+                  <circle cx="12" cy="14" r="3" stroke="currentColor" strokeWidth="1.5" />
+                </svg>
+                Game Audio
+              </button>
+              <button
+                onClick={() => setMode("library")}
+                className={`flex items-center gap-2 px-4 py-2 text-sm font-medium transition ${
+                  mode === "library"
+                    ? "bg-brand-text text-brand-bg"
+                    : "text-brand-secondary hover:bg-brand-bg hover:text-brand-text"
+                }`}
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                  <path d="M4 19.5A2.5 2.5 0 016.5 17H20" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                  <path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z" stroke="currentColor" strokeWidth="1.5" />
+                </svg>
+                Library
+              </button>
+            </nav>
 
-        {/* Bottom Actions */}
-        <div className="border-t border-brand-border py-4">
-          <button
-            onClick={toggleTheme}
-            className="w-full flex items-center gap-3 px-4 py-3 text-brand-secondary hover:bg-brand-border hover:text-brand-text transition"
-          >
-            {isDark ? (
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="shrink-0">
-                <circle cx="12" cy="12" r="5" stroke="currentColor" strokeWidth="1.5" />
-                <path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-              </svg>
-            ) : (
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="shrink-0">
-                <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            )}
-            <span className="text-body">
-              {isDark ? "Light Mode" : "Dark Mode"}
-            </span>
-          </button>
-          <button
-            onClick={() => setShowShortcuts(true)}
-            className="w-full flex items-center gap-3 px-4 py-3 text-brand-secondary hover:bg-brand-border hover:text-brand-text transition"
-          >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="shrink-0">
-              <rect x="2" y="4" width="20" height="16" rx="2" stroke="currentColor" strokeWidth="1.5" />
-              <path d="M6 8h.01M10 8h.01M14 8h.01M18 8h.01M8 12h.01M12 12h.01M16 12h.01M6 16h12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-            </svg>
-            <span className="text-body">Shortcuts</span>
-          </button>
+            {/* Actions */}
+            <div className="flex items-center gap-2">
+              <button
+                onClick={toggleTheme}
+                className="p-2 text-brand-secondary hover:text-brand-text transition"
+                title={isDark ? "Switch to light mode" : "Switch to dark mode"}
+              >
+                {isDark ? (
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                    <circle cx="12" cy="12" r="5" stroke="currentColor" strokeWidth="1.5" />
+                    <path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                  </svg>
+                ) : (
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                    <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                )}
+              </button>
+              <button
+                onClick={() => setShowShortcuts(true)}
+                className="p-2 text-brand-secondary hover:text-brand-text transition"
+                title="Keyboard shortcuts"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                  <rect x="2" y="4" width="20" height="16" rx="2" stroke="currentColor" strokeWidth="1.5" />
+                  <path d="M6 8h.01M10 8h.01M14 8h.01M18 8h.01M8 12h.01M12 12h.01M16 12h.01M6 16h12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                </svg>
+              </button>
+            </div>
+          </div>
         </div>
-      </aside>
+      </header>
 
       {/* Main Content */}
-      <main className="flex-1 ml-48 px-8 py-8">
+      <main className="flex-1 mx-auto max-w-[1800px] w-full p-8">
         {mode === "library" ? (
           <div className="card">
             <LibraryPanel />
@@ -689,16 +690,16 @@ export default function Home() {
 
                 {/* Duration */}
                 <div className="mt-4">
-                  <p className="uppercase-label text-brand-secondary">Duration</p>
+                  <p className="text-body-sm text-brand-secondary">Duration</p>
                   <div className="mt-2 flex gap-2">
                     {[15, 30, 60].map((value) => (
                       <button
                         key={value}
                         onClick={() => setLengthSeconds(value)}
-                        className={`px-4 py-2 uppercase-label border transition ${
+                        className={`px-4 py-2 text-body-sm border transition ${
                           lengthSeconds === value
                             ? "border-brand-text bg-brand-text text-brand-bg"
-                            : "border-brand-border text-brand-secondary hover:border-brand-text hover:text-brand-text"
+                            : "border-brand-border/30 text-brand-secondary hover:border-brand-text hover:text-brand-text"
                         }`}
                       >
                         {value}s
@@ -723,7 +724,7 @@ export default function Home() {
 
                 {/* Optional Prompt */}
                 <div className="mt-4">
-                  <p className="uppercase-label text-brand-secondary">Style Keywords (Optional)</p>
+                  <p className="text-body-sm text-brand-secondary">Style Keywords (Optional)</p>
                   <textarea
                     className="input-field mt-2"
                     rows={2}
@@ -753,7 +754,7 @@ export default function Home() {
 
               {currentBundle ? (
                 <div className="mt-4">
-                  <div className="flex items-center justify-between border-b border-brand-border pb-3">
+                  <div className="flex items-center justify-between border-b border-brand-border/30 pb-3">
                     <div>
                       <p className="text-heading-sm capitalize">{currentBundle.gameState} Bundle</p>
                       <p className="text-body-sm text-brand-secondary">
@@ -764,7 +765,7 @@ export default function Home() {
 
                   <div className="mt-4 space-y-3">
                     {currentBundle.stems.map((stem) => (
-                      <div key={stem.stemType} className="border border-brand-border p-3">
+                      <div key={stem.stemType} className="border border-brand-border/30 p-3">
                         <div className="flex items-center justify-between">
                           <div>
                             <p className="text-body font-medium capitalize">{stem.stemType}</p>
@@ -787,7 +788,7 @@ export default function Home() {
                     ))}
                   </div>
 
-                  <div className="mt-4 border-t border-brand-border pt-4">
+                  <div className="mt-4 border-t border-brand-border/30 pt-4">
                     <p className="text-body-sm text-brand-secondary">
                       Bundle ID: {currentBundle.id}
                     </p>
@@ -886,7 +887,7 @@ export default function Home() {
 
                 <div
                   className={`mt-4 border-2 border-dashed p-6 text-center transition ${
-                    isDraggingReference ? "border-brand-text bg-brand-surface" : "border-brand-border"
+                    isDraggingReference ? "border-brand-text bg-brand-surface" : "border-brand-border/30"
                   }`}
                   onDragOver={handleDragOver}
                   onDragLeave={handleDragLeave}
@@ -950,22 +951,22 @@ export default function Home() {
 
                 {/* Duration */}
                 <div className="mt-4">
-                  <p className="uppercase-label text-brand-secondary">Duration</p>
+                  <p className="text-body-sm text-brand-secondary">Duration</p>
                   <div className="mt-2 flex flex-wrap gap-2">
                     {LENGTH_PRESETS.map((value) => (
                       <button
                         key={value}
                         onClick={() => setLengthSeconds(value)}
-                        className={`px-4 py-2 uppercase-label border transition ${
+                        className={`px-4 py-2 text-body-sm border transition ${
                           lengthSeconds === value
                             ? "border-brand-text bg-brand-text text-brand-bg"
-                            : "border-brand-border text-brand-secondary hover:border-brand-text hover:text-brand-text"
+                            : "border-brand-border/30 text-brand-secondary hover:border-brand-text hover:text-brand-text"
                         }`}
                       >
                         {value < 60 ? `${value}s` : `${value / 60}m`}
                       </button>
                     ))}
-                    <div className="flex items-center border border-brand-border px-3 py-2">
+                    <div className="flex items-center border border-brand-border/30 px-3 py-2">
                       <input
                         type="number"
                         min={2}
@@ -983,21 +984,21 @@ export default function Home() {
                 <div className="mt-4">
                   <button
                     onClick={() => setShowAdvanced(!showAdvanced)}
-                    className="uppercase-label text-brand-secondary hover:text-brand-text"
+                    className="text-body-sm text-brand-secondary hover:text-brand-text"
                   >
                     {showAdvanced ? "- Hide" : "+ Show"} Advanced Options
                   </button>
 
                   {showAdvanced && (
-                    <div className="mt-4 space-y-4 border-t border-brand-border pt-4">
+                    <div className="mt-4 space-y-4 border-t border-brand-border/30 pt-4">
                       <div>
-                        <p className="uppercase-label text-brand-secondary">Sound Palette</p>
+                        <p className="text-body-sm text-brand-secondary">Sound Palette</p>
                         <div className="mt-2">
                           <PaletteEditor value={selectedPalette} onChange={setSelectedPalette} />
                         </div>
                       </div>
                       <div>
-                        <p className="uppercase-label text-brand-secondary">Game State</p>
+                        <p className="text-body-sm text-brand-secondary">Game State</p>
                         <div className="mt-2">
                           <GameStateSelector value={selectedGameState} onChange={setSelectedGameState} showDetails={false} />
                         </div>
@@ -1008,14 +1009,14 @@ export default function Home() {
 
                 {/* Active Constraints */}
                 {(selectedPalette || selectedGameState) && (
-                  <div className="mt-4 flex flex-wrap gap-2 border-t border-brand-border pt-4">
+                  <div className="mt-4 flex flex-wrap gap-2 border-t border-brand-border/30 pt-4">
                     {selectedPalette && (
-                      <span className="border border-brand-border px-2 py-1 text-body-sm">
+                      <span className="border border-brand-border/30 px-2 py-1 text-body-sm">
                         Palette: {selectedPalette.name}
                       </span>
                     )}
                     {selectedGameState && (
-                      <span className="border border-brand-border px-2 py-1 text-body-sm capitalize">
+                      <span className="border border-brand-border/30 px-2 py-1 text-body-sm capitalize">
                         State: {selectedGameState}
                       </span>
                     )}
@@ -1050,14 +1051,14 @@ export default function Home() {
 
                 {currentSound ? (
                 <div className="mt-4">
-                  <div className="border-b border-brand-border pb-4">
-                    <p className="uppercase-label text-brand-secondary">{currentSound.status}</p>
+                  <div className="border-b border-brand-border/30 pb-4">
+                    <p className="text-body-sm text-brand-secondary">{currentSound.status}</p>
                     <h3 className="mt-1 font-display text-display-md">{currentSound.name}</h3>
                     <p className="mt-2 text-body text-brand-secondary">{currentSound.prompt}</p>
 
                     {currentSound.provenanceCid && (
                       <div className="mt-2">
-                        <span className="border border-brand-border px-2 py-1 text-body-sm">
+                        <span className="border border-brand-border/30 px-2 py-1 text-body-sm">
                           Provenance: {currentSound.provenanceCid.slice(0, 16)}...
                         </span>
                       </div>
@@ -1087,7 +1088,7 @@ export default function Home() {
 
                       {/* Provenance */}
                       {currentSound.status === "ready" && (
-                        <div className="flex items-center justify-between border border-brand-border p-3">
+                        <div className="flex items-center justify-between border border-brand-border/30 p-3">
                           {currentProvenance ? (
                             <ProvenanceBadge provenance={currentProvenance} />
                           ) : (
@@ -1125,12 +1126,12 @@ export default function Home() {
 
                       {/* Stem Export to Burn the Square */}
                       {currentSound.status === "ready" && currentSound.audioUrl && (
-                        <div className="border-t border-brand-border pt-3">
+                        <div className="border-t border-brand-border/30 pt-3">
                           <button
                             onClick={() => setShowStemExport(!showStemExport)}
                             className="flex w-full items-center justify-between text-left"
                           >
-                            <span className="uppercase-label text-brand-secondary">
+                            <span className="text-body-sm text-brand-secondary">
                               Export to Burn the Square
                             </span>
                             <svg
@@ -1189,7 +1190,7 @@ export default function Home() {
           onClick={() => setShowShortcuts(false)}
         >
           <div
-            className="bg-brand-surface border border-brand-border p-6 max-w-md w-full mx-4"
+            className="bg-brand-surface border border-brand-border/30 p-6 max-w-md w-full mx-4"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between mb-4">
@@ -1205,16 +1206,16 @@ export default function Home() {
             </div>
             <div className="space-y-2">
               {getShortcutsList(shortcuts).map(({ key, description }) => (
-                <div key={key} className="flex items-center justify-between py-2 border-b border-brand-border last:border-b-0">
+                <div key={key} className="flex items-center justify-between py-2 border-b border-brand-border/30 last:border-b-0">
                   <span className="text-body text-brand-text">{description}</span>
-                  <kbd className="px-2 py-1 bg-brand-bg border border-brand-border text-body-sm font-mono">
+                  <kbd className="px-2 py-1 bg-brand-bg border border-brand-border/30 text-body-sm font-mono">
                     {key}
                   </kbd>
                 </div>
               ))}
             </div>
             <p className="mt-4 text-body-sm text-brand-secondary text-center">
-              Press <kbd className="px-1 bg-brand-bg border border-brand-border">?</kbd> anytime to toggle this menu
+              Press <kbd className="px-1 bg-brand-bg border border-brand-border/30">?</kbd> anytime to toggle this menu
             </p>
           </div>
         </div>

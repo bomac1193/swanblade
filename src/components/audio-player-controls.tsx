@@ -120,13 +120,13 @@ export function AudioPlayerControls({ audioUrl, disabled }: AudioPlayerControlsP
   };
 
   return (
-    <div className={cn("border border-brand-border bg-brand-bg p-6", disabled && "opacity-40")}>
+    <div className={cn("border border-brand-border/30 bg-brand-bg p-6", disabled && "opacity-40")}>
       <div className="flex items-center gap-4">
         <button
           type="button"
           onClick={togglePlay}
           disabled={!audioUrl || disabled}
-          className="flex h-14 w-14 items-center justify-center border border-brand-border bg-brand-surface transition hover:border-brand-text"
+          className="flex h-14 w-14 items-center justify-center border border-brand-border/30 bg-brand-surface transition hover:border-brand-text"
         >
           {isPlaying ? (
             <svg width="24" height="24" viewBox="0 0 24 24" className="fill-brand-text">
@@ -159,7 +159,7 @@ export function AudioPlayerControls({ audioUrl, disabled }: AudioPlayerControlsP
           type="button"
           onClick={() => setLoop((prev) => !prev)}
           className={cn(
-            "ml-4 flex h-10 w-10 items-center justify-center border border-brand-border transition",
+            "ml-4 flex h-10 w-10 items-center justify-center border border-brand-border/30 transition",
             loop ? "bg-brand-text" : "bg-transparent",
           )}
         >

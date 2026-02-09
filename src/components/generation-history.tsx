@@ -27,7 +27,7 @@ export function GenerationHistory({
   }
 
   return (
-    <div className={cn("border border-brand-border bg-brand-surface", className)}>
+    <div className={cn("border border-brand-border/30 bg-brand-surface", className)}>
       <div
         className="flex items-center justify-between px-4 py-3 cursor-pointer hover:bg-brand-bg transition-colors"
         onClick={() => setExpanded(!expanded)}
@@ -54,14 +54,14 @@ export function GenerationHistory({
       </div>
 
       {expanded && (
-        <div className="border-t border-brand-border">
+        <div className="border-t border-brand-border/30">
           <div className="max-h-64 overflow-y-auto">
             {history.map((entry, index) => (
               <div
                 key={entry.id}
                 onClick={() => onSelect(index)}
                 className={cn(
-                  "px-4 py-3 cursor-pointer border-b border-brand-border last:border-b-0 transition-colors",
+                  "px-4 py-3 cursor-pointer border-b border-brand-border/30 last:border-b-0 transition-colors",
                   index === currentIndex
                     ? "bg-[#66023C]/10"
                     : "hover:bg-brand-bg"
@@ -94,7 +94,7 @@ export function GenerationHistory({
             ))}
           </div>
 
-          <div className="p-3 border-t border-brand-border">
+          <div className="p-3 border-t border-brand-border/30">
             <button
               onClick={(e) => {
                 e.stopPropagation();
@@ -131,7 +131,7 @@ export function HistoryControls({
       <button
         onClick={onUndo}
         disabled={!canUndo}
-        className="p-2 border border-brand-border hover:border-brand-text disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+        className="p-2 border border-brand-border/30 hover:border-brand-text disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
         title="Undo (previous generation)"
       >
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" className="text-brand-secondary">
@@ -142,7 +142,7 @@ export function HistoryControls({
       <button
         onClick={onRedo}
         disabled={!canRedo}
-        className="p-2 border border-brand-border hover:border-brand-text disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+        className="p-2 border border-brand-border/30 hover:border-brand-text disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
         title="Redo (next generation)"
       >
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" className="text-brand-secondary">

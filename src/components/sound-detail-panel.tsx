@@ -17,7 +17,7 @@ interface SoundDetailPanelProps {
 export function SoundDetailPanel({ sound, onRegenerate, onVariation, onDownload, onCopyPreset }: SoundDetailPanelProps) {
   if (!sound) {
     return (
-      <div className="flex h-full flex-col items-center justify-center border border-dashed border-brand-border bg-brand-surface p-12 text-center">
+      <div className="flex h-full flex-col items-center justify-center border border-dashed border-brand-border/30 bg-brand-surface p-12 text-center">
         <p className="font-display text-display-lg text-brand-text">Swanblade is idle.</p>
         <p className="mt-3 max-w-md text-body text-brand-secondary">
           Describe a sound using the composer below to generate audio mockups.
@@ -29,7 +29,7 @@ export function SoundDetailPanel({ sound, onRegenerate, onVariation, onDownload,
   const disabled = sound.status !== "ready";
 
   return (
-    <div className="flex h-full flex-col gap-6 border border-brand-border bg-brand-surface p-8">
+    <div className="flex h-full flex-col gap-6 border border-brand-border/30 bg-brand-surface p-8">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <p className="text-label uppercase tracking-wider text-brand-secondary">{sound.type}</p>

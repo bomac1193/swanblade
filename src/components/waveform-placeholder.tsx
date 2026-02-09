@@ -35,7 +35,7 @@ export function WaveformPlaceholder({ isActive, isLoading }: WaveformPlaceholder
   }, [bars, isActive]);
 
   return (
-    <div className="w-full border border-brand-border bg-brand-bg p-4">
+    <div className="w-full border border-brand-border/30 bg-brand-bg p-4">
       <div className={cn("relative h-32 w-full", isLoading && "animate-pulse opacity-70")}>
         <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="h-full w-full">
           <defs>

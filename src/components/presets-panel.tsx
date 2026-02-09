@@ -32,7 +32,7 @@ export function PresetsPanel({
   };
 
   return (
-    <div className={cn("border border-brand-border bg-brand-surface", className)}>
+    <div className={cn("border border-brand-border/30/30", className)}>
       <div
         className="flex items-center justify-between px-4 py-3 cursor-pointer hover:bg-brand-bg transition-colors"
         onClick={() => setExpanded(!expanded)}
@@ -45,7 +45,7 @@ export function PresetsPanel({
             <rect x="14" y="14" width="7" height="7" stroke="currentColor" strokeWidth="1.5" />
           </svg>
           <div>
-            <p className="text-label uppercase tracking-wider text-brand-secondary">Presets</p>
+            <p className="text-body-sm text-brand-secondary">Presets</p>
             <p className="text-body-sm text-brand-text">{presets.length} saved</p>
           </div>
         </div>
@@ -56,7 +56,7 @@ export function PresetsPanel({
               setShowSaveDialog(true);
               setExpanded(true);
             }}
-            className="px-2 py-1 text-[10px] uppercase tracking-wider border border-brand-border hover:border-[#66023C] hover:text-[#66023C] transition-colors"
+            className="px-2 py-1 text-body-sm border border-brand-border/30 hover:border-[#66023C] hover:text-[#66023C] transition-colors"
           >
             + Save
           </button>
@@ -73,11 +73,11 @@ export function PresetsPanel({
       </div>
 
       {expanded && (
-        <div className="border-t border-brand-border">
+        <div className="border-t border-brand-border/30">
           {/* Save Dialog */}
           {showSaveDialog && (
-            <div className="p-4 bg-brand-bg border-b border-brand-border">
-              <p className="text-label uppercase tracking-wider text-brand-secondary mb-2">
+            <div className="p-4 bg-brand-bg border-b border-brand-border/30">
+              <p className="text-body-sm text-brand-secondary mb-2">
                 Save Current Settings
               </p>
               <div className="flex gap-2">
@@ -87,7 +87,7 @@ export function PresetsPanel({
                   onChange={(e) => setNewPresetName(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && handleSave()}
                   placeholder="Preset name..."
-                  className="flex-1 px-3 py-2 border border-brand-border bg-brand-surface text-body text-brand-text placeholder:text-brand-secondary focus:outline-none focus:border-brand-text"
+                  className="flex-1 px-3 py-2 border border-brand-border/30 bg-brand-surface text-body text-brand-text placeholder:text-brand-secondary focus:outline-none focus:border-brand-text"
                   autoFocus
                 />
                 <Button
@@ -123,7 +123,7 @@ export function PresetsPanel({
               {presets.map((preset) => (
                 <div
                   key={preset.id}
-                  className="px-4 py-3 border-b border-brand-border last:border-b-0 hover:bg-brand-bg transition-colors group"
+                  className="px-4 py-3 border-b border-brand-border/30 last:border-b-0 hover:bg-brand-bg transition-colors group"
                 >
                   <div className="flex items-center justify-between">
                     <button
@@ -137,14 +137,14 @@ export function PresetsPanel({
                         {preset.prompt.slice(0, 40)}...
                       </p>
                       <div className="flex gap-2 mt-1">
-                        <span className="text-[9px] uppercase tracking-wider px-1.5 py-0.5 bg-brand-bg border border-brand-border text-brand-secondary">
+                        <span className="text-[10px] px-1.5 py-0.5 bg-brand-bg border border-brand-border/30 text-brand-secondary">
                           {preset.lengthSeconds}s
                         </span>
-                        <span className="text-[9px] uppercase tracking-wider px-1.5 py-0.5 bg-brand-bg border border-brand-border text-brand-secondary">
+                        <span className="text-[10px] px-1.5 py-0.5 bg-brand-bg border border-brand-border/30 text-brand-secondary">
                           {preset.provider}
                         </span>
                         {preset.gameState && (
-                          <span className="text-[9px] uppercase tracking-wider px-1.5 py-0.5 bg-[#66023C]/10 border border-[#66023C]/20 text-[#66023C]">
+                          <span className="text-[10px] px-1.5 py-0.5 bg-[#66023C]/10 border border-[#66023C]/20 text-[#66023C]">
                             {preset.gameState}
                           </span>
                         )}

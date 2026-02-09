@@ -175,16 +175,16 @@ export function ProviderSelector({
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between">
-        <label className="text-label uppercase tracking-wider text-brand-secondary">Audio Engine</label>
+        <label className="text-body-sm text-brand-secondary">Audio Engine</label>
         <div className="flex items-center gap-2">
           {isAuto ? (
-            <span className="text-label uppercase tracking-wider text-brand-text">Auto</span>
+            <span className="text-body-sm text-brand-text">Auto</span>
           ) : (
             onResetAuto && (
               <button
                 type="button"
                 onClick={onResetAuto}
-                className="text-label uppercase tracking-wider text-brand-secondary hover:text-brand-text transition"
+                className="text-body-sm text-brand-secondary hover:text-brand-text transition"
               >
                 Auto-pick
               </button>
@@ -204,7 +204,7 @@ export function ProviderSelector({
       <select
         value={value}
         onChange={(e) => onChange(e.target.value as ProviderId)}
-        className="w-full border border-brand-border bg-brand-bg px-3 py-2 text-body text-brand-text hover:border-brand-text focus:border-brand-text focus:outline-none"
+        className="w-full border border-brand-border/30 bg-brand-bg px-3 py-2 text-body text-brand-text hover:border-brand-text focus:border-brand-text focus:outline-none"
       >
         {PROVIDERS.filter((p) => p.available).map((provider) => {
           const isRecommended = provider.id === computedRecommendation;

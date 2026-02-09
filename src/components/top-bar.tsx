@@ -4,7 +4,7 @@ interface TopBarProps {
 
 export function TopBar({ activeProvider }: TopBarProps) {
   return (
-    <div className="flex flex-wrap items-center justify-between gap-4 border border-brand-border bg-brand-surface px-6 py-4">
+    <div className="flex flex-wrap items-center justify-between gap-4 border border-brand-border/30 bg-brand-surface px-6 py-4">
       <div>
         <p className="text-label uppercase tracking-wider text-brand-secondary">Swanblade</p>
         <p className="text-heading-lg text-brand-text">Sound Design Lab</p>

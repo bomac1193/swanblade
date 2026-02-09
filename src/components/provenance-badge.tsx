@@ -25,7 +25,7 @@ export function ProvenanceBadge({ provenance, provenanceResult, className }: Pro
   }
 
   return (
-    <div className={cn("border border-brand-border bg-brand-surface", className)}>
+    <div className={cn("border border-brand-border/30 bg-brand-surface", className)}>
       <div
         className="flex items-center gap-2 px-3 py-2 cursor-pointer hover:bg-brand-bg transition-colors"
         onClick={() => setExpanded(!expanded)}
@@ -47,7 +47,7 @@ export function ProvenanceBadge({ provenance, provenanceResult, className }: Pro
       </div>
 
       {expanded && (
-        <div className="border-t border-brand-border px-3 py-2 space-y-2">
+        <div className="border-t border-brand-border/30 px-3 py-2 space-y-2">
           {provenance && (
             <>
               <div className="flex justify-between text-body-sm">
@@ -162,7 +162,7 @@ export function ProvenanceStampButton({
     <button
       onClick={handleStamp}
       disabled={stamping}
-      className="flex items-center gap-2 px-3 py-1.5 border border-brand-border hover:border-[#66023C] text-brand-secondary hover:text-[#66023C] transition-colors disabled:opacity-50"
+      className="flex items-center gap-2 px-3 py-1.5 border border-brand-border/30 hover:border-[#66023C] text-brand-secondary hover:text-[#66023C] transition-colors disabled:opacity-50"
     >
       {stamping ? (
         <svg width="14" height="14" viewBox="0 0 24 24" className="animate-spin">
