@@ -1,12 +1,13 @@
 "use client";
 
-import { useRef, useEffect, useCallback } from "react";
+import { useRef, useEffect, useCallback, useState } from "react";
 
 interface ShaderBackgroundProps {
   colors: [string, string, string];
   width?: number;
   height?: number;
   className?: string;
+  interactive?: boolean;
 }
 
 // Convert hex to RGB normalized (0-1)
@@ -39,6 +40,7 @@ const fragmentShaderSource = `
   uniform vec3 u_color2;
   uniform vec3 u_color3;
   uniform vec2 u_resolution;
+  uniform vec2 u_mouse;
 
   // Simplex noise
   vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
@@ -78,22 +80,47 @@ const fragmentShaderSource = `
     vec2 pos = uv;
     pos.x *= aspect;
 
-    float time = u_time * 0.15;
+    float time = u_time * 0.4;
 
-    // Create flowing noise patterns
-    float n1 = snoise(pos * 1.5 + time * 0.3) * 0.5 + 0.5;
-    float n2 = snoise(pos * 2.0 - time * 0.2 + vec2(100.0)) * 0.5 + 0.5;
-    float n3 = snoise(pos * 0.8 + time * 0.15 + vec2(200.0)) * 0.5 + 0.5;
+    // Mouse influence - creates a flowing attraction point
+    vec2 mouse = u_mouse;
+    mouse.x *= aspect;
+    float mouseDist = length(pos - mouse);
+    float mouseInfluence = smoothstep(0.8, 0.0, mouseDist);
 
-    // Blend colors based on noise
-    vec3 color = u_color1 * n1 + u_color2 * n2 * (1.0 - n1 * 0.5) + u_color3 * n3 * 0.3;
+    // Create flowing noise patterns with more movement
+    float n1 = snoise(pos * 2.0 + time * 0.5 + mouse * 0.3) * 0.5 + 0.5;
+    float n2 = snoise(pos * 3.0 - time * 0.4 + vec2(100.0) - mouse * 0.2) * 0.5 + 0.5;
+    float n3 = snoise(pos * 1.5 + time * 0.3 + vec2(200.0)) * 0.5 + 0.5;
+
+    // Layered turbulence for more organic movement
+    float turb = snoise(pos * 4.0 + time) * 0.25;
+    turb += snoise(pos * 8.0 - time * 0.7) * 0.125;
+
+    // Mouse creates swirling effect
+    float swirl = sin(mouseDist * 10.0 - time * 2.0) * mouseInfluence * 0.3;
+    n1 += swirl;
+    n2 -= swirl * 0.5;
+
+    // Blend colors based on noise with mouse interaction
+    vec3 color = u_color1 * n1;
+    color += u_color2 * n2 * (1.0 - n1 * 0.4);
+    color += u_color3 * n3 * 0.4;
+    color += turb * (u_color1 + u_color2) * 0.2;
+
+    // Mouse glow effect
+    color += mouseInfluence * 0.15 * (u_color1 + u_color3);
+
+    // Pulsing effect
+    float pulse = sin(time * 1.5) * 0.05 + 1.0;
+    color *= pulse;
 
     // Add subtle vignette
-    float vignette = 1.0 - length(uv - 0.5) * 0.5;
+    float vignette = 1.0 - length(uv - 0.5) * 0.4;
     color *= vignette;
 
-    // Slight gamma correction for richness
-    color = pow(color, vec3(0.9));
+    // Gamma correction
+    color = pow(color, vec3(0.85));
 
     gl_FragColor = vec4(color, 1.0);
   }
@@ -104,12 +131,16 @@ export function ShaderBackground({
   width,
   height,
   className,
+  interactive = true,
 }: ShaderBackgroundProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const glRef = useRef<WebGLRenderingContext | null>(null);
   const programRef = useRef<WebGLProgram | null>(null);
   const animationRef = useRef<number>(0);
   const startTimeRef = useRef<number>(0);
+  const [mousePos, setMousePos] = useState({ x: 0.5, y: 0.5 });
+  const targetMouseRef = useRef({ x: 0.5, y: 0.5 });
+  const currentMouseRef = useRef({ x: 0.5, y: 0.5 });
 
   const createShader = useCallback(
     (gl: WebGLRenderingContext, type: number, source: string) => {
@@ -186,6 +217,11 @@ export function ShaderBackground({
 
     if (!gl || !program || !canvas) return;
 
+    // Smooth mouse interpolation
+    const lerp = 0.08;
+    currentMouseRef.current.x += (targetMouseRef.current.x - currentMouseRef.current.x) * lerp;
+    currentMouseRef.current.y += (targetMouseRef.current.y - currentMouseRef.current.y) * lerp;
+
     // Update canvas size
     const displayWidth = width ?? canvas.clientWidth;
     const displayHeight = height ?? canvas.clientHeight;
@@ -201,6 +237,7 @@ export function ShaderBackground({
     // Set uniforms
     const timeLocation = gl.getUniformLocation(program, "u_time");
     const resolutionLocation = gl.getUniformLocation(program, "u_resolution");
+    const mouseLocation = gl.getUniformLocation(program, "u_mouse");
     const color1Location = gl.getUniformLocation(program, "u_color1");
     const color2Location = gl.getUniformLocation(program, "u_color2");
     const color3Location = gl.getUniformLocation(program, "u_color3");
@@ -208,6 +245,7 @@ export function ShaderBackground({
     const elapsed = (performance.now() - startTimeRef.current) / 1000;
     gl.uniform1f(timeLocation, elapsed);
     gl.uniform2f(resolutionLocation, displayWidth, displayHeight);
+    gl.uniform2f(mouseLocation, currentMouseRef.current.x, currentMouseRef.current.y);
 
     const [r1, g1, b1] = hexToRgb(colors[0]);
     const [r2, g2, b2] = hexToRgb(colors[1]);
@@ -233,10 +271,40 @@ export function ShaderBackground({
     };
   }, [initGL, render]);
 
+  const handleMouseMove = useCallback(
+    (e: React.MouseEvent<HTMLCanvasElement>) => {
+      if (!interactive) return;
+      const canvas = canvasRef.current;
+      if (!canvas) return;
+
+      const rect = canvas.getBoundingClientRect();
+      const x = (e.clientX - rect.left) / rect.width;
+      const y = 1.0 - (e.clientY - rect.top) / rect.height; // Flip Y for WebGL
+      targetMouseRef.current = { x, y };
+    },
+    [interactive]
+  );
+
+  const handleTouchMove = useCallback(
+    (e: React.TouchEvent<HTMLCanvasElement>) => {
+      if (!interactive) return;
+      const canvas = canvasRef.current;
+      if (!canvas || !e.touches[0]) return;
+
+      const rect = canvas.getBoundingClientRect();
+      const x = (e.touches[0].clientX - rect.left) / rect.width;
+      const y = 1.0 - (e.touches[0].clientY - rect.top) / rect.height;
+      targetMouseRef.current = { x, y };
+    },
+    [interactive]
+  );
+
   return (
     <canvas
       ref={canvasRef}
       className={className}
+      onMouseMove={handleMouseMove}
+      onTouchMove={handleTouchMove}
       style={{
         width: width ?? "100%",
         height: height ?? "100%",
