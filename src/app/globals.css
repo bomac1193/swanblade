@@ -24,6 +24,28 @@
   --brand-accent-subtle: rgba(102, 2, 60, 0.1);
 }
 
+/* Dark mode */
+[data-theme="dark"] {
+  --brand-bg: #0A0A0A;
+  --brand-surface: #141414;
+  --brand-text: #FAFAFA;
+  --brand-secondary: #A0A0A0;
+  --brand-border: #2A2A2A;
+  --brand-accent-subtle: rgba(102, 2, 60, 0.25);
+}
+
+/* System preference fallback */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --brand-bg: #0A0A0A;
+    --brand-surface: #141414;
+    --brand-text: #FAFAFA;
+    --brand-secondary: #A0A0A0;
+    --brand-border: #2A2A2A;
+    --brand-accent-subtle: rgba(102, 2, 60, 0.25);
+  }
+}
+
 /* Remove all rounded corners by default */
 * {
   border-radius: 0;

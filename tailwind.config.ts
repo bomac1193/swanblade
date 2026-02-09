@@ -9,18 +9,19 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Monochrome palette (Starforge aesthetic)
-        'brand-bg': '#FAFAFA',
-        'brand-surface': '#FFFFFF',
-        'brand-text': '#0A0A0A',
-        'brand-secondary': '#6A6A6A',
-        'brand-border': '#E0E0E0',
-        'brand-accent': '#2A2A2A',
+        // Use CSS variables for theme support
+        'brand-bg': 'var(--brand-bg)',
+        'brand-surface': 'var(--brand-surface)',
+        'brand-text': 'var(--brand-text)',
+        'brand-secondary': 'var(--brand-secondary)',
+        'brand-border': 'var(--brand-border)',
+        'brand-accent': 'var(--brand-accent)',
 
-        // Status colors (minimal)
-        'status-success': '#1A1A1A',
-        'status-error': '#8B0000',
-        'status-pending': '#6A6A6A',
+        // Status colors
+        'status-success': '#16A34A',
+        'status-error': '#DC2626',
+        'status-warning': '#D97706',
+        'status-pending': 'var(--brand-secondary)',
       },
       fontFamily: {
         // PRIMARY HEADINGS (H1-H3): Presence, naming, orientation
