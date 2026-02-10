@@ -19,8 +19,8 @@ export default function FeaturesPage() {
             Your sound. Finally.
           </h1>
           <p className="text-white/50 leading-relaxed" style={{ fontFamily: "Sohne, sans-serif" }}>
-            Swanblade don&apos;t compromise. Every sound is broadcast-ready.
-            Every output belongs in the final cut. Diamonds or silence.
+            We don&apos;t do demos. We don&apos;t do drafts. Every sound that leaves
+            Swanblade belongs in the final cut. If it&apos;s not ready to ship, it doesn&apos;t exist.
           </p>
         </div>
       </section>
@@ -31,22 +31,22 @@ export default function FeaturesPage() {
           <div>
             <h2 className="text-xl font-display mb-3">Generate</h2>
             <p className="text-white/50" style={{ fontFamily: "Sohne, sans-serif" }}>
-              Describe what you need. Get broadcast-quality results in seconds, not days.
-              No sample library diving. No endless tweaking.
+              Say what you hear in your head. Swanblade renders it in seconds.
+              No library diving. No tweaking for hours. Just the sound you imagined, ready to use.
             </p>
           </div>
           <div>
             <h2 className="text-xl font-display mb-3">Transform</h2>
             <p className="text-white/50" style={{ fontFamily: "Sohne, sans-serif" }}>
-              Take existing audio and reshape it with language. Turn a field recording
-              into something otherworldly while preserving what matters.
+              Feed it a field recording. Tell it what you want. Watch it become
+              something you couldn&apos;t have made any other way.
             </p>
           </div>
           <div>
             <h2 className="text-xl font-display mb-3">Ship</h2>
             <p className="text-white/50" style={{ fontFamily: "Sohne, sans-serif" }}>
-              One-click export to Wwise, FMOD, Unity, Unreal. Stems, metadata,
-              implementation-ready. Your middleware, not ours.
+              Export straight to Wwise, FMOD, Unity, Unreal. Stems, metadata, everything.
+              Ready to drop into your project and never think about again.
             </p>
           </div>
         </div>
@@ -59,28 +59,25 @@ export default function FeaturesPage() {
             className="text-xs uppercase tracking-[0.3em] text-white/30 mb-6"
             style={{ fontFamily: "Sohne, sans-serif" }}
           >
-            Swanblade
+            Fit
           </p>
 
           <div className="space-y-8">
             <div>
-              <h3 className="text-lg font-display mb-3 text-white">You belong here if:</h3>
-              <ul className="space-y-2 text-white/50" style={{ fontFamily: "Sohne, sans-serif" }}>
-                <li>You ship. Games, films, projects with real deadlines.</li>
-                <li>You know what good audio sounds like.</li>
-                <li>You value your time more than learning another tool.</li>
-                <li>You refuse to settle.</li>
-              </ul>
+              <h3 className="text-lg font-display mb-3 text-white">This is for you if</h3>
+              <p className="text-white/50" style={{ fontFamily: "Sohne, sans-serif" }}>
+                You&apos;re shipping something real. A game, a film, a project with a deadline
+                that isn&apos;t moving. You know exactly what good audio sounds like, and you&apos;re
+                tired of tools that waste your time getting there.
+              </p>
             </div>
 
             <div>
-              <h3 className="text-lg font-display mb-3 text-white/40">This is not for you if:</h3>
-              <ul className="space-y-2 text-white/30" style={{ fontFamily: "Sohne, sans-serif" }}>
-                <li>You&apos;re looking for the cheapest option.</li>
-                <li>You need tutorials and hand-holding.</li>
-                <li>You&apos;re still exploring.</li>
-                <li>&quot;Good enough&quot; is good enough.</li>
-              </ul>
+              <h3 className="text-lg font-display mb-3 text-white/40">This is not for you if</h3>
+              <p className="text-white/30" style={{ fontFamily: "Sohne, sans-serif" }}>
+                You&apos;re shopping for the cheapest option. You want tutorials.
+                You&apos;re not sure what you need yet. &quot;Good enough&quot; is good enough for you.
+              </p>
             </div>
           </div>
         </div>

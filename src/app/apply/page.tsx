@@ -30,10 +30,10 @@ export default function ApplyPage() {
           >
             Application Received
           </p>
-          <h1 className="text-3xl font-display mb-6">Your sound is waiting.</h1>
+          <h1 className="text-3xl font-display mb-6">We&apos;ll be in touch.</h1>
           <p className="text-white/50 mb-8" style={{ fontFamily: "Sohne, sans-serif" }}>
-            Applications are reviewed weekly. If you&apos;re one of the few,
-            you&apos;ll receive your credentials via email.
+            We review applications weekly. If it&apos;s a fit,
+            you&apos;ll hear from us with next steps.
           </p>
           <Link
             href="/"
@@ -64,10 +64,10 @@ export default function ApplyPage() {
         >
           Join Swanblade
         </p>
-        <h1 className="text-3xl font-display mb-4">Diamonds or Silence.</h1>
+        <h1 className="text-3xl font-display mb-4">Diamonds or Silence</h1>
         <p className="text-white/50 mb-12" style={{ fontFamily: "Sohne, sans-serif" }}>
-          Swanblade is for creators who ship. Not hobbyists. Not experimenters.
-          Tell us who you are.
+          We review every application personally. Tell us what you&apos;re working on
+          and why Swanblade belongs in your workflow.
         </p>
 
         {/* Seats remaining */}

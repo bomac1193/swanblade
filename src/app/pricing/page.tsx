@@ -63,11 +63,12 @@ export default function PricingPage() {
             Membership
           </p>
           <h1 className="text-4xl font-display mb-8">
-            Diamonds or Silence.
+            Diamonds or Silence
           </h1>
           <p className="text-white/50 leading-relaxed mb-8" style={{ fontFamily: "Sohne, sans-serif" }}>
-            No free tier. No trials. No compromises.
-            Swanblade is for those who ship.
+            No free tier. No trials. If you need to &quot;try before you buy,&quot;
+            this probably isn&apos;t for you. Swanblade is for people who already
+            know what they want.
           </p>
 
           {/* Toggles */}

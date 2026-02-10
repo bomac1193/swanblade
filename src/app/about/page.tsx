@@ -18,8 +18,9 @@ export default function AboutPage() {
             The rest is noise.
           </h1>
           <p className="text-white/50 leading-relaxed" style={{ fontFamily: "Sohne, sans-serif" }}>
-            Swanblade exists for creators who ship. Not hobbyists. Not experimenters.
-            Those who put sound in front of millions and refuse to compromise.
+            We built Swanblade for people who ship. Not for hobbyists tinkering on weekends.
+            Not for experimenters chasing trends. For the ones who put sound in front of
+            millions and refuse to compromise on any of it.
           </p>
         </div>
       </section>
@@ -30,22 +31,24 @@ export default function AboutPage() {
           <div>
             <h2 className="text-xl font-display mb-4">Diamonds or nothing</h2>
             <p className="text-white/50" style={{ fontFamily: "Sohne, sans-serif" }}>
-              Every sound that leaves Swanblade is broadcast-ready. We don&apos;t ship
-              interesting experiments. We ship audio that belongs in the final cut.
+              If it&apos;s not ready for broadcast, it doesn&apos;t leave. We don&apos;t do
+              &quot;interesting experiments.&quot; We do audio that belongs in the final cut,
+              first try, every time.
             </p>
           </div>
           <div>
             <h2 className="text-xl font-display mb-4">Your sound. Finally.</h2>
             <p className="text-white/50" style={{ fontFamily: "Sohne, sans-serif" }}>
-              You&apos;ve compromised long enough. Swanblade delivers the sound you&apos;ve
-              always heard in your head. The search ends here.
+              You&apos;ve spent years compromising. Settling for close enough. Swanblade
+              is the sound you&apos;ve always heard in your head, finally real.
+              The search is over.
             </p>
           </div>
           <div>
             <h2 className="text-xl font-display mb-4">Not for everyone</h2>
             <p className="text-white/50" style={{ fontFamily: "Sohne, sans-serif" }}>
-              We price for commitment. We design for professionals.
-              Swanblade is a tribe of those who refuse to settle.
+              We charge what we&apos;re worth. We build for people who know what they want.
+              If that&apos;s not you, there are cheaper options. We won&apos;t be offended.
             </p>
           </div>
         </div>
