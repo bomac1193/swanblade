@@ -244,6 +244,70 @@
 
 ---
 
+## Cultural Alignment
+
+### Primary: Sade
+
+| Trait | Sade | Swanblade |
+|-------|------|-----------|
+| Lane | Audio/music | Audio/sound design |
+| Output | Disappears for years, returns with excellence | Quality only, no filler |
+| Saturation | Never oversaturates | "12 seats remaining" |
+| Aesthetic | Dark, smooth, timeless | Dark, minimal, premium |
+| Audience | Adults with taste, global | Professionals who ship |
+| Longevity | 40+ years, still undeniable | Built to last, not trend-chase |
+| Energy | Quiet power — never loud, always felt | "Diamonds or Silence" |
+
+**Sade is Swanblade in human form.**
+
+### Secondary Alignments
+
+| Dimension | Alignment | Why |
+|-----------|-----------|-----|
+| **Business** | Dr. Dre / Beats | Premium audio empire. Obsessive quality. Sold to Apple for $3B. Built the category. |
+| **Movement** | Afrofuturism + 90s Minimalism | Transformation + restraint. Vision + discipline. Magician + Ruler. |
+| **Design Philosophy** | Dieter Rams | "Less but better." Ten principles. The product works. Nothing else. |
+| **Fashion** | The Row | Quiet luxury. No logos. Premium materials. Not for everyone. |
+
+### The Complete DNA
+
+```
+Sade's restraint
+    + Dr. Dre's obsession with quality
+        + Afrofuturism's vision
+            + 90s Minimalism's discipline
+                + Dieter Rams' "less but better"
+                    = Swanblade
+```
+
+### Cultural Shorthand
+
+> "Sade's restraint. Dre's obsession. Rams' discipline."
+
+### Eras & Movements
+
+| Era/Movement | Alignment |
+|--------------|-----------|
+| **1920s Bauhaus** | Form follows function. Craft as art. No decoration for decoration's sake. |
+| **1960s Minimalism** | Judd, Flavin. Reduction to essence. What remains when you remove everything unnecessary. |
+| **1970s Detroit Techno Origins** | Dark, minimal, futuristic. Black-originated. Underground that became canonical. |
+| **1990s Fashion Minimalism** | Helmut Lang, Jil Sander. Black, clean, no logos, anti-excess. |
+| **1990s Trip-Hop** | Massive Attack, Portishead. Dark, atmospheric, cinematic. |
+| **2010s Quiet Luxury** | The Row, Celine (Phoebe Philo era). Rejection of logos. Quality over hype. |
+| **Afrofuturism** | Transformation. Imagining futures. Technology + culture. Magician energy. |
+
+### Additional Cultural Figures
+
+| Person | Why |
+|--------|-----|
+| **Quincy Jones** | The producer's producer. Taste as gatekeeper. Quality control. |
+| **Grace Wales Bonner** | Intellectual luxury. Quiet, not loud. Premium without performance. |
+| **Rick Rubin** | Taste as product. Minimal. Essential. |
+| **J Dilla** | Production god. Cult following. Quality so high it became canonical. |
+| **Tyler Perry** | Vertical integration. Built his own studio. Owns everything. |
+
+---
+
 ## Visual Identity Notes
 
 - **Color:** Deep blacks, golds, diamond whites
