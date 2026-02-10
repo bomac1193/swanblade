@@ -15,10 +15,10 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Swanblade — Sound Design Lab",
-  description: "Prompt-driven audio generation with game-state awareness.",
+  title: "Swanblade — Diamonds or Silence",
+  description: "Your sound. Finally. For creators who ship.",
   manifest: "/manifest.json",
-  themeColor: "#66023C",
+  themeColor: "#0A0A0A",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",

@@ -16,12 +16,11 @@ export default function FeaturesPage() {
             Capabilities
           </p>
           <h1 className="text-4xl font-display mb-8">
-            Built for studios that ship.
+            Your sound. Finally.
           </h1>
           <p className="text-white/50 leading-relaxed" style={{ fontFamily: "Sohne, sans-serif" }}>
-            Swanblade is not a toy. It&apos;s not for hobbyists exploring sound design
-            on weekends. It&apos;s for professionals under deadline who need production-ready
-            audio without the wait.
+            Swanblade don&apos;t compromise. Every sound is broadcast-ready.
+            Every output belongs in the final cut. Diamonds or silence.
           </p>
         </div>
       </section>
@@ -60,27 +59,27 @@ export default function FeaturesPage() {
             className="text-xs uppercase tracking-[0.3em] text-white/30 mb-6"
             style={{ fontFamily: "Sohne, sans-serif" }}
           >
-            Fit
+            Swanblade
           </p>
 
           <div className="space-y-8">
             <div>
-              <h3 className="text-lg font-display mb-3 text-white">This is for you if:</h3>
+              <h3 className="text-lg font-display mb-3 text-white">You belong here if:</h3>
               <ul className="space-y-2 text-white/50" style={{ fontFamily: "Sohne, sans-serif" }}>
-                <li>You&apos;re shipping a game or film with real deadlines</li>
-                <li>You know what good audio sounds like</li>
-                <li>You value your time more than learning another tool</li>
-                <li>You need results, not experiments</li>
+                <li>You ship. Games, films, projects with real deadlines.</li>
+                <li>You know what good audio sounds like.</li>
+                <li>You value your time more than learning another tool.</li>
+                <li>You refuse to settle.</li>
               </ul>
             </div>
 
             <div>
               <h3 className="text-lg font-display mb-3 text-white/40">This is not for you if:</h3>
               <ul className="space-y-2 text-white/30" style={{ fontFamily: "Sohne, sans-serif" }}>
-                <li>You&apos;re looking for the cheapest option</li>
-                <li>You want tutorials and hand-holding</li>
-                <li>You&apos;re not sure what you need yet</li>
-                <li>&quot;Good enough&quot; is good enough</li>
+                <li>You&apos;re looking for the cheapest option.</li>
+                <li>You need tutorials and hand-holding.</li>
+                <li>You&apos;re still exploring.</li>
+                <li>&quot;Good enough&quot; is good enough.</li>
               </ul>
             </div>
           </div>
@@ -90,18 +89,19 @@ export default function FeaturesPage() {
       {/* CTA */}
       <section className="py-32 px-6 border-t border-white/10">
         <div className="max-w-2xl mx-auto text-center">
-          <p
-            className="font-mono text-xs text-white/20 tracking-wider mb-6"
-          >
-            Powered by Obsidian Engine
-          </p>
           <Link
             href="/apply"
             className="inline-block border border-white/30 text-white px-8 py-4 text-xs uppercase tracking-widest hover:bg-white hover:text-black transition"
             style={{ fontFamily: "Sohne, sans-serif" }}
           >
-            Apply for Membership
+            Join Swanblade
           </Link>
+          <p
+            className="text-xs text-white/20 uppercase tracking-widest mt-6"
+            style={{ fontFamily: "Sohne, sans-serif" }}
+          >
+            Not for everyone
+          </p>
         </div>
       </section>
     </MarketingLayout>

@@ -22,22 +22,22 @@ const EXCHANGE_RATES: Record<Currency, number> = {
 const PLANS = [
   {
     name: "Professional",
-    monthlyUSD: 111,
-    annualUSD: 999,
-    description: "For individual sound designers and composers.",
+    monthlyUSD: 299,
+    annualUSD: 2999,
+    description: "For those who ship. Individual membership.",
   },
   {
     name: "Studio",
-    monthlyUSD: 449,
-    annualUSD: 3999,
-    description: "For teams. 5 seats included.",
+    monthlyUSD: 999,
+    annualUSD: 9999,
+    description: "For teams who don't compromise. 5 seats.",
     highlighted: true,
   },
   {
     name: "Enterprise",
     monthlyUSD: null,
-    annualUSD: null,
-    description: "Custom terms for large studios.",
+    annualUSD: 25000,
+    description: "Custom terms. Minimum commitment.",
   },
 ];
 
@@ -63,11 +63,11 @@ export default function PricingPage() {
             Membership
           </p>
           <h1 className="text-4xl font-display mb-8">
-            Investment in your craft.
+            Diamonds or Silence.
           </h1>
           <p className="text-white/50 leading-relaxed mb-8" style={{ fontFamily: "Sohne, sans-serif" }}>
-            No free tier. No trials. When you&apos;re ready to commit
-            to better audio, apply for membership.
+            No free tier. No trials. No compromises.
+            Swanblade is for those who ship.
           </p>
 
           {/* Toggles */}
@@ -176,7 +176,7 @@ export default function PricingPage() {
               Q1 2026
             </p>
             <p className="text-white/70" style={{ fontFamily: "Sohne, sans-serif" }}>
-              <span className="text-white font-display text-2xl">47</span> seats remaining
+              <span className="text-white font-display text-2xl">12</span> seats remaining
             </p>
           </div>
           <div>
@@ -185,9 +185,15 @@ export default function PricingPage() {
               className="inline-block border border-white/30 text-white px-8 py-4 text-xs uppercase tracking-widest hover:bg-white hover:text-black transition"
               style={{ fontFamily: "Sohne, sans-serif" }}
             >
-              Apply for Membership
+              Join Swanblade
             </Link>
           </div>
+          <p
+            className="text-xs uppercase tracking-widest text-white/20 mt-8"
+            style={{ fontFamily: "Sohne, sans-serif" }}
+          >
+            Not for everyone
+          </p>
         </div>
       </section>
     </MarketingLayout>

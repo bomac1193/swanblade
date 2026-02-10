@@ -15,12 +15,11 @@ export default function AboutPage() {
             Philosophy
           </p>
           <h1 className="text-4xl font-display mb-8">
-            We build instruments, not toys.
+            The rest is noise.
           </h1>
           <p className="text-white/50 leading-relaxed" style={{ fontFamily: "Sohne, sans-serif" }}>
-            Swanblade exists for one reason: to give professional sound designers
-            the tools they deserve. Not the tools they can afford. Not the tools
-            that are easy to market. The tools that actually work.
+            Swanblade exists for creators who ship. Not hobbyists. Not experimenters.
+            Those who put sound in front of millions and refuse to compromise.
           </p>
         </div>
       </section>
@@ -29,24 +28,24 @@ export default function AboutPage() {
       <section className="py-16 px-6 border-t border-white/10">
         <div className="max-w-2xl mx-auto space-y-12">
           <div>
-            <h2 className="text-xl font-display mb-4">Quality is non-negotiable</h2>
+            <h2 className="text-xl font-display mb-4">Diamonds or nothing</h2>
             <p className="text-white/50" style={{ fontFamily: "Sohne, sans-serif" }}>
               Every sound that leaves Swanblade is broadcast-ready. We don&apos;t ship
-              interesting experiments. We ship audio you can put in front of millions.
+              interesting experiments. We ship audio that belongs in the final cut.
             </p>
           </div>
           <div>
-            <h2 className="text-xl font-display mb-4">Your time is valuable</h2>
+            <h2 className="text-xl font-display mb-4">Your sound. Finally.</h2>
             <p className="text-white/50" style={{ fontFamily: "Sohne, sans-serif" }}>
-              We respect that you have deadlines, budgets, and stakeholders.
-              Swanblade gets out of your way and lets you work.
+              You&apos;ve compromised long enough. Swanblade delivers the sound you&apos;ve
+              always heard in your head. The search ends here.
             </p>
           </div>
           <div>
             <h2 className="text-xl font-display mb-4">Not for everyone</h2>
             <p className="text-white/50" style={{ fontFamily: "Sohne, sans-serif" }}>
-              We deliberately price and position Swanblade for professionals.
-              This keeps our focus sharp and our users serious.
+              We price for commitment. We design for professionals.
+              Swanblade is a tribe of those who refuse to settle.
             </p>
           </div>
         </div>
@@ -62,7 +61,7 @@ export default function AboutPage() {
             Contact
           </p>
           <p className="text-white/50 mb-4" style={{ fontFamily: "Sohne, sans-serif" }}>
-            For inquiries, partnerships, or enterprise discussions:
+            For enterprise inquiries and partnerships:
           </p>
           <a
             href="mailto:studio@swanblade.com"

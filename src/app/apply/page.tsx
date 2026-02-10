@@ -30,10 +30,10 @@ export default function ApplyPage() {
           >
             Application Received
           </p>
-          <h1 className="text-3xl font-display mb-6">We'll be in touch.</h1>
+          <h1 className="text-3xl font-display mb-6">Your sound is waiting.</h1>
           <p className="text-white/50 mb-8" style={{ fontFamily: "Sohne, sans-serif" }}>
-            Applications are reviewed weekly. If approved, you'll receive
-            your member credentials via email.
+            Applications are reviewed weekly. If you&apos;re one of the few,
+            you&apos;ll receive your credentials via email.
           </p>
           <Link
             href="/"
@@ -62,12 +62,12 @@ export default function ApplyPage() {
           className="text-xs uppercase tracking-[0.3em] text-white/30 mb-6"
           style={{ fontFamily: "Sohne, sans-serif" }}
         >
-          Membership Application
+          Join Swanblade
         </p>
-        <h1 className="text-3xl font-display mb-4">Apply for Access</h1>
+        <h1 className="text-3xl font-display mb-4">Diamonds or Silence.</h1>
         <p className="text-white/50 mb-12" style={{ fontFamily: "Sohne, sans-serif" }}>
-          Swanblade is for professionals shipping real projects.
-          Tell us about yourself.
+          Swanblade is for creators who ship. Not hobbyists. Not experimenters.
+          Tell us who you are.
         </p>
 
         {/* Seats remaining */}
@@ -79,7 +79,7 @@ export default function ApplyPage() {
             Q1 2026
           </p>
           <p className="text-white/70" style={{ fontFamily: "Sohne, sans-serif" }}>
-            <span className="text-white font-display text-xl">47</span> seats remaining
+            <span className="text-white font-display text-xl">12</span> seats remaining
           </p>
         </div>
 
@@ -201,15 +201,15 @@ export default function ApplyPage() {
               className="w-full border border-white/30 text-white py-4 text-xs uppercase tracking-widest hover:bg-white hover:text-black transition"
               style={{ fontFamily: "Sohne, sans-serif" }}
             >
-              Submit Application
+              Join Swanblade
             </button>
           </div>
         </form>
 
         <p className="mt-8 text-xs text-white/20 text-center" style={{ fontFamily: "Sohne, sans-serif" }}>
-          Applications are reviewed in order received.
+          Not for everyone
           <br />
-          Invite codes receive priority review.
+          Invite codes receive priority.
         </p>
       </main>
     </div>

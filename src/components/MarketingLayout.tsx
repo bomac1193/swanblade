@@ -46,7 +46,7 @@ export function MarketingLayout({ children }: MarketingLayoutProps) {
               className="border border-white/30 text-white px-5 py-2 text-xs uppercase tracking-widest hover:bg-white hover:text-black transition"
               style={{ fontFamily: "Sohne, sans-serif" }}
             >
-              Apply
+              Join
             </Link>
           </nav>
         </div>
@@ -57,17 +57,22 @@ export function MarketingLayout({ children }: MarketingLayoutProps) {
 
       {/* Footer */}
       <footer className="border-t border-white/5 py-12 px-6">
-        <div className="max-w-3xl mx-auto flex items-center justify-between">
-          <span className="text-xs text-white/20 uppercase tracking-widest" style={{ fontFamily: "Sohne, sans-serif" }}>
-            &copy; {new Date().getFullYear()} Swanblade
+        <div className="max-w-3xl mx-auto flex flex-col items-center gap-4">
+          <span className="text-xs text-white/30 uppercase tracking-widest" style={{ fontFamily: "Sohne, sans-serif" }}>
+            Not for everyone
           </span>
-          <a
-            href="mailto:studio@swanblade.com"
-            className="text-xs text-white/20 uppercase tracking-widest hover:text-white transition"
-            style={{ fontFamily: "Sohne, sans-serif" }}
-          >
-            studio@swanblade.com
-          </a>
+          <div className="flex items-center gap-8">
+            <span className="text-xs text-white/20 uppercase tracking-widest" style={{ fontFamily: "Sohne, sans-serif" }}>
+              &copy; {new Date().getFullYear()} Swanblade
+            </span>
+            <a
+              href="mailto:studio@swanblade.com"
+              className="text-xs text-white/20 uppercase tracking-widest hover:text-white transition"
+              style={{ fontFamily: "Sohne, sans-serif" }}
+            >
+              studio@swanblade.com
+            </a>
+          </div>
         </div>
       </footer>
     </div>
