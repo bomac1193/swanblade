@@ -12,14 +12,14 @@ export default function NotFound() {
         <h1 className="text-4xl font-display mb-4">Nothing here.</h1>
         <p
           className="text-white/40 mb-12"
-          style={{ fontFamily: "Sohne, sans-serif" }}
+         
         >
           The path you followed doesn&apos;t lead anywhere.
         </p>
         <Link
           href="/"
           className="text-xs uppercase tracking-widest text-white/40 hover:text-white transition"
-          style={{ fontFamily: "Sohne, sans-serif" }}
+         
         >
           Return
         </Link>

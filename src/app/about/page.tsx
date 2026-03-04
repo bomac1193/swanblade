@@ -10,14 +10,14 @@ export default function AboutPage() {
         <div className="max-w-2xl mx-auto">
           <p
             className="text-xs uppercase tracking-[0.3em] text-white/30 mb-6"
-            style={{ fontFamily: "Sohne, sans-serif" }}
+           
           >
             Philosophy
           </p>
           <h1 className="text-4xl font-display mb-8">
-            The rest is noise.
+            Only what cuts through.
           </h1>
-          <p className="text-white/50 leading-relaxed" style={{ fontFamily: "Sohne, sans-serif" }}>
+          <p className="text-white/50 leading-relaxed">
             We built Swanblade for people who ship. Not for hobbyists tinkering on weekends.
             Not for experimenters chasing trends. For the ones who put sound in front of
             millions and refuse to compromise on any of it.
@@ -30,7 +30,7 @@ export default function AboutPage() {
         <div className="max-w-2xl mx-auto space-y-12">
           <div>
             <h2 className="text-xl font-display mb-4">Diamonds or nothing</h2>
-            <p className="text-white/50" style={{ fontFamily: "Sohne, sans-serif" }}>
+            <p className="text-white/50">
               If it&apos;s not ready for broadcast, it doesn&apos;t leave. We don&apos;t do
               &quot;interesting experiments.&quot; We do audio that belongs in the final cut,
               first try, every time.
@@ -38,7 +38,7 @@ export default function AboutPage() {
           </div>
           <div>
             <h2 className="text-xl font-display mb-4">Your sound. Finally.</h2>
-            <p className="text-white/50" style={{ fontFamily: "Sohne, sans-serif" }}>
+            <p className="text-white/50">
               You&apos;ve spent years compromising. Settling for close enough. Swanblade
               is the sound you&apos;ve always heard in your head, finally real.
               The search is over.
@@ -46,7 +46,7 @@ export default function AboutPage() {
           </div>
           <div>
             <h2 className="text-xl font-display mb-4">Not for everyone</h2>
-            <p className="text-white/50" style={{ fontFamily: "Sohne, sans-serif" }}>
+            <p className="text-white/50">
               We charge what we&apos;re worth. We build for people who know what they want.
               If that&apos;s not you, there are cheaper options. We won&apos;t be offended.
             </p>
@@ -59,11 +59,11 @@ export default function AboutPage() {
         <div className="max-w-2xl mx-auto">
           <p
             className="text-xs uppercase tracking-[0.3em] text-white/30 mb-6"
-            style={{ fontFamily: "Sohne, sans-serif" }}
+           
           >
             Contact
           </p>
-          <p className="text-white/50 mb-4" style={{ fontFamily: "Sohne, sans-serif" }}>
+          <p className="text-white/50 mb-4">
             For enterprise inquiries and partnerships:
           </p>
           <a

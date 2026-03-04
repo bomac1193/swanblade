@@ -79,22 +79,22 @@ function AudioWaveform({
   // Show loading state if no peaks yet
   if (peaks.length === 0) {
     return (
-      <div className="h-12 w-full bg-transparent border-subtle flex items-center justify-center">
-        <span className="text-body-sm text-brand-secondary">Loading waveform...</span>
+      <div className="h-12 w-full bg-transparent border border-white/[0.06] flex items-center justify-center">
+        <span className="text-body-sm text-gray-500">Loading waveform...</span>
       </div>
     );
   }
 
   return (
     <div
-      className="h-14 w-full bg-transparent border-subtle cursor-pointer relative overflow-hidden"
+      className="h-14 w-full bg-transparent border border-white/[0.06] cursor-pointer relative overflow-hidden"
       onClick={handleClick}
     >
       {/* Full waveform in light gray */}
       <svg
         viewBox="0 0 100 100"
         preserveAspectRatio="none"
-        className="absolute inset-0 h-full w-full text-brand-text"
+        className="absolute inset-0 h-full w-full text-white"
       >
         <path d={waveformPath} fill="currentColor" opacity="0.2" />
       </svg>
@@ -116,7 +116,7 @@ function AudioWaveform({
 
       {/* Playhead - accent color */}
       <div
-        className="absolute top-0 bottom-0 w-0.5 bg-brand-text shadow-sm"
+        className="absolute top-0 bottom-0 w-0.5 bg-white shadow-sm"
         style={{ left: `${clampedProgress}%` }}
       />
     </div>
@@ -379,7 +379,7 @@ export function LibraryPanel() {
   if (loading) {
     return (
       <div className="flex items-center justify-center p-12">
-        <p className="text-body text-brand-secondary">Loading library...</p>
+        <p className="text-body text-gray-500">Loading library...</p>
       </div>
     );
   }
@@ -387,8 +387,8 @@ export function LibraryPanel() {
   if (sounds.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center gap-3 p-12 text-center">
-        <p className="text-body text-brand-secondary">Your library is empty</p>
-        <p className="text-body-sm text-brand-secondary/60">Generate sounds and save them to build your collection</p>
+        <p className="text-body text-gray-500">Your library is empty</p>
+        <p className="text-body-sm text-gray-500/60">Generate sounds and save them to build your collection</p>
       </div>
     );
   }
@@ -423,7 +423,7 @@ export function LibraryPanel() {
           <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value as SortBy)}
-            className="border-subtle bg-brand-bg px-3 py-1.5 text-body text-brand-secondary"
+            className="border border-white/[0.06] bg-[#0a0a0a] px-3 py-1.5 text-body text-gray-500"
           >
             <option value="date">Newest First</option>
             <option value="name">Name A-Z</option>
@@ -435,7 +435,7 @@ export function LibraryPanel() {
           <button
             onClick={() => setFilterBy("all")}
             className={`px-3 py-1.5 text-body-sm transition ${
-              filterBy === "all" ? "border border-brand-text bg-brand-text text-brand-bg" : "border-subtle text-brand-secondary hover:text-brand-text"
+              filterBy === "all" ? "border border-white bg-white text-black" : "border border-white/[0.06] text-gray-500 hover:text-white"
             }`}
           >
             All ({sounds.length})
@@ -444,7 +444,7 @@ export function LibraryPanel() {
           <button
             onClick={() => setFilterBy("liked")}
             className={`px-3 py-1.5 text-body-sm transition ${
-              filterBy === "liked" ? "border border-brand-text bg-brand-text text-brand-bg" : "border-subtle text-brand-secondary hover:text-brand-text"
+              filterBy === "liked" ? "border border-white bg-white text-black" : "border border-white/[0.06] text-gray-500 hover:text-white"
             }`}
           >
             Liked ({sounds.filter((s) => s.liked).length})
@@ -457,7 +457,7 @@ export function LibraryPanel() {
                 setSelectedGroup(e.target.value);
                 setFilterBy("group");
               }}
-              className="border-subtle bg-brand-bg px-3 py-1.5 text-body text-brand-secondary"
+              className="border border-white/[0.06] bg-[#0a0a0a] px-3 py-1.5 text-body text-gray-500"
             >
               <option value="">All Groups</option>
               {groups.map((group) => (
@@ -490,8 +490,8 @@ export function LibraryPanel() {
           <div
             key={sound.id}
             className={cn(
-              "border-subtle bg-brand-bg transition",
-              playingId === sound.id && "border border-brand-text"
+              "border border-white/[0.06] bg-[#0a0a0a] transition",
+              playingId === sound.id && "border-white"
             )}
           >
             {/* Main row - always visible */}
@@ -499,10 +499,10 @@ export function LibraryPanel() {
               {/* Play button - always shows play icon to start/select this sound */}
               <button
                 onClick={() => handlePlayPause(sound)}
-                className="flex h-8 w-8 shrink-0 items-center justify-center border-subtle bg-transparent hover:border-brand-text"
+                className="flex h-8 w-8 shrink-0 items-center justify-center border border-white/[0.06] bg-transparent hover:border-white"
                 title="Play"
               >
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" className="text-brand-text">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" className="text-white">
                   <path d="M6 4l14 8-14 8z" />
                 </svg>
               </button>
@@ -519,12 +519,12 @@ export function LibraryPanel() {
                       className="h-6 text-body-sm"
                       autoFocus
                     />
-                    <button onClick={() => handleRename(sound.id)} className="text-label text-brand-text">✓</button>
-                    <button onClick={() => setEditingId(null)} className="text-label text-brand-secondary">×</button>
+                    <button onClick={() => handleRename(sound.id)} className="text-caption text-white">✓</button>
+                    <button onClick={() => setEditingId(null)} className="text-caption text-gray-500">×</button>
                   </div>
                 ) : (
                   <p
-                    className="text-body-sm font-medium text-brand-text truncate cursor-pointer hover:text-brand-accent"
+                    className="text-body-sm font-medium text-white truncate cursor-pointer hover:text-[#66023C]"
                     onClick={() => startEditing(sound)}
                     title={sound.name}
                   >
@@ -541,7 +541,7 @@ export function LibraryPanel() {
                 onClick={() => handleToggleLike(sound.id, sound.liked)}
                 className={cn(
                   "text-sm shrink-0",
-                  sound.liked ? "text-brand-text" : "text-brand-secondary hover:text-brand-text"
+                  sound.liked ? "text-white" : "text-gray-500 hover:text-white"
                 )}
               >
                 {sound.liked ? "★" : "☆"}
@@ -550,7 +550,7 @@ export function LibraryPanel() {
               {/* Download */}
               <button
                 onClick={() => handleDownload(sound.id)}
-                className="text-sm text-brand-secondary hover:text-brand-text"
+                className="text-sm text-gray-500 hover:text-white"
               >
                 ↓
               </button>
@@ -558,7 +558,7 @@ export function LibraryPanel() {
               {/* Delete */}
               <button
                 onClick={() => handleDelete(sound.id)}
-                className="text-sm text-brand-secondary hover:text-brand-text"
+                className="text-sm text-gray-500 hover:text-white"
               >
                 ×
               </button>
@@ -566,21 +566,21 @@ export function LibraryPanel() {
 
             {/* Expanded player row - shows when this sound is selected */}
             {playingId === sound.id && (
-              <div className="border-subtle-t px-3 py-2">
+              <div className="border-t border-white/[0.06] px-3 py-2">
                 <div className="flex items-center gap-2">
                   {/* Play/Pause button */}
                   <button
                     onClick={() => handlePlayPause(sound)}
-                    className="flex h-7 w-7 shrink-0 items-center justify-center border-subtle bg-transparent hover:border-brand-text"
+                    className="flex h-7 w-7 shrink-0 items-center justify-center border border-white/[0.06] bg-transparent hover:border-white"
                     title={isPlaying ? "Pause" : "Play"}
                   >
                     {isPlaying ? (
-                      <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" className="text-brand-text">
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" className="text-white">
                         <rect x="6" y="5" width="4" height="14" />
                         <rect x="14" y="5" width="4" height="14" />
                       </svg>
                     ) : (
-                      <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" className="text-brand-text">
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" className="text-white">
                         <path d="M6 4l14 8-14 8z" />
                       </svg>
                     )}
@@ -589,15 +589,15 @@ export function LibraryPanel() {
                   {/* Stop button */}
                   <button
                     onClick={handleStop}
-                    className="flex h-7 w-7 shrink-0 items-center justify-center border-subtle bg-transparent hover:border-brand-text"
+                    className="flex h-7 w-7 shrink-0 items-center justify-center border border-white/[0.06] bg-transparent hover:border-white"
                     title="Stop"
                   >
-                    <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" className="text-brand-text">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" className="text-white">
                       <rect x="5" y="5" width="14" height="14" />
                     </svg>
                   </button>
 
-                  <span className="text-body-sm text-brand-secondary w-10 text-right shrink-0">
+                  <span className="text-body-sm text-gray-500 w-10 text-right shrink-0">
                     {secondsToTimecode(currentTime)}
                   </span>
 
@@ -609,7 +609,7 @@ export function LibraryPanel() {
                     />
                   </div>
 
-                  <span className="text-body-sm text-brand-secondary w-8 shrink-0">
+                  <span className="text-body-sm text-gray-500 w-8 shrink-0">
                     {secondsToTimecode(duration)}
                   </span>
                 </div>
@@ -621,7 +621,7 @@ export function LibraryPanel() {
 
       {filteredSounds.length === 0 && (
         <div className="flex items-center justify-center p-8">
-          <p className="text-body text-brand-secondary">No sounds match your filters</p>
+          <p className="text-body text-gray-500">No sounds match your filters</p>
         </div>
       )}
     </div>

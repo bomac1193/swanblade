@@ -11,7 +11,7 @@ export interface O8ClientConfig {
 }
 
 const DEFAULT_CONFIG: O8ClientConfig = {
-  apiUrl: process.env.NEXT_PUBLIC_O8_API_URL || 'http://localhost:3001',
+  apiUrl: process.env.NEXT_PUBLIC_O8_API_URL || '',
 }
 
 export class O8Client {

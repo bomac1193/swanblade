@@ -48,7 +48,7 @@ export function OutputPanel({
 }) {
   return (
     <div className="space-y-4">
-      <div className="bg-[#0a0a0a] border border-[#1a1a1a] p-6">
+      <div className="bg-[#0a0a0a] border border-white/[0.06] p-6">
         <div className="flex items-center justify-between">
           <p className="text-sm font-medium text-gray-400">Output</p>
           <HistoryControls
@@ -61,7 +61,7 @@ export function OutputPanel({
 
         {currentSound ? (
           <div className="mt-4">
-            <div className="border-b border-[#1a1a1a] pb-4">
+            <div className="border-b border-white/[0.06] pb-4">
               <p className="text-sm font-medium text-gray-400">{currentSound.status}</p>
               <h3
                 className="mt-2 text-2xl font-medium text-white"
@@ -73,7 +73,7 @@ export function OutputPanel({
 
               {currentSound.provenanceCid && (
                 <div className="mt-2">
-                  <span className="border border-[#1a1a1a] px-2 py-1 text-body-sm">
+                  <span className="border border-white/[0.06] px-2 py-1 text-body-sm">
                     Provenance: {currentSound.provenanceCid.slice(0, 16)}...
                   </span>
                 </div>
@@ -88,7 +88,7 @@ export function OutputPanel({
             </div>
 
             {currentSound.status === "error" ? (
-              <div className="mt-4 border border-[#1a1a1a] p-4">
+              <div className="mt-4 py-4">
                 <p className="text-sm text-red-400">
                   {currentSound.errorMessage ?? "Generation failed."}
                 </p>
@@ -103,7 +103,7 @@ export function OutputPanel({
 
                 {/* Provenance */}
                 {currentSound.status === "ready" && (
-                  <div className="flex items-center justify-between border border-[#1a1a1a] p-3">
+                  <div className="flex items-center justify-between py-3">
                     {currentProvenance ? (
                       <ProvenanceBadge provenance={currentProvenance} />
                     ) : (
@@ -133,14 +133,14 @@ export function OutputPanel({
                 <button
                   onClick={onSaveToLibrary}
                   disabled={currentSound.status !== "ready"}
-                  className="w-full px-6 py-3 text-body-sm font-medium text-white border border-[#1a1a1a] hover:border-[#333] transition-colors duration-300 disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="w-full px-6 py-3 text-body-sm font-medium text-white border border-white/[0.06] hover:border-white/[0.12] transition-colors duration-300 disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   Save to Library
                 </button>
 
                 {/* Stem Export */}
                 {currentSound.status === "ready" && currentSound.audioUrl && (
-                  <div className="border-t border-[#1a1a1a] pt-3">
+                  <div className="border-t border-white/[0.06] pt-3">
                     <button
                       onClick={onToggleStemExport}
                       className="flex w-full items-center justify-between text-left"

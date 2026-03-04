@@ -12,10 +12,10 @@ export function MoodTagPill({ active, className, children, ...props }: MoodTagPi
     <button
       type="button"
       className={cn(
-        "border px-4 py-2 text-label uppercase tracking-wider transition-all",
+        "border px-4 py-2 text-sm transition-all",
         active
-          ? "border-brand-text bg-brand-text text-brand-bg"
-          : "border-brand-border/30 bg-transparent text-brand-secondary hover:border-brand-text hover:text-brand-text",
+          ? "border-white bg-white text-black"
+          : "border-[#1a1a1a] bg-transparent text-gray-500 hover:border-white hover:text-white",
         className,
       )}
       {...props}

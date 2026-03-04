@@ -67,7 +67,7 @@ export function BriefPanel({
   disabled?: boolean;
 }) {
   return (
-    <div className="bg-[#0a0a0a] border border-[#1a1a1a] p-6">
+    <div className="bg-[#0a0a0a] border border-white/[0.06] p-6">
       <div className="flex items-center justify-between">
         <p className="text-sm font-medium text-gray-400">Brief</p>
         <p className="text-body-sm font-light text-gray-600">
@@ -76,16 +76,16 @@ export function BriefPanel({
       </div>
 
       {/* Mode Tabs */}
-      <div className="mt-4 flex gap-px bg-[#111]">
+      <div className="mt-4 flex flex-wrap gap-2">
         {BRIEF_MODES.map((m) => (
           <button
             key={m.id}
             type="button"
             onClick={() => onBriefModeChange(m.id)}
-            className={`flex-1 px-3 py-2 text-body-sm font-light transition-all duration-200 ${
+            className={`px-3 py-1.5 text-body-sm font-light border transition-all duration-200 ${
               briefMode === m.id
-                ? "bg-white text-black"
-                : "bg-[#0a0a0a] text-gray-500 hover:text-white"
+                ? "border-white text-white"
+                : "border-white/[0.06] text-gray-500 hover:text-white hover:border-white/[0.12]"
             }`}
           >
             {m.label}
@@ -94,7 +94,7 @@ export function BriefPanel({
       </div>
 
       <textarea
-        className="w-full bg-black border-0 border-b border-[#1a1a1a] px-3 py-3 text-white font-light placeholder:text-gray-600 focus:outline-none focus:border-[#333] transition-colors mt-3 resize-none"
+        className="w-full bg-black border-0 border-b border-white/[0.06] px-3 py-3 text-white font-light placeholder:text-gray-600 focus:outline-none focus:border-white/[0.12] transition-colors mt-3 resize-none"
         rows={3}
         placeholder={BRIEF_PLACEHOLDERS[briefMode]}
         value={prompt}

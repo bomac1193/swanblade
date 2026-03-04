@@ -32,9 +32,9 @@ export function PresetsPanel({
   };
 
   return (
-    <div className={cn("border border-brand-border/30/30", className)}>
+    <div className={cn("border border-[#1a1a1a]/30", className)}>
       <div
-        className="flex items-center justify-between px-4 py-3 cursor-pointer hover:bg-brand-bg transition-colors"
+        className="flex items-center justify-between px-4 py-3 cursor-pointer hover:bg-black transition-colors"
         onClick={() => setExpanded(!expanded)}
       >
         <div className="flex items-center gap-3">
@@ -45,8 +45,8 @@ export function PresetsPanel({
             <rect x="14" y="14" width="7" height="7" stroke="currentColor" strokeWidth="1.5" />
           </svg>
           <div>
-            <p className="text-body-sm text-brand-secondary">Presets</p>
-            <p className="text-body-sm text-brand-text">{presets.length} saved</p>
+            <p className="text-body-sm text-gray-500">Presets</p>
+            <p className="text-body-sm text-white">{presets.length} saved</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
@@ -56,7 +56,7 @@ export function PresetsPanel({
               setShowSaveDialog(true);
               setExpanded(true);
             }}
-            className="px-2 py-1 text-body-sm border border-brand-border/30 hover:border-[#66023C] hover:text-[#66023C] transition-colors"
+            className="px-2 py-1 text-body-sm border border-[#1a1a1a] hover:border-[#66023C] hover:text-[#66023C] transition-colors"
           >
             + Save
           </button>
@@ -65,7 +65,7 @@ export function PresetsPanel({
             height="16"
             viewBox="0 0 24 24"
             fill="none"
-            className={cn("text-brand-secondary transition-transform", expanded && "rotate-180")}
+            className={cn("text-gray-500 transition-transform", expanded && "rotate-180")}
           >
             <path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
           </svg>
@@ -73,11 +73,11 @@ export function PresetsPanel({
       </div>
 
       {expanded && (
-        <div className="border-t border-brand-border/30">
+        <div className="border-t border-[#1a1a1a]">
           {/* Save Dialog */}
           {showSaveDialog && (
-            <div className="p-4 bg-brand-bg border-b border-brand-border/30">
-              <p className="text-body-sm text-brand-secondary mb-2">
+            <div className="p-4 bg-black border-b border-[#1a1a1a]">
+              <p className="text-body-sm text-gray-500 mb-2">
                 Save Current Settings
               </p>
               <div className="flex gap-2">
@@ -87,7 +87,7 @@ export function PresetsPanel({
                   onChange={(e) => setNewPresetName(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && handleSave()}
                   placeholder="Preset name..."
-                  className="flex-1 px-3 py-2 border border-brand-border/30 bg-brand-surface text-body text-brand-text placeholder:text-brand-secondary focus:outline-none focus:border-brand-text"
+                  className="flex-1 px-3 py-2 border border-[#1a1a1a] bg-[#0a0a0a] text-body text-white placeholder:text-gray-500 focus:outline-none focus:border-white"
                   autoFocus
                 />
                 <Button
@@ -113,8 +113,8 @@ export function PresetsPanel({
           {/* Presets List */}
           {presets.length === 0 ? (
             <div className="p-4 text-center">
-              <p className="text-body-sm text-brand-secondary">No presets saved yet</p>
-              <p className="text-body-sm text-brand-secondary/60 mt-1">
+              <p className="text-body-sm text-gray-500">No presets saved yet</p>
+              <p className="text-body-sm text-gray-500/60 mt-1">
                 Configure your settings and save them as a preset
               </p>
             </div>
@@ -123,24 +123,24 @@ export function PresetsPanel({
               {presets.map((preset) => (
                 <div
                   key={preset.id}
-                  className="px-4 py-3 border-b border-brand-border/30 last:border-b-0 hover:bg-brand-bg transition-colors group"
+                  className="px-4 py-3 border-b border-[#1a1a1a] last:border-b-0 hover:bg-black transition-colors group"
                 >
                   <div className="flex items-center justify-between">
                     <button
                       onClick={() => onSelect(preset)}
                       className="flex-1 text-left"
                     >
-                      <p className="text-body-sm font-medium text-brand-text">
+                      <p className="text-body-sm font-medium text-white">
                         {preset.name}
                       </p>
-                      <p className="text-body-sm text-brand-secondary truncate">
+                      <p className="text-body-sm text-gray-500 truncate">
                         {preset.prompt.slice(0, 40)}...
                       </p>
                       <div className="flex gap-2 mt-1">
-                        <span className="text-[10px] px-1.5 py-0.5 bg-brand-bg border border-brand-border/30 text-brand-secondary">
+                        <span className="text-[10px] px-1.5 py-0.5 bg-black border border-[#1a1a1a] text-gray-500">
                           {preset.lengthSeconds}s
                         </span>
-                        <span className="text-[10px] px-1.5 py-0.5 bg-brand-bg border border-brand-border/30 text-brand-secondary">
+                        <span className="text-[10px] px-1.5 py-0.5 bg-black border border-[#1a1a1a] text-gray-500">
                           {preset.provider}
                         </span>
                         {preset.gameState && (
@@ -152,7 +152,7 @@ export function PresetsPanel({
                     </button>
                     <button
                       onClick={() => onDelete(preset.id)}
-                      className="p-1.5 text-brand-secondary hover:text-status-error opacity-0 group-hover:opacity-100 transition-all"
+                      className="p-1.5 text-gray-500 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-all"
                       title="Delete preset"
                     >
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none">

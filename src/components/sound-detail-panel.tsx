@@ -17,9 +17,9 @@ interface SoundDetailPanelProps {
 export function SoundDetailPanel({ sound, onRegenerate, onVariation, onDownload, onCopyPreset }: SoundDetailPanelProps) {
   if (!sound) {
     return (
-      <div className="flex h-full flex-col items-center justify-center border border-dashed border-brand-border/30 bg-brand-surface p-12 text-center">
-        <p className="font-display text-display-lg text-brand-text">Swanblade is idle.</p>
-        <p className="mt-3 max-w-md text-body text-brand-secondary">
+      <div className="flex h-full flex-col items-center justify-center border border-dashed border-[#1a1a1a] bg-[#0a0a0a] p-12 text-center">
+        <p className="font-display text-display-lg text-white">Swanblade is idle.</p>
+        <p className="mt-3 max-w-md text-body text-gray-500">
           Describe a sound using the composer below to generate audio mockups.
         </p>
       </div>
@@ -29,12 +29,12 @@ export function SoundDetailPanel({ sound, onRegenerate, onVariation, onDownload,
   const disabled = sound.status !== "ready";
 
   return (
-    <div className="flex h-full flex-col gap-6 border border-brand-border/30 bg-brand-surface p-8">
+    <div className="flex h-full flex-col gap-6 border border-[#1a1a1a] bg-[#0a0a0a] p-8">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <p className="text-label uppercase tracking-wider text-brand-secondary">{sound.type}</p>
-          <h2 className="mt-2 font-display text-display-lg text-brand-text">{sound.name}</h2>
-          <p className="mt-2 text-body text-brand-secondary">{sound.prompt}</p>
+          <p className="text-sm text-gray-400">{sound.type}</p>
+          <h2 className="mt-2 font-display text-display-lg text-white">{sound.name}</h2>
+          <p className="mt-2 text-body text-gray-500">{sound.prompt}</p>
         </div>
         <StatusBadge status={sound.status} />
       </div>
@@ -44,7 +44,7 @@ export function SoundDetailPanel({ sound, onRegenerate, onVariation, onDownload,
       <AudioPlayerControls audioUrl={sound.audioUrl} disabled={disabled} />
 
       {sound.status === "error" && (
-        <div className="border border-status-error bg-brand-surface px-4 py-3 text-body text-status-error">
+        <div className="border border-red-400 bg-[#0a0a0a] px-4 py-3 text-body text-red-400">
           {sound.errorMessage ?? "Generation failed. Try again with a different prompt or parameters."}
         </div>
       )}

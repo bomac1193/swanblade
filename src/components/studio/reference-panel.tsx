@@ -59,7 +59,7 @@ function ClipCard({
   dataProtected?: boolean;
 }) {
   return (
-    <div className="border border-[#1a1a1a] bg-[#0a0a0a] p-4">
+    <div className="border border-white/[0.06] bg-[#0a0a0a] p-4">
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-2">
           {dataProtected && (
@@ -80,7 +80,7 @@ function ClipCard({
           Remove
         </button>
       </div>
-      <div className="mt-3 border border-[#1a1a1a] bg-black p-2">
+      <div className="mt-3">
         <audio
           controls
           src={clip.previewUrl}
@@ -211,7 +211,7 @@ export function ReferencePanel({
   const openPicker = () => fileInputRef.current?.click();
 
   return (
-    <div className="bg-[#0a0a0a] border border-[#1a1a1a] p-6">
+    <div className="bg-[#0a0a0a] border border-white/[0.06] p-6">
       <div className="flex items-center justify-between">
         <p className="text-sm font-medium text-gray-400">Audio References</p>
         {clips.length > 0 && (
@@ -225,7 +225,7 @@ export function ReferencePanel({
       </p>
 
       {/* Data Protection Toggle */}
-      <div className="mt-4 flex items-center justify-between border border-[#1a1a1a] p-3">
+      <div className="mt-4 flex items-center justify-between py-3">
         <div className="flex items-center gap-2">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" className={dataProtected ? "text-emerald-500" : "text-gray-600"}>
             <path d="M12 2L4 6v6c0 5.25 3.4 10.2 8 12 4.6-1.8 8-6.75 8-12V6l-8-4z" stroke="currentColor" strokeWidth="1.5" fill="currentColor" fillOpacity="0.15" />
@@ -253,7 +253,7 @@ export function ReferencePanel({
         className={`group mt-4 relative cursor-pointer overflow-hidden border transition-all duration-300 ${
           isDragging
             ? "border-white/30 bg-white/[0.03]"
-            : "border-[#1a1a1a] hover:border-[#333]"
+            : "border-white/[0.06] hover:border-white/[0.12]"
         }`}
         onDragOver={onDragOver}
         onDragLeave={onDragLeave}
@@ -271,7 +271,7 @@ export function ReferencePanel({
         <div className={`absolute top-0 left-0 right-0 h-px transition-opacity duration-300 ${isDragging ? "opacity-100" : "opacity-0 group-hover:opacity-100"}`} style={{ background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent)" }} />
 
         <div className="flex items-center gap-5 px-6 py-5">
-          <div className={`flex items-center justify-center w-10 h-10 border transition-all duration-300 ${isDragging ? "border-white/20 bg-white/5" : "border-[#1a1a1a] group-hover:border-[#333]"}`}>
+          <div className={`flex items-center justify-center w-10 h-10 border transition-all duration-300 ${isDragging ? "border-white/20 bg-white/5" : "border-white/[0.06] group-hover:border-white/[0.12]"}`}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className={`transition-all duration-300 ${isDragging ? "text-white -translate-y-0.5" : "text-gray-500 group-hover:text-gray-300"}`}>
               <path d="M12 16V4m0 0l-4 4m4-4l4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
               <path d="M20 16v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />

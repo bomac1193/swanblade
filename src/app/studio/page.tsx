@@ -341,8 +341,8 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-black text-white">
       {/* Sidebar */}
-      <aside className="fixed left-0 top-0 bottom-0 w-64 bg-black border-r border-[#1a1a1a] flex flex-col z-30">
-        <div className="p-6 border-b border-[#1a1a1a]">
+      <aside className="fixed left-0 top-0 bottom-0 w-64 bg-black border-r border-white/[0.06] flex flex-col z-30">
+        <div className="p-6 border-b border-white/[0.06]">
           <span className="text-2xl text-white" style={{ fontFamily: "var(--font-canela), Georgia, serif" }}>
             Swanblade
           </span>
@@ -364,15 +364,15 @@ export default function Home() {
             </button>
           ))}
         </nav>
-        <div className="p-4 border-t border-[#1a1a1a]">
+        <div className="p-4 border-t border-white/[0.06]">
           <div className="px-4 py-3 text-xs text-gray-600">
-            Press <kbd className="px-1 border border-[#1a1a1a] text-gray-500">?</kbd> for shortcuts
+            Press <kbd className="px-1 border border-white/[0.06] text-gray-500">?</kbd> for shortcuts
           </div>
         </div>
       </aside>
 
       {/* Header */}
-      <header className="fixed top-0 left-64 right-0 h-16 bg-black border-b border-[#1a1a1a] flex items-center px-6 z-20">
+      <header className="fixed top-0 left-64 right-0 h-12 bg-black border-b border-white/[0.06] flex items-center px-6 z-20">
         <div className="relative w-96 flex items-center">
           <svg className="absolute left-3 w-4 h-4 text-gray-500" viewBox="0 0 24 24" fill="none">
             <circle cx="11" cy="11" r="8" stroke="currentColor" strokeWidth="1.5" />
@@ -381,7 +381,7 @@ export default function Home() {
           <input
             type="text"
             placeholder="Search sounds..."
-            className="w-full h-10 pl-10 pr-4 bg-[#0a0a0a] border border-[#1a1a1a] text-white text-sm font-light placeholder:text-gray-500 focus:outline-none focus:border-[#333] transition-all duration-200"
+            className="w-full h-10 pl-10 pr-4 bg-[#0a0a0a] border border-white/[0.06] text-white text-sm font-light placeholder:text-gray-500 focus:outline-none focus:border-white/[0.12] transition-all duration-200"
           />
         </div>
         <div className="ml-auto flex items-center gap-4">
@@ -395,20 +395,18 @@ export default function Home() {
               <path d="M6 8h.01M10 8h.01M14 8h.01M18 8h.01M8 12h.01M12 12h.01M16 12h.01M6 16h12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
             </svg>
           </button>
-          <div className="w-8 h-8 bg-[#0a0a0a] border border-[#1a1a1a] flex items-center justify-center text-sm text-gray-400">
+          <div className="w-8 h-8 bg-[#0a0a0a] border border-white/[0.06] flex items-center justify-center text-sm text-gray-400">
             S
           </div>
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="ml-64 pt-28 min-h-screen px-8 pb-12">
+      <main className="ml-64 pt-16 min-h-screen px-8 pb-12">
         {mode === "library" ? (
           <>
-            <h2 className="text-[11px] font-display tracking-wide text-white mb-4">Library</h2>
-            <div className="bg-[#0a0a0a] border border-[#1a1a1a] p-6">
-              <LibraryPanel />
-            </div>
+            <p className="text-lg tracking-[0.05em] text-white font-display mb-5">Library</p>
+            <LibraryPanel />
           </>
         ) : mode === "game-audio" ? (
           <GameAudioView
@@ -434,7 +432,7 @@ export default function Home() {
           />
         ) : (
           <>
-            <h2 className="text-[11px] font-display tracking-wide text-white mb-4">Generate</h2>
+            <p className="text-lg tracking-[0.05em] text-white font-display mb-5">Generate</p>
             <div className="grid gap-6 lg:grid-cols-2">
               {/* Left: Controls */}
               <div className="space-y-6">
@@ -451,7 +449,7 @@ export default function Home() {
                   onSelect={handleLoadPreset}
                   onSave={handleSavePreset}
                   onDelete={deletePreset}
-                  className="bg-[#0a0a0a] border border-[#1a1a1a]"
+                  className="bg-[#0a0a0a] border border-white/[0.06]"
                 />
 
                 <ReferencePanel
@@ -464,11 +462,11 @@ export default function Home() {
 
                 <O8IdentityPanel
                   onIdentityChange={handleIdentityChange}
-                  className="bg-[#0a0a0a] border border-[#1a1a1a]"
+                  className="bg-[#0a0a0a] border border-white/[0.06]"
                 />
 
                 {/* Parameters */}
-                <div className="bg-[#0a0a0a] border border-[#1a1a1a] p-6">
+                <div className="bg-[#0a0a0a] border border-white/[0.06] p-6">
                   <p className="text-sm font-medium text-gray-400">Parameters</p>
 
                   <div className="mt-4">
@@ -494,13 +492,13 @@ export default function Home() {
                           className={`px-4 py-2 text-body-sm border transition ${
                             lengthSeconds === value
                               ? "border-white bg-white text-black"
-                              : "border-[#1a1a1a] text-gray-500 hover:border-white hover:text-white"
+                              : "border-white/[0.06] text-gray-500 hover:border-white hover:text-white"
                           }`}
                         >
                           {value < 60 ? `${value}s` : `${value / 60}m`}
                         </button>
                       ))}
-                      <div className="flex items-center border border-[#1a1a1a] px-3 py-2">
+                      <div className="flex items-center border border-white/[0.06] px-3 py-2">
                         <input
                           type="number"
                           min={2}
@@ -524,7 +522,7 @@ export default function Home() {
                     </button>
 
                     {showAdvanced && (
-                      <div className="mt-4 space-y-4 border-t border-[#1a1a1a] pt-4">
+                      <div className="mt-4 space-y-4 border-t border-white/[0.06] pt-4">
                         <div>
                           <p className="text-body-sm font-light text-gray-500">Sound Palette</p>
                           <div className="mt-2">
@@ -542,14 +540,14 @@ export default function Home() {
                   </div>
 
                   {(selectedPalette || selectedGameState) && (
-                    <div className="mt-4 flex flex-wrap gap-2 border-t border-[#1a1a1a] pt-4">
+                    <div className="mt-4 flex flex-wrap gap-2 border-t border-white/[0.06] pt-4">
                       {selectedPalette && (
-                        <span className="border border-[#1a1a1a] px-2 py-1 text-body-sm">
+                        <span className="border border-white/[0.06] px-2 py-1 text-body-sm">
                           Palette: {selectedPalette.name}
                         </span>
                       )}
                       {selectedGameState && (
-                        <span className="border border-[#1a1a1a] px-2 py-1 text-body-sm capitalize">
+                        <span className="border border-white/[0.06] px-2 py-1 text-body-sm capitalize">
                           State: {selectedGameState}
                         </span>
                       )}
@@ -606,7 +604,7 @@ export default function Home() {
           onClick={() => setShowShortcuts(false)}
         >
           <div
-            className="bg-[#0a0a0a] border border-[#1a1a1a] p-6 max-w-md w-full mx-4"
+            className="bg-[#0a0a0a] border border-white/[0.06] p-6 max-w-md w-full mx-4"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between mb-6">
@@ -619,14 +617,14 @@ export default function Home() {
             </div>
             <div className="space-y-2">
               {getShortcutsList(shortcuts).map(({ key, description }) => (
-                <div key={key} className="flex items-center justify-between py-2 border-b border-[#1a1a1a] last:border-b-0">
+                <div key={key} className="flex items-center justify-between py-2 border-b border-white/[0.06] last:border-b-0">
                   <span className="text-sm font-light text-gray-400">{description}</span>
-                  <kbd className="px-2 py-1 bg-black border border-[#1a1a1a] text-caption font-mono text-gray-300">{key}</kbd>
+                  <kbd className="px-2 py-1 bg-black border border-white/[0.06] text-caption font-mono text-gray-300">{key}</kbd>
                 </div>
               ))}
             </div>
             <p className="mt-4 text-caption text-gray-600 text-center">
-              Press <kbd className="px-1 bg-black border border-[#1a1a1a] text-gray-400">?</kbd> anytime
+              Press <kbd className="px-1 bg-black border border-white/[0.06] text-gray-400">?</kbd> anytime
             </p>
           </div>
         </div>
@@ -682,15 +680,15 @@ function GameAudioView({
 }) {
   return (
     <>
-      <h2 className="text-[11px] font-display tracking-wide text-white mb-4">Game Audio</h2>
+      <p className="text-lg tracking-[0.05em] text-white font-display mb-5">Game Audio</p>
       <div className="grid gap-6 lg:grid-cols-2">
         <div className="space-y-6">
           <O8IdentityPanel
             onIdentityChange={onIdentityChange}
-            className="bg-[#0a0a0a] border border-[#1a1a1a]"
+            className="bg-[#0a0a0a] border border-white/[0.06]"
           />
 
-          <div className="bg-[#0a0a0a] border border-[#1a1a1a] p-6">
+          <div className="bg-[#0a0a0a] border border-white/[0.06] p-6">
             <p className="text-sm font-medium text-gray-400">Game State</p>
             <p className="mt-2 text-body-sm font-light text-gray-500">
               Generate coherent stem bundles for specific game contexts.
@@ -700,7 +698,7 @@ function GameAudioView({
             </div>
           </div>
 
-          <div className="bg-[#0a0a0a] border border-[#1a1a1a] p-6">
+          <div className="bg-[#0a0a0a] border border-white/[0.06] p-6">
             <p className="text-sm font-medium text-gray-400">Sound Palette</p>
             <p className="mt-2 text-body-sm font-light text-gray-500">
               Constrain generation to a consistent aesthetic.
@@ -710,7 +708,7 @@ function GameAudioView({
             </div>
           </div>
 
-          <div className="bg-[#0a0a0a] border border-[#1a1a1a] p-6">
+          <div className="bg-[#0a0a0a] border border-white/[0.06] p-6">
             <p className="text-sm font-medium text-gray-400">Parameters</p>
 
             <div className="mt-4">
@@ -723,7 +721,7 @@ function GameAudioView({
                     className={`px-4 py-2 text-body-sm border transition ${
                       lengthSeconds === value
                         ? "border-white bg-white text-black"
-                        : "border-[#1a1a1a] text-gray-500 hover:border-white hover:text-white"
+                        : "border-white/[0.06] text-gray-500 hover:border-white hover:text-white"
                     }`}
                   >
                     {value}s
@@ -748,7 +746,7 @@ function GameAudioView({
             <div className="mt-4">
               <p className="text-body-sm font-light text-gray-500">Style Direction (Optional)</p>
               <textarea
-                className="w-full bg-black border-0 border-b border-[#1a1a1a] px-3 py-3 text-white font-light placeholder:text-gray-600 focus:outline-none focus:border-[#333] transition-colors mt-2 resize-none"
+                className="w-full bg-black border-0 border-b border-white/[0.06] px-3 py-3 text-white font-light placeholder:text-gray-600 focus:outline-none focus:border-white/[0.12] transition-colors mt-2 resize-none"
                 rows={2}
                 placeholder="e.g., orchestral, epic, brass..."
                 value={prompt}
@@ -770,12 +768,12 @@ function GameAudioView({
         </div>
 
         {/* Right: Result */}
-        <div className="bg-[#0a0a0a] border border-[#1a1a1a] p-6">
+        <div className="bg-[#0a0a0a] border border-white/[0.06] p-6">
           <p className="text-sm font-medium text-gray-400">Output</p>
 
           {currentBundle ? (
             <div className="mt-4">
-              <div className="flex items-center justify-between border-b border-[#1a1a1a] pb-3">
+              <div className="flex items-center justify-between border-b border-white/[0.06] pb-3">
                 <div>
                   <p className="text-lg font-medium capitalize text-white" style={{ fontFamily: "var(--font-canela), Georgia, serif" }}>{currentBundle.gameState} Bundle</p>
                   <p className="text-body-sm font-light text-gray-500">{currentBundle.stems.length} stems generated</p>
@@ -784,7 +782,7 @@ function GameAudioView({
 
               <div className="mt-4 space-y-3">
                 {currentBundle.stems.map((stem) => (
-                  <div key={stem.stemType} className="border border-[#1a1a1a] p-3">
+                  <div key={stem.stemType} className="border border-white/[0.06] p-3">
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="text-sm font-medium capitalize">{stem.stemType}</p>
@@ -801,7 +799,7 @@ function GameAudioView({
                 ))}
               </div>
 
-              <div className="mt-4 border-t border-[#1a1a1a] pt-4">
+              <div className="mt-4 border-t border-white/[0.06] pt-4">
                 <p className="text-body-sm font-light text-gray-500">Bundle ID: {currentBundle.id}</p>
                 <div className="mt-3">
                   {o8Identity ? (

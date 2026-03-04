@@ -35,14 +35,14 @@ export function WaveformPlaceholder({ isActive, isLoading }: WaveformPlaceholder
   }, [bars, isActive]);
 
   return (
-    <div className="w-full border border-brand-border/30 bg-brand-bg p-4">
+    <div className="w-full border border-[#1a1a1a] bg-black p-4">
       <div className={cn("relative h-32 w-full", isLoading && "animate-pulse opacity-70")}>
         <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="h-full w-full">
           <defs>
             <linearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="rgba(10, 10, 10, 0.1)" />
-              <stop offset="50%" stopColor="rgba(10, 10, 10, 0.3)" />
-              <stop offset="100%" stopColor="rgba(10, 10, 10, 0.1)" />
+              <stop offset="0%" stopColor="rgba(255, 255, 255, 0.05)" />
+              <stop offset="50%" stopColor="rgba(255, 255, 255, 0.15)" />
+              <stop offset="100%" stopColor="rgba(255, 255, 255, 0.05)" />
             </linearGradient>
           </defs>
           <path
@@ -54,7 +54,7 @@ export function WaveformPlaceholder({ isActive, isLoading }: WaveformPlaceholder
           <path
             d={pathD}
             fill="none"
-            stroke="rgba(10, 10, 10, 0.4)"
+            stroke="rgba(255, 255, 255, 0.2)"
             strokeWidth={isActive ? 0.9 : 0.6}
             className="transition-all duration-500"
           />

@@ -26,19 +26,19 @@ export default function ApplyPage() {
         <div className="max-w-md text-center">
           <p
             className="text-xs uppercase tracking-[0.3em] text-white/30 mb-6"
-            style={{ fontFamily: "Sohne, sans-serif" }}
+           
           >
             Application Received
           </p>
           <h1 className="text-3xl font-display mb-6">We&apos;ll be in touch.</h1>
-          <p className="text-white/50 mb-8" style={{ fontFamily: "Sohne, sans-serif" }}>
+          <p className="text-white/50 mb-8">
             We review applications weekly. If it&apos;s a fit,
             you&apos;ll hear from us with next steps.
           </p>
           <Link
             href="/"
             className="text-xs uppercase tracking-widest text-white/40 hover:text-white transition"
-            style={{ fontFamily: "Sohne, sans-serif" }}
+           
           >
             Return
           </Link>
@@ -60,12 +60,12 @@ export default function ApplyPage() {
       <main className="max-w-lg mx-auto px-6 py-16">
         <p
           className="text-xs uppercase tracking-[0.3em] text-white/30 mb-6"
-          style={{ fontFamily: "Sohne, sans-serif" }}
+         
         >
           Join Swanblade
         </p>
         <h1 className="text-3xl font-display mb-4">Diamonds or Silence</h1>
-        <p className="text-white/50 mb-12" style={{ fontFamily: "Sohne, sans-serif" }}>
+        <p className="text-white/50 mb-12">
           We review every application personally. Tell us what you&apos;re working on
           and why Swanblade belongs in your workflow.
         </p>
@@ -78,7 +78,7 @@ export default function ApplyPage() {
           >
             Q1 2026
           </p>
-          <p className="text-white/70" style={{ fontFamily: "Sohne, sans-serif" }}>
+          <p className="text-white/70">
             <span className="text-white font-display text-xl">12</span> seats remaining
           </p>
         </div>
@@ -87,7 +87,7 @@ export default function ApplyPage() {
           <div>
             <label
               className="block text-xs uppercase tracking-widest text-white/40 mb-2"
-              style={{ fontFamily: "Sohne, sans-serif" }}
+             
             >
               Name
             </label>
@@ -97,14 +97,14 @@ export default function ApplyPage() {
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               className="w-full bg-transparent border-b border-white/20 py-3 text-white focus:border-white focus:outline-none transition"
-              style={{ fontFamily: "Sohne, sans-serif" }}
+             
             />
           </div>
 
           <div>
             <label
               className="block text-xs uppercase tracking-widest text-white/40 mb-2"
-              style={{ fontFamily: "Sohne, sans-serif" }}
+             
             >
               Email
             </label>
@@ -114,14 +114,14 @@ export default function ApplyPage() {
               value={formData.email}
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
               className="w-full bg-transparent border-b border-white/20 py-3 text-white focus:border-white focus:outline-none transition"
-              style={{ fontFamily: "Sohne, sans-serif" }}
+             
             />
           </div>
 
           <div>
             <label
               className="block text-xs uppercase tracking-widest text-white/40 mb-2"
-              style={{ fontFamily: "Sohne, sans-serif" }}
+             
             >
               Role
             </label>
@@ -130,7 +130,7 @@ export default function ApplyPage() {
               value={formData.role}
               onChange={(e) => setFormData({ ...formData, role: e.target.value })}
               className="w-full bg-transparent border-b border-white/20 py-3 text-white focus:border-white focus:outline-none transition appearance-none"
-              style={{ fontFamily: "Sohne, sans-serif" }}
+             
             >
               <option value="" className="bg-[#0A0A0A]">Select</option>
               <option value="sound-designer" className="bg-[#0A0A0A]">Sound Designer</option>
@@ -145,7 +145,7 @@ export default function ApplyPage() {
           <div>
             <label
               className="block text-xs uppercase tracking-widest text-white/40 mb-2"
-              style={{ fontFamily: "Sohne, sans-serif" }}
+             
             >
               What are you working on?
             </label>
@@ -156,14 +156,14 @@ export default function ApplyPage() {
               onChange={(e) => setFormData({ ...formData, project: e.target.value })}
               placeholder="Current project, studio, or context"
               className="w-full bg-transparent border-b border-white/20 py-3 text-white focus:border-white focus:outline-none transition resize-none placeholder:text-white/20"
-              style={{ fontFamily: "Sohne, sans-serif" }}
+             
             />
           </div>
 
           <div>
             <label
               className="block text-xs uppercase tracking-widest text-white/40 mb-2"
-              style={{ fontFamily: "Sohne, sans-serif" }}
+             
             >
               Portfolio / Website
               <span className="text-white/20 normal-case tracking-normal ml-2">Optional</span>
@@ -174,14 +174,14 @@ export default function ApplyPage() {
               onChange={(e) => setFormData({ ...formData, website: e.target.value })}
               placeholder="https://"
               className="w-full bg-transparent border-b border-white/20 py-3 text-white focus:border-white focus:outline-none transition placeholder:text-white/20"
-              style={{ fontFamily: "Sohne, sans-serif" }}
+             
             />
           </div>
 
           <div>
             <label
               className="block text-xs uppercase tracking-widest text-white/40 mb-2"
-              style={{ fontFamily: "Sohne, sans-serif" }}
+             
             >
               Invite Code
               <span className="text-white/20 normal-case tracking-normal ml-2">If you have one</span>
@@ -199,14 +199,14 @@ export default function ApplyPage() {
             <button
               type="submit"
               className="w-full border border-white/30 text-white py-4 text-xs uppercase tracking-widest hover:bg-white hover:text-black transition"
-              style={{ fontFamily: "Sohne, sans-serif" }}
+             
             >
               Join Swanblade
             </button>
           </div>
         </form>
 
-        <p className="mt-8 text-xs text-white/20 text-center" style={{ fontFamily: "Sohne, sans-serif" }}>
+        <p className="mt-8 text-xs text-white/20 text-center">
           Not for everyone
           <br />
           Invite codes receive priority.

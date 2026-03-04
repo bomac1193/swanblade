@@ -25,11 +25,11 @@ export function GameStateSelector({
   return (
     <div>
       <div className="flex items-center justify-between">
-        <p className="text-body-sm text-brand-secondary">Game State</p>
+        <p className="text-body-sm text-gray-500">Game State</p>
         {value && (
           <button
             onClick={() => onChange(null)}
-            className="text-body-sm text-brand-secondary hover:text-brand-text"
+            className="text-body-sm text-gray-500 hover:text-white"
           >
             Clear
           </button>
@@ -40,16 +40,16 @@ export function GameStateSelector({
       <div className="mt-3 space-y-3">
         {Object.entries(GAME_STATE_CATEGORIES).map(([category, states]) => (
           <div key={category}>
-            <p className="text-body-sm text-brand-secondary/60">{category}</p>
+            <p className="text-body-sm text-gray-500/60">{category}</p>
             <div className="mt-1 flex flex-wrap gap-2">
               {states.map((state) => (
                 <button
                   key={state}
                   onClick={() => onChange(value === state ? null : state)}
-                  className={`px-3 py-1.5 text-[10px] uppercase tracking-wider transition ${
+                  className={`px-3 py-1.5 text-xs transition ${
                     value === state
-                      ? "border border-brand-text bg-brand-text text-brand-bg"
-                      : "btn-secondary"
+                      ? "border border-white bg-white text-black"
+                      : "border border-[#1a1a1a] text-gray-400 hover:border-[#333] hover:text-white"
                   }`}
                 >
                   {state}
@@ -62,10 +62,10 @@ export function GameStateSelector({
 
       {/* Selected State Details */}
       {showDetails && selectedConfig && value && (
-        <div className="mt-4 border border-brand-border/30 bg-brand-bg p-3">
+        <div className="mt-4 border border-[#1a1a1a] bg-black p-3">
           <div>
-            <p className="text-body-lg font-medium capitalize text-brand-text">{value}</p>
-            <p className="text-body-sm text-brand-secondary">{selectedConfig.description}</p>
+            <p className="text-body-lg font-medium capitalize text-white">{value}</p>
+            <p className="text-body-sm text-gray-500">{selectedConfig.description}</p>
           </div>
 
           {/* Modifiers */}
@@ -97,7 +97,7 @@ export function GameStateSelector({
             {selectedConfig.promptKeywords.map((keyword) => (
               <span
                 key={keyword}
-                className="bg-brand-border px-2 py-0.5 text-body-sm text-brand-text"
+                className="bg-[#1a1a1a] px-2 py-0.5 text-body-sm text-white"
               >
                 {keyword}
               </span>
@@ -106,7 +106,7 @@ export function GameStateSelector({
 
           {/* Default Stems */}
           <div className="mt-3">
-            <p className="text-body-sm text-brand-secondary">
+            <p className="text-body-sm text-gray-500">
               Default Stems
             </p>
             <div className="mt-1 flex flex-wrap gap-1">
@@ -115,7 +115,7 @@ export function GameStateSelector({
                 .map(([stem, volume]) => (
                   <span
                     key={stem}
-                    className="bg-brand-text px-2 py-0.5 text-body-sm text-brand-bg"
+                    className="bg-white px-2 py-0.5 text-body-sm text-black"
                   >
                     {stem} ({Math.round(volume * 100)}%)
                   </span>
@@ -139,15 +139,15 @@ function ModifierBadge({ label, value, suffix }: ModifierBadgeProps) {
   const isNegative = value < 0;
 
   return (
-    <div className="flex items-center justify-between bg-brand-surface px-2 py-1 border border-brand-border/30">
-      <span className="text-brand-secondary">{label}</span>
+    <div className="flex items-center justify-between bg-[#0a0a0a] px-2 py-1 border border-[#1a1a1a]">
+      <span className="text-gray-500">{label}</span>
       <span
         className={
           isPositive
-            ? "text-brand-text font-medium"
+            ? "text-white font-medium"
             : isNegative
-            ? "text-status-error"
-            : "text-brand-secondary"
+            ? "text-red-400"
+            : "text-gray-500"
         }
       >
         {isPositive ? "+" : ""}
@@ -171,7 +171,7 @@ export function GameStateBadge({
   return (
     <button
       onClick={onClick}
-      className="bg-brand-text px-2 py-0.5 text-body-sm text-brand-bg hover:bg-brand-accent"
+      className="bg-white px-2 py-0.5 text-body-sm text-black hover:bg-[#66023C]"
     >
       {state}
     </button>

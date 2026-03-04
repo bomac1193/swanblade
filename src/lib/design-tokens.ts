@@ -4,7 +4,7 @@
  *
  * Aesthetic: Elegant precision (Swan + Blade)
  * - Tyrian Purple accent (#66023C)
- * - Fraunces for display, Inter for body
+ * - Canela for display, Sohne for body
  * - Sharp corners, no border-radius
  * - High contrast black/white base
  */
@@ -55,8 +55,8 @@ export const colors = {
 export const typography = {
   // Font families
   fonts: {
-    display: 'var(--font-fraunces), Georgia, serif',
-    body: 'var(--font-inter), "Helvetica Neue", Arial, sans-serif',
+    display: 'var(--font-canela), Georgia, serif',
+    body: 'var(--font-sohne), "Helvetica Neue", Arial, sans-serif',
     mono: 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace',
   },
 

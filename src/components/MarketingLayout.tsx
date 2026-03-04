@@ -36,16 +36,14 @@ export function MarketingLayout({ children }: MarketingLayoutProps) {
                     ? "text-white"
                     : "text-white/40 hover:text-white"
                 }`}
-                style={{ fontFamily: "Sohne, sans-serif" }}
+               
               >
                 {link.label}
               </Link>
             ))}
             <Link
               href="/apply"
-              className="border border-white/30 text-white px-5 py-2 text-xs uppercase tracking-widest hover:bg-white hover:text-black transition"
-              style={{ fontFamily: "Sohne, sans-serif" }}
-            >
+              className="border border-white/30 text-white px-5 py-2 text-xs uppercase tracking-widest hover:bg-white hover:text-black transition"            >
               Join
             </Link>
           </nav>
@@ -58,18 +56,16 @@ export function MarketingLayout({ children }: MarketingLayoutProps) {
       {/* Footer */}
       <footer className="border-t border-white/5 py-12 px-6">
         <div className="max-w-3xl mx-auto flex flex-col items-center gap-4">
-          <span className="text-xs text-white/30 uppercase tracking-widest" style={{ fontFamily: "Sohne, sans-serif" }}>
+          <span className="text-xs text-white/30 uppercase tracking-widest">
             Not for everyone
           </span>
           <div className="flex items-center gap-8">
-            <span className="text-xs text-white/20 uppercase tracking-widest" style={{ fontFamily: "Sohne, sans-serif" }}>
+            <span className="text-xs text-white/20 uppercase tracking-widest">
               &copy; {new Date().getFullYear()} Swanblade
             </span>
             <a
               href="mailto:studio@swanblade.com"
-              className="text-xs text-white/20 uppercase tracking-widest hover:text-white transition"
-              style={{ fontFamily: "Sohne, sans-serif" }}
-            >
+              className="text-xs text-white/20 uppercase tracking-widest hover:text-white transition"            >
               studio@swanblade.com
             </a>
           </div>

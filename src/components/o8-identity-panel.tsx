@@ -1,8 +1,6 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import type { O8Identity, SonicPalette } from "@/lib/o8/types";
 import { getO8Client, identityToPromptModifier } from "@/lib/o8/client";
@@ -17,7 +15,7 @@ function Skeleton({ className }: { className?: string }) {
   return (
     <div
       className={cn(
-        "animate-pulse bg-brand-border",
+        "animate-pulse bg-white/[0.04]",
         className
       )}
     />
@@ -27,7 +25,7 @@ function Skeleton({ className }: { className?: string }) {
 // Identity skeleton for loading state
 function IdentitySkeleton() {
   return (
-    <div className="px-4 py-3 border-b border-brand-border/30 last:border-b-0">
+    <div className="px-6 py-3.5 border-b border-white/[0.04] last:border-b-0">
       <div className="flex items-center justify-between">
         <div className="space-y-2">
           <Skeleton className="h-4 w-32" />
@@ -54,16 +52,19 @@ function SonicPaletteViz({ palette }: { palette: SonicPalette }) {
   ];
 
   return (
-    <div className="flex items-end gap-1 h-16">
+    <div className="flex items-end gap-1.5 h-16">
       {bands.map((band) => (
         <div key={band.key} className="flex flex-col items-center gap-1 flex-1">
-          <div className="w-full bg-brand-border relative" style={{ height: '48px' }}>
+          <div className="w-full bg-white/[0.04] relative" style={{ height: '48px' }}>
             <div
-              className="absolute bottom-0 w-full bg-[#66023C] transition-all"
-              style={{ height: `${band.value * 100}%` }}
+              className="absolute bottom-0 w-full transition-all"
+              style={{
+                height: `${band.value * 100}%`,
+                background: `linear-gradient(to top, #66023C, #66023C99)`,
+              }}
             />
           </div>
-          <span className="text-[9px] text-brand-secondary">{band.label}</span>
+          <span className="text-[9px] font-light text-gray-600 tracking-wider">{band.label}</span>
         </div>
       ))}
     </div>
@@ -93,9 +94,14 @@ export function O8IdentityPanel({ onIdentityChange, className }: O8IdentityPanel
     }
   }, []);
 
+  // Only fetch when user expands the panel
+  const [hasLoaded, setHasLoaded] = useState(false);
   useEffect(() => {
-    loadIdentities();
-  }, [loadIdentities]);
+    if (expanded && !hasLoaded) {
+      setHasLoaded(true);
+      loadIdentities();
+    }
+  }, [expanded, hasLoaded, loadIdentities]);
 
   // Handle identity selection
   const handleSelect = (identity: O8Identity) => {
@@ -111,36 +117,40 @@ export function O8IdentityPanel({ onIdentityChange, className }: O8IdentityPanel
   };
 
   return (
-    <div className={cn("border border-brand-border/30/30", className)}>
+    <div className={cn("group/panel", className)}>
       {/* Header */}
       <div
-        className="flex items-center justify-between px-4 py-3 cursor-pointer hover:bg-brand-bg transition-colors"
+        className="relative flex items-center justify-between px-6 py-4 cursor-pointer transition-colors duration-300"
         onClick={() => setExpanded(!expanded)}
       >
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 border border-brand-border/30 bg-brand-bg flex items-center justify-center">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="text-[#66023C]">
-              <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.5" />
-              <circle cx="12" cy="12" r="4" fill="currentColor" />
+        <div className={`absolute top-0 left-0 right-0 h-px transition-opacity duration-300 opacity-0 group-hover/panel:opacity-100`} style={{ background: "linear-gradient(90deg, transparent, rgba(102,2,60,0.3), transparent)" }} />
+        <div className="flex items-center gap-4">
+          <div className="relative w-9 h-9 border border-white/[0.06] bg-black flex items-center justify-center">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+              <circle cx="12" cy="12" r="9" stroke="#66023C" strokeWidth="1" opacity="0.4" />
+              <circle cx="12" cy="12" r="5" stroke="#66023C" strokeWidth="1" />
+              <circle cx="12" cy="12" r="2" fill="#66023C" />
             </svg>
           </div>
           <div>
-            <p className="text-body-sm text-brand-secondary">∞8 Identity</p>
+            <p className="text-sm font-light text-white tracking-wide" style={{ fontFamily: "var(--font-canela), Georgia, serif" }}>
+              ∞8 Identity
+            </p>
             {selectedIdentity ? (
-              <p className="text-body-sm font-medium text-brand-text">
+              <p className="text-body-sm font-light text-[#66023C] mt-0.5">
                 {selectedIdentity.creator.name}
               </p>
             ) : (
-              <p className="text-body-sm text-brand-secondary">No identity connected</p>
+              <p className="text-body-sm font-light text-gray-600 mt-0.5">Not connected</p>
             )}
           </div>
         </div>
         <svg
-          width="16"
-          height="16"
+          width="12"
+          height="12"
           viewBox="0 0 24 24"
           fill="none"
-          className={cn("text-brand-secondary transition-transform", expanded && "rotate-180")}
+          className={cn("text-gray-600 transition-transform duration-300", expanded && "rotate-180")}
         >
           <path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
         </svg>
@@ -148,7 +158,7 @@ export function O8IdentityPanel({ onIdentityChange, className }: O8IdentityPanel
 
       {/* Expanded Content */}
       {expanded && (
-        <div className="border-t border-brand-border/30">
+        <div className="border-t border-white/[0.06]">
           {loading ? (
             <div className="max-h-64 overflow-y-auto">
               <IdentitySkeleton />
@@ -156,67 +166,44 @@ export function O8IdentityPanel({ onIdentityChange, className }: O8IdentityPanel
               <IdentitySkeleton />
             </div>
           ) : error ? (
-            <div className="p-4">
-              <div className="flex items-start gap-3">
-                <div className="w-8 h-8 border border-status-error/30 bg-status-error/10 flex items-center justify-center flex-shrink-0">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="text-status-error">
-                    <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.5" />
-                    <path d="M12 7v6M12 16v1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                  </svg>
-                </div>
-                <div className="flex-1">
-                  <p className="text-body-sm font-medium text-status-error">Connection Failed</p>
-                  <p className="text-body-sm text-brand-secondary mt-1">
-                    {error === "Failed to connect to Starforge"
-                      ? "Starforge server is not responding. Check that it's running on localhost:3001."
-                      : error}
-                  </p>
-                  <div className="mt-3 flex gap-2">
-                    <Button variant="secondary" size="sm" onClick={loadIdentities}>
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" className="mr-1.5">
-                        <path d="M3 12a9 9 0 1 1 9 9M3 12V3m0 9h9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                      </svg>
-                      Retry
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setError(null)}
-                      className="text-brand-secondary"
-                    >
-                      Work Offline
-                    </Button>
-                  </div>
-                </div>
+            <div className="px-6 py-5">
+              <p className="text-body-sm font-light text-red-400/80">Connection Failed</p>
+              <p className="text-body-sm font-light text-gray-600 mt-1">
+                {error === "Failed to connect to Starforge"
+                  ? "Starforge is not responding."
+                  : error}
+              </p>
+              <div className="mt-4 flex gap-3">
+                <button
+                  onClick={loadIdentities}
+                  className="text-body-sm font-light text-white hover:text-gray-300 transition-colors"
+                >
+                  Retry
+                </button>
+                <button
+                  onClick={() => setError(null)}
+                  className="text-body-sm font-light text-gray-600 hover:text-white transition-colors"
+                >
+                  Work Offline
+                </button>
               </div>
             </div>
           ) : identities.length === 0 ? (
-            <div className="p-4">
-              <div className="flex items-start gap-3">
-                <div className="w-8 h-8 border border-brand-border/30 bg-brand-bg flex items-center justify-center flex-shrink-0">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="text-brand-secondary">
-                    <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.5" strokeDasharray="4 2" />
-                    <path d="M12 8v4M12 14v2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                  </svg>
-                </div>
-                <div className="flex-1">
-                  <p className="text-body-sm font-medium text-brand-text">No Identities Found</p>
-                  <p className="text-body-sm text-brand-secondary mt-1">
-                    Create a Sonic Identity in Starforge to personalize your sound generation.
-                  </p>
-                  <a
-                    href="http://localhost:3001"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 mt-3 text-body-sm text-[#66023C] hover:underline"
-                  >
-                    Open Starforge
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
-                      <path d="M7 17L17 7M17 7H7M17 7v10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                  </a>
-                </div>
-              </div>
+            <div className="px-6 py-5">
+              <p className="text-body-sm font-light text-gray-500">
+                Create a Sonic Identity in Starforge to personalize generation.
+              </p>
+              <a
+                href="http://localhost:3001"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 mt-3 text-body-sm font-light text-[#66023C] hover:text-[#8a0350] transition-colors"
+              >
+                Open Starforge
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none">
+                  <path d="M7 17L17 7M17 7H7M17 7v10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </a>
             </div>
           ) : (
             <div className="max-h-64 overflow-y-auto">
@@ -225,40 +212,31 @@ export function O8IdentityPanel({ onIdentityChange, className }: O8IdentityPanel
                   key={identity.identity_id}
                   onClick={() => handleSelect(identity)}
                   className={cn(
-                    "px-4 py-3 cursor-pointer border-b border-brand-border/30 last:border-b-0 transition-colors",
+                    "px-6 py-3.5 cursor-pointer border-b border-white/[0.04] last:border-b-0 transition-colors duration-200",
                     selectedIdentity?.identity_id === identity.identity_id
-                      ? "bg-[#66023C]/10"
-                      : "hover:bg-brand-bg"
+                      ? "bg-[#66023C]/8"
+                      : "hover:bg-white/[0.02]"
                   )}
                 >
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-body-sm font-medium text-brand-text">
+                      <p className="text-sm font-light text-white">
                         {identity.creator.name}
                       </p>
-                      <div className="flex gap-2 mt-1">
+                      <div className="flex gap-2 mt-1.5">
                         {identity.dna?.audio && (
-                          <Badge className="text-[9px]">Audio DNA</Badge>
+                          <span className="text-[9px] font-light text-gray-600 tracking-wider uppercase">Audio DNA</span>
                         )}
                         {identity.genome && (
-                          <Badge className="text-[9px]">Genome</Badge>
+                          <span className="text-[9px] font-light text-gray-600 tracking-wider uppercase">Genome</span>
                         )}
-                        <Badge className="text-[9px]">
+                        <span className="text-[9px] font-light text-gray-600 tracking-wider uppercase">
                           {identity.creator.verification_level}
-                        </Badge>
+                        </span>
                       </div>
                     </div>
                     {selectedIdentity?.identity_id === identity.identity_id && (
-                      <svg width="16" height="16" viewBox="0 0 24 24" className="text-[#66023C]">
-                        <path
-                          d="M5 12l5 5L20 7"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          fill="none"
-                        />
-                      </svg>
+                      <div className="w-1.5 h-1.5 rounded-full bg-[#66023C]" />
                     )}
                   </div>
                 </div>
@@ -270,26 +248,31 @@ export function O8IdentityPanel({ onIdentityChange, className }: O8IdentityPanel
 
       {/* Selected Identity Details */}
       {selectedIdentity && !expanded && selectedIdentity.dna?.audio && (
-        <div className="border-t border-brand-border/30 px-4 py-3">
-          <p className="text-body-sm text-brand-secondary mb-2">
+        <div className="border-t border-white/[0.06] px-6 py-4">
+          <p className="text-[10px] font-light text-gray-600 tracking-widest uppercase mb-3">
             Sonic Palette
           </p>
           <SonicPaletteViz palette={selectedIdentity.dna.audio.sonic_palette} />
 
           {selectedIdentity.dna.audio.influence_genealogy && (
-            <div className="mt-3 flex flex-wrap gap-1">
-              <Badge>{selectedIdentity.dna.audio.influence_genealogy.primary_genre}</Badge>
+            <div className="mt-4 flex flex-wrap gap-2">
+              <span className="text-body-sm font-light text-[#66023C]">
+                {selectedIdentity.dna.audio.influence_genealogy.primary_genre}
+              </span>
               {selectedIdentity.dna.audio.influence_genealogy.secondary_genres.slice(0, 2).map((g) => (
-                <Badge key={g} className="bg-brand-bg">{g}</Badge>
+                <span key={g} className="text-body-sm font-light text-gray-600">
+                  {g}
+                </span>
               ))}
             </div>
           )}
 
-          <div className="mt-3 flex gap-2">
-            <Button variant="ghost" size="sm" onClick={handleClear} className="flex-1">
-              Disconnect
-            </Button>
-          </div>
+          <button
+            onClick={handleClear}
+            className="mt-4 text-body-sm font-light text-gray-600 hover:text-white transition-colors duration-200"
+          >
+            Disconnect
+          </button>
         </div>
       )}
     </div>

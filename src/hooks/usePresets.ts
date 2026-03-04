@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback, useEffect } from "react";
+import { uuid } from "@/lib/utils";
 import type { SoundCategory, GameState } from "@/types";
 import type { SoundPalette } from "@/lib/soundPalette";
 import type { ProviderId } from "@/components/provider-selector";
@@ -89,7 +90,7 @@ export function usePresets() {
   const savePreset = useCallback((preset: Omit<GenerationPreset, "id" | "createdAt">) => {
     const newPreset: GenerationPreset = {
       ...preset,
-      id: crypto.randomUUID(),
+      id: uuid(),
       createdAt: new Date().toISOString(),
     };
 
@@ -127,7 +128,7 @@ export function usePresets() {
 
     const duplicate: GenerationPreset = {
       ...original,
-      id: crypto.randomUUID(),
+      id: uuid(),
       name: `${original.name} (Copy)`,
       createdAt: new Date().toISOString(),
     };

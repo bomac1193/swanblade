@@ -1,16 +1,37 @@
 import type { Metadata } from "next";
-import { Fraunces, Inter } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 
-const fraunces = Fraunces({
-  subsets: ["latin"],
-  variable: "--font-fraunces",
+const canela = localFont({
+  src: [
+    { path: "../../public/fonts/canela/Canela-Light.otf", weight: "300", style: "normal" },
+    { path: "../../public/fonts/canela/Canela-Regular.otf", weight: "400", style: "normal" },
+    { path: "../../public/fonts/canela/Canela-Medium.otf", weight: "500", style: "normal" },
+    { path: "../../public/fonts/canela/Canela-Bold.otf", weight: "700", style: "normal" },
+  ],
+  variable: "--font-canela",
   display: "swap",
 });
 
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-inter",
+const canelaText = localFont({
+  src: [
+    { path: "../../public/fonts/canela-text/CanelaText-Regular.otf", weight: "400", style: "normal" },
+    { path: "../../public/fonts/canela-text/CanelaText-Medium.otf", weight: "500", style: "normal" },
+    { path: "../../public/fonts/canela-text/CanelaText-Bold.otf", weight: "700", style: "normal" },
+  ],
+  variable: "--font-canela-text",
+  display: "swap",
+});
+
+const sohne = localFont({
+  src: [
+    { path: "../../public/fonts/sohne/Sohne-Light.otf", weight: "300", style: "normal" },
+    { path: "../../public/fonts/sohne/Sohne-Regular.otf", weight: "400", style: "normal" },
+    { path: "../../public/fonts/sohne/Sohne-Medium.otf", weight: "500", style: "normal" },
+    { path: "../../public/fonts/sohne/Sohne-Semibold.otf", weight: "600", style: "normal" },
+    { path: "../../public/fonts/sohne/Sohne-Bold.otf", weight: "700", style: "normal" },
+  ],
+  variable: "--font-sohne",
   display: "swap",
 });
 
@@ -51,11 +72,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${fraunces.variable} ${inter.variable}`} suppressHydrationWarning>
+    <html lang="en" className={`${canela.variable} ${canelaText.variable} ${sohne.variable}`} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
-      <body className="antialiased">
+      <body className={`${sohne.className} antialiased`}>
         {children}
       </body>
     </html>

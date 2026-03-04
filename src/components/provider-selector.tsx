@@ -175,16 +175,16 @@ export function ProviderSelector({
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between">
-        <label className="text-body-sm text-brand-secondary">Audio Engine</label>
+        <label className="text-body-sm text-gray-500">Audio Engine</label>
         <div className="flex items-center gap-2">
           {isAuto ? (
-            <span className="text-body-sm text-brand-text">Auto</span>
+            <span className="text-body-sm text-white">Auto</span>
           ) : (
             onResetAuto && (
               <button
                 type="button"
                 onClick={onResetAuto}
-                className="text-body-sm text-brand-secondary hover:text-brand-text transition"
+                className="text-body-sm text-gray-500 hover:text-white transition"
               >
                 Auto-pick
               </button>
@@ -193,7 +193,7 @@ export function ProviderSelector({
           {computedRecommendation && computedRecommendation !== value && recommendedProvider && (
             <button
               onClick={() => onChange(computedRecommendation)}
-              className="text-label text-brand-text hover:underline transition"
+              className="text-caption text-white hover:underline transition"
             >
               Use {recommendedProvider.name}
             </button>
@@ -204,7 +204,7 @@ export function ProviderSelector({
       <select
         value={value}
         onChange={(e) => onChange(e.target.value as ProviderId)}
-        className="w-full border border-brand-border/30 bg-brand-bg px-3 py-2 text-body text-brand-text hover:border-brand-text focus:border-brand-text focus:outline-none"
+        className="w-full border border-[#1a1a1a] bg-black px-3 py-2 text-body text-white hover:border-white focus:border-white focus:outline-none"
       >
         {PROVIDERS.filter((p) => p.available).map((provider) => {
           const isRecommended = provider.id === computedRecommendation;
@@ -218,7 +218,7 @@ export function ProviderSelector({
       </select>
 
       {selectedProvider && (
-        <div className="text-body-sm text-brand-secondary">
+        <div className="text-body-sm text-gray-500">
           {selectedProvider.description}
         </div>
       )}

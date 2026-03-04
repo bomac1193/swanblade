@@ -106,14 +106,14 @@ export function StemExportPanel({
   const enabledCount = stems.filter((s) => s.enabled).length;
 
   return (
-    <div className={cn("border border-brand-border/30 bg-brand-surface", className)}>
+    <div className={cn("border border-[#1a1a1a] bg-[#0a0a0a]", className)}>
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-brand-border/30">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-[#1a1a1a]">
         <div>
-          <p className="text-label uppercase tracking-wider text-brand-secondary">
+          <p className="text-sm text-gray-400">
             Export to Burn the Square
           </p>
-          <p className="text-body-sm text-brand-text font-medium">{soundName}</p>
+          <p className="text-body-sm text-white font-medium">{soundName}</p>
         </div>
         <Badge className="bg-[#66023C] text-white border-0">
           {enabledCount} stems
@@ -121,8 +121,8 @@ export function StemExportPanel({
       </div>
 
       {/* Stem Selection */}
-      <div className="p-4 border-b border-brand-border/30">
-        <p className="text-label uppercase tracking-wider text-brand-secondary mb-3">
+      <div className="p-4 border-b border-[#1a1a1a]">
+        <p className="text-sm text-gray-400 mb-3">
           Stem Layers
         </p>
         <div className="grid grid-cols-2 gap-2">
@@ -137,14 +137,14 @@ export function StemExportPanel({
                 className={cn(
                   "flex items-center gap-2 px-3 py-2 border transition-colors text-left",
                   isEnabled
-                    ? "border-[#66023C] bg-[#66023C]/10 text-brand-text"
-                    : "border-brand-border/30 text-brand-secondary hover:border-brand-text"
+                    ? "border-[#66023C] bg-[#66023C]/10 text-white"
+                    : "border-[#1a1a1a] text-gray-500 hover:border-white"
                 )}
               >
                 <div
                   className={cn(
                     "w-3 h-3 border",
-                    isEnabled ? "bg-[#66023C] border-[#66023C]" : "border-brand-border/30"
+                    isEnabled ? "bg-[#66023C] border-[#66023C]" : "border-[#1a1a1a]"
                   )}
                 />
                 <div>
@@ -157,8 +157,8 @@ export function StemExportPanel({
       </div>
 
       {/* Game State Target */}
-      <div className="p-4 border-b border-brand-border/30">
-        <p className="text-label uppercase tracking-wider text-brand-secondary mb-3">
+      <div className="p-4 border-b border-[#1a1a1a]">
+        <p className="text-sm text-gray-400 mb-3">
           Primary Game State
         </p>
         <div className="flex flex-wrap gap-2">
@@ -167,10 +167,10 @@ export function StemExportPanel({
               key={state}
               onClick={() => setTargetState(state)}
               className={cn(
-                "px-3 py-1.5 border text-body-sm uppercase tracking-wider transition-colors",
+                "px-3 py-1.5 border text-sm transition-colors",
                 targetState === state
                   ? "border-[#66023C] bg-[#66023C] text-white"
-                  : "border-brand-border/30 text-brand-secondary hover:border-brand-text"
+                  : "border-[#1a1a1a] text-gray-500 hover:border-white"
               )}
             >
               {state}
@@ -180,8 +180,8 @@ export function StemExportPanel({
       </div>
 
       {/* Format Selection */}
-      <div className="p-4 border-b border-brand-border/30">
-        <p className="text-label uppercase tracking-wider text-brand-secondary mb-3">
+      <div className="p-4 border-b border-[#1a1a1a]">
+        <p className="text-sm text-gray-400 mb-3">
           Format
         </p>
         <div className="flex gap-2">
@@ -190,10 +190,10 @@ export function StemExportPanel({
               key={f}
               onClick={() => setFormat(f)}
               className={cn(
-                "px-4 py-2 border text-body-sm uppercase tracking-wider transition-colors",
+                "px-4 py-2 border text-sm transition-colors",
                 format === f
-                  ? "border-brand-text bg-brand-text text-brand-bg"
-                  : "border-brand-border/30 text-brand-secondary hover:border-brand-text"
+                  ? "border-white bg-white text-black"
+                  : "border-[#1a1a1a] text-gray-500 hover:border-white"
               )}
             >
               {f}
@@ -257,7 +257,7 @@ export function StemExportPanel({
           </Button>
         )}
 
-        <p className="text-body-sm text-brand-secondary text-center mt-2">
+        <p className="text-body-sm text-gray-500 text-center mt-2">
           Stems will be available in your Burn the Square project
         </p>
       </div>

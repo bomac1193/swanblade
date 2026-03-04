@@ -46,18 +46,18 @@ export function SoundParametersPanel({ value, onChange }: SoundParametersPanelPr
   };
 
   return (
-    <div className="flex h-full flex-col gap-6 border border-brand-border/30 bg-brand-surface p-6">
+    <div className="flex h-full flex-col gap-6 border border-[#1a1a1a] bg-[#0a0a0a] p-6">
       <div>
-        <p className="text-label uppercase tracking-wider text-brand-secondary">Sound Parameters</p>
-        <h3 className="mt-2 font-display text-display-md text-brand-text">Designer Controls</h3>
+        <p className="text-sm text-gray-400">Sound Parameters</p>
+        <h3 className="mt-2 font-display text-display-md text-white">Designer Controls</h3>
       </div>
 
       <div className="space-y-4">
-        <label className="text-label uppercase tracking-wider text-brand-secondary">Type</label>
+        <label className="text-sm text-gray-400">Type</label>
         <select
           value={value.type}
           onChange={(event) => onChange("type", event.target.value as SoundCategory)}
-          className="w-full border border-brand-border/30 bg-brand-bg px-4 py-3 text-body text-brand-text"
+          className="w-full border border-[#1a1a1a] bg-black px-4 py-3 text-body text-white"
         >
           {SOUND_TYPES.map((type) => (
             <option key={type} value={type}>
@@ -103,7 +103,7 @@ export function SoundParametersPanel({ value, onChange }: SoundParametersPanelPr
       </div>
 
       <div>
-        <p className="text-label uppercase tracking-wider text-brand-secondary">Mood Tags</p>
+        <p className="text-sm text-gray-400">Mood Tags</p>
         <div className="mt-3 flex flex-wrap gap-2">
           {MOOD_TAGS.map((tag) => (
             <MoodTagPill key={tag} active={value.moodTags.includes(tag)} onClick={() => toggleMood(tag)}>
@@ -114,7 +114,7 @@ export function SoundParametersPanel({ value, onChange }: SoundParametersPanelPr
       </div>
 
       <div>
-        <p className="text-label uppercase tracking-wider text-brand-secondary">Length</p>
+        <p className="text-sm text-gray-400">Length</p>
         <div className="mt-3 grid grid-cols-5 gap-2">
           {LENGTH_OPTIONS.map((seconds) => (
             <button
@@ -122,8 +122,8 @@ export function SoundParametersPanel({ value, onChange }: SoundParametersPanelPr
               type="button"
               onClick={() => onChange("lengthSeconds", seconds)}
               className={cn(
-                "border border-brand-border/30 py-2 text-label uppercase tracking-wider text-brand-secondary transition",
-                value.lengthSeconds === seconds && "border-brand-text bg-brand-text text-brand-bg",
+                "border border-[#1a1a1a] py-2 text-sm text-gray-400 transition",
+                value.lengthSeconds === seconds && "border-white bg-white text-black",
               )}
             >
               {seconds}s
@@ -136,17 +136,17 @@ export function SoundParametersPanel({ value, onChange }: SoundParametersPanelPr
         <button
           type="button"
           onClick={() => setAdvancedOpen((prev) => !prev)}
-          className="flex w-full items-center justify-between border border-brand-border/30 px-4 py-3 text-body text-brand-secondary"
+          className="flex w-full items-center justify-between border border-[#1a1a1a] px-4 py-3 text-body text-gray-500"
         >
           Advanced Parameters
-          <span className="text-label uppercase tracking-wider text-brand-secondary">{advancedOpen ? "Hide" : "Show"}</span>
+          <span className="text-sm text-gray-400">{advancedOpen ? "Hide" : "Show"}</span>
         </button>
 
         {advancedOpen && (
-          <div className="space-y-3 border border-brand-border/30 p-4">
+          <div className="space-y-3 border border-[#1a1a1a] p-4">
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <p className="text-label uppercase tracking-wider text-brand-secondary">BPM</p>
+                <p className="text-sm text-gray-400">BPM</p>
                 <Input
                   type="number"
                   value={value.bpm ?? ""}
@@ -160,11 +160,11 @@ export function SoundParametersPanel({ value, onChange }: SoundParametersPanelPr
                 />
               </div>
               <div>
-                <p className="text-label uppercase tracking-wider text-brand-secondary">Key</p>
+                <p className="text-sm text-gray-400">Key</p>
                 <select
                   value={value.key ?? ""}
                   onChange={(event) => onChange("key", event.target.value || undefined)}
-                  className="w-full border border-brand-border/30 bg-brand-bg px-4 py-3 text-body text-brand-text"
+                  className="w-full border border-[#1a1a1a] bg-black px-4 py-3 text-body text-white"
                 >
                   <option value="">—</option>
                   {KEY_OPTIONS.map((key) => (
@@ -176,7 +176,7 @@ export function SoundParametersPanel({ value, onChange }: SoundParametersPanelPr
               </div>
             </div>
             <div>
-              <p className="text-label uppercase tracking-wider text-brand-secondary">Seed</p>
+              <p className="text-sm text-gray-400">Seed</p>
               <Input
                 type="number"
                 value={value.seed ?? ""}

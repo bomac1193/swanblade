@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback, useEffect } from "react";
+import { uuid } from "@/lib/utils";
 import type { SoundGeneration } from "@/types";
 
 const STORAGE_KEY = "swanblade-generation-history";
@@ -49,7 +50,7 @@ export function useGenerationHistory() {
     if (sound.status !== "ready" || !sound.audioUrl) return;
 
     const entry: GenerationHistoryEntry = {
-      id: crypto.randomUUID(),
+      id: uuid(),
       sound,
       timestamp: new Date().toISOString(),
     };

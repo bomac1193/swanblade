@@ -36,28 +36,28 @@ export function Frame2147241533({ className, children }: Frame2147241533Props) {
             <Link
               href="/features"
               className="text-white/40 hover:text-white text-xs uppercase tracking-widest transition"
-              style={{ fontFamily: "Sohne, sans-serif" }}
+             
             >
               Features
             </Link>
             <Link
               href="/pricing"
               className="text-white/40 hover:text-white text-xs uppercase tracking-widest transition"
-              style={{ fontFamily: "Sohne, sans-serif" }}
+             
             >
               Pricing
             </Link>
             <Link
               href="/about"
               className="text-white/40 hover:text-white text-xs uppercase tracking-widest transition"
-              style={{ fontFamily: "Sohne, sans-serif" }}
+             
             >
               About
             </Link>
             <Link
               href="/apply"
               className="border border-white/30 text-white px-5 py-2 text-xs uppercase tracking-widest hover:bg-white hover:text-black transition"
-              style={{ fontFamily: "Sohne, sans-serif" }}
+             
             >
               Join
             </Link>
@@ -80,7 +80,7 @@ export function Frame2147241533({ className, children }: Frame2147241533Props) {
           <Link
             href="/apply"
             className="inline-block border border-white/30 text-white px-8 py-4 text-xs uppercase tracking-widest hover:bg-white hover:text-black transition"
-            style={{ fontFamily: "Sohne, sans-serif" }}
+           
           >
             Apply
           </Link>
@@ -92,7 +92,7 @@ export function Frame2147241533({ className, children }: Frame2147241533Props) {
       <footer className="pointer-events-auto px-8 py-6">
         <p
           className="text-center text-xs text-white/20 uppercase tracking-widest"
-          style={{ fontFamily: "Sohne, sans-serif" }}
+         
         >
           Not for everyone
         </p>

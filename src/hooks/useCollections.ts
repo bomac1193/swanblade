@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback, useEffect } from "react";
+import { uuid } from "@/lib/utils";
 
 const STORAGE_KEY = "swanblade-collections";
 
@@ -52,7 +53,7 @@ export function useCollections() {
   // Create collection
   const createCollection = useCallback((name: string) => {
     const newCollection: Collection = {
-      id: crypto.randomUUID(),
+      id: uuid(),
       name,
       color: COLORS[Math.floor(Math.random() * COLORS.length)],
       soundIds: [],

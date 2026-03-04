@@ -25,32 +25,36 @@ const config: Config = {
         'status-pending': 'var(--brand-secondary)',
       },
       fontFamily: {
-        // PRIMARY HEADINGS (H1-H3): Presence, naming, orientation
-        display: ['Fraunces', 'Georgia', 'Times New Roman', 'serif'],
-        // SECONDARY HEADINGS & BODY: Structural, operational, clear
-        sans: ['Sohne', 'Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif'],
-        ui: ['Sohne', 'Inter', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+        sans: ['Sohne', 'Helvetica Neue', 'Helvetica', 'Arial', 'sans-serif'],
+        display: ['Sohne', 'Helvetica Neue', 'Helvetica', 'Arial', 'sans-serif'],
+        mono: ['SF Mono', 'Monaco', 'Inconsolata', 'Fira Mono', 'monospace'],
       },
       fontSize: {
-        // H1-H3: Canela (announces, never explains)
-        'display-xl': ['48px', { lineHeight: '56px', fontWeight: '500' }],
-        'display-lg': ['32px', { lineHeight: '40px', fontWeight: '500' }],
-        'display-md': ['24px', { lineHeight: '32px', fontWeight: '400' }],
-
-        // H4-H6: Söhne (structural labels)
-        'heading-lg': ['20px', { lineHeight: '28px', fontWeight: '600' }],
-        'heading': ['18px', { lineHeight: '26px', fontWeight: '500' }],
-        'heading-sm': ['16px', { lineHeight: '24px', fontWeight: '500' }],
-
-        // Body & UI: Söhne Buch
-        'body-lg': ['16px', { lineHeight: '24px', fontWeight: '400' }],
-        'body': ['14px', { lineHeight: '20px', fontWeight: '400' }],
-        'body-sm': ['12px', { lineHeight: '18px', fontWeight: '400' }],
-        'label': ['11px', { lineHeight: '16px', fontWeight: '500', letterSpacing: '0.05em' }],
+        // Imprint brutal scale
+        'display-xl': ['8rem', { lineHeight: '0.85', letterSpacing: '-0.04em' }],
+        'display-lg': ['5rem', { lineHeight: '0.9', letterSpacing: '-0.03em' }],
+        'display-md': ['3rem', { lineHeight: '0.95', letterSpacing: '-0.02em' }],
+        'display-sm': ['2rem', { lineHeight: '1', letterSpacing: '-0.01em' }],
+        'body-lg': ['1.25rem', { lineHeight: '1.5' }],
+        'body': ['1rem', { lineHeight: '1.5' }],
+        'body-sm': ['0.875rem', { lineHeight: '1.5' }],
+        'caption': ['0.75rem', { lineHeight: '1.4', letterSpacing: '0.02em' }],
+        'overline': ['0.625rem', { lineHeight: '1.2', letterSpacing: '0.1em' }],
+      },
+      fontWeight: {
+        light: '300',
+        normal: '400',
+        medium: '500',
+        bold: '700',
+        black: '900',
       },
       letterSpacing: {
-        'wider': '0.05em',
-        'widest': '0.1em',
+        tighter: '-0.04em',
+        tight: '-0.02em',
+        normal: '0',
+        wide: '0.02em',
+        wider: '0.05em',
+        widest: '0.1em',
       },
       maxWidth: {
         'container': '1200px',

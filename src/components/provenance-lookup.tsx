@@ -52,9 +52,9 @@ export function ProvenanceLookup({ className, onResult }: ProvenanceLookupProps)
   };
 
   return (
-    <div className={cn("border border-brand-border/30 bg-brand-surface", className)}>
-      <div className="px-4 py-3 border-b border-brand-border/30">
-        <p className="text-label uppercase tracking-wider text-brand-secondary">
+    <div className={cn("border border-[#1a1a1a] bg-[#0a0a0a]", className)}>
+      <div className="px-4 py-3 border-b border-[#1a1a1a]">
+        <p className="text-sm font-medium text-gray-400">
           Verify Provenance
         </p>
       </div>
@@ -67,7 +67,7 @@ export function ProvenanceLookup({ className, onResult }: ProvenanceLookupProps)
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleLookup()}
             placeholder="Enter CID or audio fingerprint..."
-            className="flex-1 px-3 py-2 border border-brand-border/30 bg-brand-bg text-body text-brand-text placeholder:text-brand-secondary focus:outline-none focus:border-brand-text"
+            className="flex-1 px-3 py-2 border border-[#1a1a1a] bg-black text-body text-white placeholder:text-gray-500 focus:outline-none focus:border-white"
             disabled={loading}
           />
           <Button
@@ -92,14 +92,14 @@ export function ProvenanceLookup({ className, onResult }: ProvenanceLookupProps)
         {searched && (
           <div className="mt-4">
             {error ? (
-              <div className="flex items-start gap-3 p-3 bg-status-error/5 border border-status-error/20">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="text-status-error flex-shrink-0 mt-0.5">
+              <div className="flex items-start gap-3 p-3 bg-red-400/5 border border-red-400/20">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="text-red-400 flex-shrink-0 mt-0.5">
                   <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.5" />
                   <path d="M12 7v6M12 16v1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
                 </svg>
                 <div>
-                  <p className="text-body-sm text-status-error font-medium">Not Verified</p>
-                  <p className="text-body-sm text-brand-secondary mt-1">{error}</p>
+                  <p className="text-body-sm text-red-400 font-medium">Not Verified</p>
+                  <p className="text-body-sm text-gray-500 mt-1">{error}</p>
                 </div>
               </div>
             ) : result ? (
@@ -112,36 +112,36 @@ export function ProvenanceLookup({ className, onResult }: ProvenanceLookupProps)
                   <span className="text-body font-medium">∞8 Verified</span>
                 </div>
 
-                <div className="border border-brand-border/30 divide-y divide-brand-border">
+                <div className="border border-[#1a1a1a] divide-y divide-[#1a1a1a]">
                   <div className="flex justify-between px-3 py-2">
-                    <span className="text-body-sm text-brand-secondary">Identity</span>
-                    <span className="text-body-sm text-brand-text font-mono">
+                    <span className="text-body-sm text-gray-500">Identity</span>
+                    <span className="text-body-sm text-white font-mono">
                       {result.identity_id.slice(0, 16)}...
                     </span>
                   </div>
                   <div className="flex justify-between px-3 py-2">
-                    <span className="text-body-sm text-brand-secondary">Fingerprint</span>
-                    <span className="text-body-sm text-brand-text font-mono">
+                    <span className="text-body-sm text-gray-500">Fingerprint</span>
+                    <span className="text-body-sm text-white font-mono">
                       {result.fingerprint.slice(0, 16)}...
                     </span>
                   </div>
                   <div className="flex justify-between px-3 py-2">
-                    <span className="text-body-sm text-brand-secondary">Timestamp</span>
-                    <span className="text-body-sm text-brand-text">
+                    <span className="text-body-sm text-gray-500">Timestamp</span>
+                    <span className="text-body-sm text-white">
                       {new Date(result.timestamp).toLocaleString()}
                     </span>
                   </div>
                   {result.generation_context && (
                     <>
                       <div className="flex justify-between px-3 py-2">
-                        <span className="text-body-sm text-brand-secondary">Provider</span>
-                        <span className="text-body-sm text-brand-text">
+                        <span className="text-body-sm text-gray-500">Provider</span>
+                        <span className="text-body-sm text-white">
                           {result.generation_context.provider}
                         </span>
                       </div>
                       <div className="px-3 py-2">
-                        <span className="text-body-sm text-brand-secondary block mb-1">Prompt</span>
-                        <p className="text-body-sm text-brand-text">
+                        <span className="text-body-sm text-gray-500 block mb-1">Prompt</span>
+                        <p className="text-body-sm text-white">
                           {result.generation_context.prompt}
                         </p>
                       </div>
@@ -151,7 +151,7 @@ export function ProvenanceLookup({ className, onResult }: ProvenanceLookupProps)
 
                 <button
                   onClick={handleClear}
-                  className="text-body-sm text-brand-secondary hover:text-brand-text"
+                  className="text-body-sm text-gray-500 hover:text-white"
                 >
                   Clear
                 </button>

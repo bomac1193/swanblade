@@ -4,15 +4,15 @@ interface TopBarProps {
 
 export function TopBar({ activeProvider }: TopBarProps) {
   return (
-    <div className="flex flex-wrap items-center justify-between gap-4 border border-brand-border/30 bg-brand-surface px-6 py-4">
+    <div className="flex flex-wrap items-center justify-between gap-4 border border-[#1a1a1a] bg-[#0a0a0a] px-6 py-4">
       <div>
-        <p className="text-label uppercase tracking-wider text-brand-secondary">Swanblade</p>
-        <p className="text-heading-lg text-brand-text">Sound Design Lab</p>
-        <p className="text-body-sm text-brand-secondary">Prompt-driven audio generation with game-state awareness.</p>
+        <p className="text-overline uppercase tracking-widest text-gray-500">Swanblade</p>
+        <p className="text-body-lg font-medium text-white">Sound Design Lab</p>
+        <p className="text-body-sm font-light text-gray-500">Prompt-driven audio generation with game-state awareness.</p>
       </div>
       <div className="text-right">
-        <p className="text-label uppercase tracking-wider text-brand-secondary">Provider</p>
-        <p className="text-body font-medium text-brand-text">{activeProvider}</p>
+        <p className="text-caption uppercase tracking-wider text-gray-500">Provider</p>
+        <p className="text-body font-medium text-white">{activeProvider}</p>
       </div>
     </div>
   );
