@@ -150,6 +150,7 @@ interface ProviderSelectorProps {
   onResetAuto?: () => void;
   durationSeconds?: number;
   hasReferences?: boolean;
+  sculptActive?: boolean;
 }
 
 export function ProviderSelector({
@@ -160,7 +161,8 @@ export function ProviderSelector({
   isAuto = false,
   onResetAuto,
   durationSeconds,
-  hasReferences = false
+  hasReferences = false,
+  sculptActive = false,
 }: ProviderSelectorProps) {
   const computedRecommendation = useMemo<ProviderId | null>(() => {
     if (typeof recommendation !== "undefined") {
@@ -169,59 +171,65 @@ export function ProviderSelector({
     return recommendProvider(prompt, hasReferences, durationSeconds);
   }, [prompt, recommendation, hasReferences, durationSeconds]);
 
-  const selectedProvider = PROVIDERS.find((p) => p.id === value);
-  const recommendedProvider = PROVIDERS.find((p) => p.id === computedRecommendation);
+  const availableProviders = PROVIDERS.filter((p) => p.available);
 
   return (
-    <div className="space-y-2">
-      <div className="flex items-center justify-between">
-        <label className="text-body-sm text-gray-500">Audio Engine</label>
-        <div className="flex items-center gap-2">
-          {isAuto ? (
-            <span className="text-body-sm text-white">Auto</span>
-          ) : (
-            onResetAuto && (
-              <button
-                type="button"
-                onClick={onResetAuto}
-                className="text-body-sm text-gray-500 hover:text-white transition"
-              >
-                Auto-pick
-              </button>
-            )
-          )}
-          {computedRecommendation && computedRecommendation !== value && recommendedProvider && (
-            <button
-              onClick={() => onChange(computedRecommendation)}
-              className="text-caption text-white hover:underline transition"
-            >
-              Use {recommendedProvider.name}
-            </button>
-          )}
-        </div>
+    <div className={sculptActive ? "opacity-40 pointer-events-none" : ""}>
+      <div className="flex items-center justify-between mb-2">
+        <p className="text-[11px] text-gray-500">
+          {sculptActive ? "Engine — managed by Sculpt" : "Engine"}
+        </p>
+        {!sculptActive && (
+          <div className="flex items-center gap-2">
+            {isAuto ? (
+              <span className="text-[10px] text-gray-500">auto</span>
+            ) : (
+              onResetAuto && (
+                <button
+                  type="button"
+                  onClick={onResetAuto}
+                  className="text-[10px] text-gray-600 hover:text-gray-400 transition-colors"
+                >
+                  reset
+                </button>
+              )
+            )}
+          </div>
+        )}
       </div>
 
-      <select
-        value={value}
-        onChange={(e) => onChange(e.target.value as ProviderId)}
-        className="w-full border border-[#1a1a1a] bg-black px-3 py-2 text-body text-white hover:border-white focus:border-white focus:outline-none"
-      >
-        {PROVIDERS.filter((p) => p.available).map((provider) => {
+      <div className="grid grid-cols-3 gap-1.5">
+        {availableProviders.map((provider) => {
+          const isSelected = provider.id === value;
           const isRecommended = provider.id === computedRecommendation;
+
           return (
-            <option key={provider.id} value={provider.id}>
-              {provider.name} — {provider.strengths.slice(0, 2).join(", ")}
-              {isRecommended ? " (Recommended)" : ""}
-            </option>
+            <button
+              key={provider.id}
+              onClick={() => onChange(provider.id)}
+              className={`relative px-2 py-2 text-left border transition-colors duration-150 ${
+                isSelected
+                  ? "border-white/20 bg-white/[0.06]"
+                  : "border-white/[0.04] hover:border-white/[0.10]"
+              }`}
+            >
+              {isRecommended && !isSelected && (
+                <span className="absolute top-1 right-1.5 w-1 h-1 rounded-full bg-white/40" />
+              )}
+              <p className={`text-[11px] font-medium leading-tight ${
+                isSelected ? "text-white" : "text-gray-500"
+              }`}>
+                {provider.name}
+              </p>
+              <p className={`text-[9px] leading-tight mt-0.5 ${
+                isSelected ? "text-gray-400" : "text-gray-600"
+              }`}>
+                {provider.strengths[0]}
+              </p>
+            </button>
           );
         })}
-      </select>
-
-      {selectedProvider && (
-        <div className="text-body-sm text-gray-500">
-          {selectedProvider.description}
-        </div>
-      )}
+      </div>
     </div>
   );
 }

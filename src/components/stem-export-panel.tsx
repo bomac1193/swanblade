@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+
+
 import { cn } from "@/lib/utils";
 import type { StemType } from "@/lib/o8/types";
 
@@ -115,9 +115,9 @@ export function StemExportPanel({
           </p>
           <p className="text-body-sm text-white font-medium">{soundName}</p>
         </div>
-        <Badge className="bg-[#66023C] text-white border-0">
+        <span className="text-[10px] text-[#66023C]">
           {enabledCount} stems
-        </Badge>
+        </span>
       </div>
 
       {/* Stem Selection */}
@@ -147,9 +147,7 @@ export function StemExportPanel({
                     isEnabled ? "bg-[#66023C] border-[#66023C]" : "border-[#1a1a1a]"
                   )}
                 />
-                <div>
-                  <p className="text-body-sm font-medium">{stemType.label}</p>
-                </div>
+                <p className="text-[11px]">{stemType.label}</p>
               </button>
             );
           })}
@@ -234,27 +232,13 @@ export function StemExportPanel({
             </a>
           </div>
         ) : (
-          <Button
+          <button
             onClick={handleExport}
             disabled={!audioUrl || exporting || enabledCount === 0}
-            className="w-full bg-[#66023C] hover:bg-[#520230] text-white border-0"
+            className="w-full py-2.5 bg-[#66023C] hover:bg-[#520230] text-white text-[11px] font-medium transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
           >
-            {exporting ? (
-              <span className="flex items-center gap-2">
-                <svg width="16" height="16" viewBox="0 0 24 24" className="animate-spin">
-                  <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" strokeDasharray="40 20" fill="none" />
-                </svg>
-                Separating Stems...
-              </span>
-            ) : (
-              <span className="flex items-center gap-2">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                  <path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                </svg>
-                Export {enabledCount} Stems
-              </span>
-            )}
-          </Button>
+            {exporting ? "Separating..." : `Export ${enabledCount} stems`}
+          </button>
         )}
 
         <p className="text-body-sm text-gray-500 text-center mt-2">

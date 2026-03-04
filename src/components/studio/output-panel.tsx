@@ -1,6 +1,5 @@
 "use client";
 
-import { WaveformPlaceholder } from "@/components/waveform-placeholder";
 import { AudioPlayerControls } from "@/components/audio-player-controls";
 import { ProvenanceBadge, ProvenanceStampButton } from "@/components/provenance-badge";
 import { StemExportPanel } from "@/components/stem-export-panel";
@@ -8,6 +7,7 @@ import { HistoryControls, GenerationHistory } from "@/components/generation-hist
 import type { SoundGeneration } from "@/types";
 import type { ProviderId } from "@/components/provider-selector";
 import type { O8Identity, O8Provenance } from "@/lib/o8/types";
+import type { GenerationHistoryEntry } from "@/hooks/useGenerationHistory";
 
 export function OutputPanel({
   currentSound,
@@ -41,7 +41,7 @@ export function OutputPanel({
   canRedo: boolean;
   onUndo: () => void;
   onRedo: () => void;
-  history: SoundGeneration[];
+  history: GenerationHistoryEntry[];
   historyIndex: number;
   onHistorySelect: (index: number) => void;
   onClearHistory: () => void;
@@ -61,30 +61,17 @@ export function OutputPanel({
 
         {currentSound ? (
           <div className="mt-4">
-            <div className="border-b border-white/[0.06] pb-4">
-              <p className="text-sm font-medium text-gray-400">{currentSound.status}</p>
-              <h3
-                className="mt-2 text-2xl font-medium text-white"
-                style={{ fontFamily: "var(--font-canela), Georgia, serif" }}
-              >
-                {currentSound.name}
-              </h3>
-              <p className="mt-2 text-sm font-light text-gray-500">{currentSound.prompt}</p>
-
+            <div className="border-b border-white/[0.06] pb-3">
+              <div className="flex items-center justify-between">
+                <p className="text-xs text-white truncate max-w-[240px]">{currentSound.name}</p>
+                <p className="text-[10px] text-gray-600 capitalize">{currentSound.status}</p>
+              </div>
+              <p className="mt-1 text-[11px] text-gray-500 line-clamp-2">{currentSound.prompt}</p>
               {currentSound.provenanceCid && (
-                <div className="mt-2">
-                  <span className="border border-white/[0.06] px-2 py-1 text-body-sm">
-                    Provenance: {currentSound.provenanceCid.slice(0, 16)}...
-                  </span>
-                </div>
+                <p className="mt-1.5 text-[10px] text-gray-600 font-mono truncate">
+                  {currentSound.provenanceCid.slice(0, 24)}...
+                </p>
               )}
-            </div>
-
-            <div className="mt-4">
-              <WaveformPlaceholder
-                isActive={currentSound.status === "ready"}
-                isLoading={currentSound.status === "pending"}
-              />
             </div>
 
             {currentSound.status === "error" ? (

@@ -20,8 +20,12 @@ import { useTheme } from "@/hooks/useTheme";
 import { useGenerationHistory } from "@/hooks/useGenerationHistory";
 import { usePresets } from "@/hooks/usePresets";
 import { PresetsPanel } from "@/components/presets-panel";
+import { ProfileDropdown } from "@/components/studio/profile-dropdown";
+import { TrainingPanel } from "@/components/studio/training-panel";
+import { LoraSelector, type LoraSelection } from "@/components/studio/lora-selector";
+import { RemixPanel, type RemixFile, type RemixEngineId } from "@/components/studio/remix-panel";
 
-type AppMode = "generate" | "game-audio" | "library";
+type AppMode = "generate" | "game-audio" | "library" | "training";
 
 const DEFAULT_PARAMETERS = {
   type: "FX" as SoundCategory,
@@ -50,6 +54,14 @@ export default function Home() {
   const [providerPinned, setProviderPinned] = useState(false);
   const [referenceClips, setReferenceClips] = useState<ReferenceClip[]>([]);
   const [dataProtected, setDataProtected] = useState(true);
+  const [selectedLora, setSelectedLora] = useState<LoraSelection | null>(null);
+  const [remixFile, setRemixFile] = useState<RemixFile | null>(null);
+  const [remixStrength, setRemixStrength] = useState(0.5);
+  const [remixEngine, setRemixEngine] = useState<RemixEngineId>("stable-audio");
+  const [vampnetPeriodicPrompt, setVampnetPeriodicPrompt] = useState(7);
+  const [vampnetOnsetMaskWidth, setVampnetOnsetMaskWidth] = useState(0);
+  const [vampnetTemperature, setVampnetTemperature] = useState(1.0);
+  const [vampnetFeedbackSteps, setVampnetFeedbackSteps] = useState(1);
 
   // Blue Ocean state
   const [selectedPalette, setSelectedPalette] = useState<SoundPalette | null>(null);
@@ -160,6 +172,13 @@ export default function Home() {
     setSelectedProvider(provider);
   }, []);
 
+  // Auto-switch sculpt engine to Diffusion when a LoRA is selected (LoRAs are incompatible with VampNet)
+  useEffect(() => {
+    if (selectedLora && remixFile && remixEngine === "vampnet") {
+      setRemixEngine("stable-audio");
+    }
+  }, [selectedLora, remixFile, remixEngine]);
+
   const resetProviderToAuto = useCallback(() => {
     setProviderPinned(false);
     if (recommendedProvider) {
@@ -217,37 +236,102 @@ export default function Home() {
     setIsGenerating(true);
 
     try {
-      const referencePayloads = await serializeReferencePayloads();
-      const response = await fetch("/api/generate-sound", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          prompt: trimmedPrompt,
-          brief_mode: briefMode,
-          parameters: requestParameters,
-          provider: selectedProvider,
-          references: referencePayloads,
-          palette: selectedPalette,
-          gameState: selectedGameState,
-          data_protection: dataProtected,
-        }),
-      });
+      let data: { audioUrl: string; provenanceCid?: string };
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error ?? "Generation failed");
+      if (remixFile) {
+        // Remix: encrypt audio -> POST to /api/remix -> get remixed audio back
+        const { readFileAsBase64 } = await import("@/components/studio/reference-panel");
+        const audioB64 = await readFileAsBase64(remixFile.file);
+        const response = await fetch("/api/remix", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            audio_b64: audioB64,
+            original_name: remixFile.name,
+            prompt: fullPrompt,
+            strength: remixStrength,
+            duration_seconds: lengthSeconds,
+            seed: seedValue,
+            lora_job_id: selectedLora?.id,
+            engine: remixEngine,
+            periodic_prompt: vampnetPeriodicPrompt,
+            upper_codebook_mask: 3,
+            onset_mask_width: vampnetOnsetMaskWidth,
+            temperature: vampnetTemperature,
+            feedback_steps: vampnetFeedbackSteps,
+          }),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(errorData.error ?? "Remix failed");
+        }
+
+        data = await response.json();
+      } else if (selectedLora) {
+        // Use LoRA generation endpoint
+        const response = await fetch("/api/generate-lora", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            job_id: selectedLora.id,
+            prompt: fullPrompt,
+            duration_seconds: lengthSeconds,
+            seed: seedValue,
+          }),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(errorData.error ?? "LoRA generation failed");
+        }
+
+        data = await response.json();
+      } else {
+        // Standard generation
+        const referencePayloads = await serializeReferencePayloads();
+        const response = await fetch("/api/generate-sound", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            prompt: trimmedPrompt,
+            brief_mode: briefMode,
+            parameters: requestParameters,
+            provider: selectedProvider,
+            references: referencePayloads,
+            palette: selectedPalette,
+            gameState: selectedGameState,
+            data_protection: dataProtected,
+          }),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(errorData.error ?? "Generation failed");
+        }
+
+        data = await response.json();
       }
 
-      const data = (await response.json()) as { audioUrl: string; provenanceCid?: string };
-      const completedSound = {
+      const completedSound: SoundGeneration = {
         ...pendingSound,
         audioUrl: data.audioUrl,
         status: "ready" as const,
         provenanceCid: data.provenanceCid,
+        ...(selectedLora ? { loraId: selectedLora.id, loraName: selectedLora.name } : {}),
+        ...(remixFile ? { remixSourceName: remixFile.name, remixStrength, remixEngine } : {}),
       };
       setCurrentSound(completedSound);
       addToHistory(completedSound);
-      toast("Generation complete.", "success");
+
+      // Auto-save to library
+      fetch("/api/library", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(completedSound),
+      }).catch(() => {});
+
+      toast(remixFile ? "Sculpt complete." : "Generation complete.", "success");
     } catch (error) {
       setCurrentSound((prev) =>
         prev ? { ...prev, status: "error", errorMessage: error instanceof Error ? error.message : "Unknown error." } : prev
@@ -327,6 +411,7 @@ export default function Home() {
       { key: "1", description: "Generate mode", action: () => setMode("generate") },
       { key: "2", description: "Game Audio mode", action: () => setMode("game-audio") },
       { key: "3", description: "Library", action: () => setMode("library") },
+      { key: "4", description: "Training", action: () => setMode("training") },
       { key: "?", description: "Keyboard shortcuts", action: () => setShowShortcuts((p) => !p) },
       { key: "d", description: "Toggle dark mode", action: toggleTheme },
       { key: "z", ctrl: true, description: "Undo", action: handleUndo },
@@ -343,24 +428,22 @@ export default function Home() {
       {/* Sidebar */}
       <aside className="fixed left-0 top-0 bottom-0 w-64 bg-black border-r border-white/[0.06] flex flex-col z-30">
         <div className="p-6 border-b border-white/[0.06]">
-          <span className="text-2xl text-white" style={{ fontFamily: "var(--font-canela), Georgia, serif" }}>
+          <span className="text-lg text-white tracking-wide" style={{ fontFamily: "var(--font-canela), Georgia, serif" }}>
             Swanblade
           </span>
         </div>
         <nav className="flex-1 p-4 space-y-1">
-          {(["generate", "game-audio", "library"] as const).map((tab) => (
+          {(["generate", "game-audio", "library", "training"] as const).map((tab) => (
             <button
               key={tab}
               onClick={() => setMode(tab)}
-              className={`block w-full text-left px-4 py-3 transition-all duration-200 border-l-2 ${
+              className={`block w-full text-left px-4 py-2.5 text-sm font-display tracking-wide transition-all duration-300 ${
                 mode === tab
-                  ? "text-white border-l-[#66023C]"
-                  : "text-gray-500 hover:text-white border-transparent"
+                  ? "text-white"
+                  : "text-gray-600 hover:text-gray-300"
               }`}
             >
-              <span className="font-display">
-                {tab === "game-audio" ? "Game Audio" : tab.charAt(0).toUpperCase() + tab.slice(1)}
-              </span>
+              {tab === "game-audio" ? "Game Audio" : tab.charAt(0).toUpperCase() + tab.slice(1)}
             </button>
           ))}
         </nav>
@@ -395,15 +478,20 @@ export default function Home() {
               <path d="M6 8h.01M10 8h.01M14 8h.01M18 8h.01M8 12h.01M12 12h.01M16 12h.01M6 16h12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
             </svg>
           </button>
-          <div className="w-8 h-8 bg-[#0a0a0a] border border-white/[0.06] flex items-center justify-center text-sm text-gray-400">
-            S
-          </div>
+          <ProfileDropdown />
         </div>
       </header>
 
       {/* Main Content */}
       <main className="ml-64 pt-16 min-h-screen px-8 pb-12">
-        {mode === "library" ? (
+        {mode === "training" ? (
+          <>
+            <p className="text-lg tracking-[0.05em] text-white font-display mb-5">Training</p>
+            <div className="max-w-xl">
+              <TrainingPanel onToast={toast} />
+            </div>
+          </>
+        ) : mode === "library" ? (
           <>
             <p className="text-lg tracking-[0.05em] text-white font-display mb-5">Library</p>
             <LibraryPanel />
@@ -460,6 +548,29 @@ export default function Home() {
                   onToast={toast}
                 />
 
+                <RemixPanel
+                  file={remixFile}
+                  onFileChange={setRemixFile}
+                  strength={remixStrength}
+                  onStrengthChange={setRemixStrength}
+                  engine={remixEngine}
+                  onEngineChange={setRemixEngine}
+                  periodicPrompt={vampnetPeriodicPrompt}
+                  onPeriodicPromptChange={setVampnetPeriodicPrompt}
+                  onsetMaskWidth={vampnetOnsetMaskWidth}
+                  onOnsetMaskWidthChange={setVampnetOnsetMaskWidth}
+                  temperature={vampnetTemperature}
+                  onTemperatureChange={setVampnetTemperature}
+                  feedbackSteps={vampnetFeedbackSteps}
+                  onFeedbackStepsChange={setVampnetFeedbackSteps}
+                  onToast={toast}
+                />
+
+                <LoraSelector
+                  value={selectedLora}
+                  onChange={setSelectedLora}
+                />
+
                 <O8IdentityPanel
                   onIdentityChange={handleIdentityChange}
                   className="bg-[#0a0a0a] border border-white/[0.06]"
@@ -479,6 +590,7 @@ export default function Home() {
                       onResetAuto={providerPinned ? resetProviderToAuto : undefined}
                       durationSeconds={lengthSeconds}
                       hasReferences={referenceClips.length > 0}
+                      sculptActive={!!remixFile}
                     />
                   </div>
 
@@ -539,8 +651,13 @@ export default function Home() {
                     )}
                   </div>
 
-                  {(selectedPalette || selectedGameState) && (
+                  {(selectedPalette || selectedGameState || selectedLora || remixFile) && (
                     <div className="mt-4 flex flex-wrap gap-2 border-t border-white/[0.06] pt-4">
+                      {remixFile && (
+                        <span className="border border-white/[0.08] px-2 py-1 text-body-sm text-gray-300">
+                          Sculpt: {remixFile.name}
+                        </span>
+                      )}
                       {selectedPalette && (
                         <span className="border border-white/[0.06] px-2 py-1 text-body-sm">
                           Palette: {selectedPalette.name}
@@ -549,6 +666,15 @@ export default function Home() {
                       {selectedGameState && (
                         <span className="border border-white/[0.06] px-2 py-1 text-body-sm capitalize">
                           State: {selectedGameState}
+                        </span>
+                      )}
+                      {selectedLora && (
+                        <span className={`border px-2 py-1 text-body-sm ${
+                          remixFile && remixEngine === "vampnet"
+                            ? "border-white/[0.04] text-gray-600 line-through"
+                            : "border-white/[0.08] text-gray-300"
+                        }`}>
+                          {selectedLora.name}{remixFile && remixEngine === "vampnet" ? " (n/a)" : ""}
                         </span>
                       )}
                     </div>
@@ -560,7 +686,11 @@ export default function Home() {
                       disabled={isGenerating}
                       className="w-full px-6 py-3 text-body-sm font-medium text-black bg-white hover:bg-gray-200 transition-colors duration-300 disabled:opacity-40 disabled:cursor-not-allowed"
                     >
-                      {isGenerating ? "Generating..." : "Generate Sound"}
+                      {isGenerating
+                        ? (remixFile ? "Sculpting..." : "Generating...")
+                        : remixFile
+                          ? "Sculpt"
+                          : selectedLora ? "Generate with LoRA" : "Generate Sound"}
                     </button>
                   </div>
                 </div>

@@ -21,9 +21,14 @@ export interface SoundGeneration {
   status: SoundGenerationStatus;
   errorMessage?: string;
   variantOfId?: string;
-  // Starforge LoRA
+  // Sound World (LoRA)
   loraId?: string;
+  loraName?: string;
   loraStrength?: number;
+  // Remix
+  remixSourceName?: string;
+  remixStrength?: number;
+  remixEngine?: string;
   // o8 Provenance
   provenanceCid?: string;
   identityId?: string;
@@ -134,7 +139,8 @@ export type VariationType =
   | "style_transfer"
   | "combine"
   | "evolve"
-  | "mutate";
+  | "mutate"
+  | "remix";
 
 export interface ParameterShift {
   parameter: "intensity" | "texture" | "brightness" | "noisiness" | "bpm";
