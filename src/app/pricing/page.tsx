@@ -215,7 +215,7 @@ function PricingContent() {
               >
                 <div className="flex items-center justify-between mb-4">
                   <div>
-                    <h2 className="text-base font-display">{plan.name}</h2>
+                    <h2 className="text-sm">{plan.name}</h2>
                     <p className="text-white/40 text-xs mt-0.5">
                       {plan.description}
                     </p>
