@@ -81,7 +81,7 @@ export function Frame2147241533({ className, children }: Frame2147241533Props) {
           </button>
           <Link
             href="/apply"
-            className="inline-block border border-white/30 text-white px-8 py-4 text-sm tracking-wide hover:bg-white hover:text-black transition"
+            className="inline-block border border-white/30 text-white px-5 py-2 text-sm tracking-wide hover:bg-white hover:text-black transition"
            
           >
             Apply
