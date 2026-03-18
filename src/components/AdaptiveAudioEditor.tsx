@@ -644,7 +644,7 @@ function ParameterEditor({
   onUpdate,
   onDelete,
 }: {
-  parameter: { name: string; type: string; defaultValue: number | boolean | string; min?: number; max?: number; description?: string };
+  parameter: { name: string; type: "string" | "number" | "boolean"; defaultValue: number | boolean | string; min?: number; max?: number; description?: string };
   onUpdate: (updates: Partial<typeof parameter>) => void;
   onDelete: () => void;
 }) {

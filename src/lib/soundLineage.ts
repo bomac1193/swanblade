@@ -368,6 +368,7 @@ export function calculateLineageStats(
       combine: 0,
       evolve: 0,
       mutate: 0,
+      remix: 0,
     },
     parameterDrift: {
       intensity: 0,

@@ -1,0 +1,154 @@
+import { NextResponse } from "next/server";
+import { createClient } from "@/lib/supabase/server";
+import { execSync } from "child_process";
+import { readFileSync, existsSync, mkdirSync, rmSync } from "fs";
+import { join } from "path";
+import { tmpdir } from "os";
+
+export const runtime = "nodejs";
+export const maxDuration = 120;
+
+/**
+ * Extract JSON from Modal stdout.
+ * Scans lines in reverse to find the first valid JSON object.
+ */
+function extractJsonFromOutput(
+  stdout: string
+): Record<string, unknown> | null {
+  const lines = stdout.trim().split("\n");
+  for (let i = lines.length - 1; i >= 0; i--) {
+    const line = lines[i].trim();
+    if (line.startsWith("{") && line.endsWith("}")) {
+      try {
+        return JSON.parse(line);
+      } catch {
+        continue;
+      }
+    }
+  }
+  return null;
+}
+
+export async function POST(request: Request) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const body = await request.json();
+  const { job_id, prompt, duration_seconds = 10, seed } = body;
+
+  if (!job_id || !prompt?.trim()) {
+    return NextResponse.json(
+      { error: "job_id and prompt are required." },
+      { status: 400 }
+    );
+  }
+
+  // Verify the training job belongs to this user and is completed
+  const { data: job, error } = await supabase
+    .from("training_jobs")
+    .select("id, status, lora_model_url")
+    .eq("id", job_id)
+    .eq("user_id", user.id)
+    .single();
+
+  if (error || !job) {
+    return NextResponse.json(
+      { error: "Training job not found." },
+      { status: 404 }
+    );
+  }
+
+  if (job.status !== "completed" || !job.lora_model_url) {
+    return NextResponse.json(
+      { error: "Model not ready. Training must be completed first." },
+      { status: 400 }
+    );
+  }
+
+  // Pass prompt via environment variable to prevent shell injection
+  const seedValue = seed ?? Math.floor(Math.random() * 100000);
+  const modalCmd = `cd /home/sphinxy/modal-audio && modal run lora_train.py --generate --job-id "${job_id}" --prompt "$SWANBLADE_PROMPT" --duration ${Number(duration_seconds)} --seed ${Number(seedValue)}`;
+
+  let result: Record<string, unknown>;
+  try {
+    console.log(`[generate-lora] Starting generation with LoRA ${job_id}...`);
+    const stdout = execSync(modalCmd, {
+      timeout: 300000,
+      encoding: "utf-8",
+      env: { ...process.env, SWANBLADE_PROMPT: prompt.trim() },
+    });
+
+    // Parse JSON result (scans lines in reverse for robustness)
+    const parsed = extractJsonFromOutput(stdout);
+    if (!parsed) {
+      console.error("[generate-lora] No JSON in Modal output:", stdout.slice(0, 500));
+      return NextResponse.json(
+        { error: "No result from GPU server." },
+        { status: 500 }
+      );
+    }
+    result = parsed;
+  } catch (err) {
+    console.error("[generate-lora] Modal generation failed:", err);
+    return NextResponse.json(
+      { error: "Generation failed on GPU server." },
+      { status: 500 }
+    );
+  }
+
+  if (result.status !== "completed" || !result.generation_id) {
+    return NextResponse.json(
+      { error: (result.error as string) || "Generation failed." },
+      { status: 500 }
+    );
+  }
+
+  // Download the generated audio from Modal volume
+  const genId = result.generation_id as string;
+  const tempDir = join(tmpdir(), `swanblade-gen-${genId}`);
+  mkdirSync(tempDir, { recursive: true });
+
+  const localWavPath = join(tempDir, `${genId}.wav`);
+
+  try {
+    execSync(
+      `cd /home/sphinxy/modal-audio && modal volume get swanblade-training "generations/${genId}.wav" "${localWavPath}"`,
+      { timeout: 60000 }
+    );
+
+    if (!existsSync(localWavPath)) {
+      throw new Error("Downloaded file not found");
+    }
+
+    // Read and convert to data URL
+    const audioBuffer = readFileSync(localWavPath);
+    const base64 = audioBuffer.toString("base64");
+    const audioUrl = `data:audio/wav;base64,${base64}`;
+
+    console.log(
+      `[generate-lora] Generation complete: ${genId} (${(audioBuffer.byteLength / 1e6).toFixed(1)} MB)`
+    );
+
+    return NextResponse.json({
+      audioUrl,
+      generationId: genId,
+      loraJobId: job_id,
+    });
+  } catch (err) {
+    console.error("[generate-lora] Failed to download from Modal:", err);
+    return NextResponse.json(
+      { error: "Failed to retrieve generated audio." },
+      { status: 500 }
+    );
+  } finally {
+    if (existsSync(tempDir)) {
+      rmSync(tempDir, { recursive: true, force: true });
+    }
+  }
+}

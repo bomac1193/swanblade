@@ -376,8 +376,12 @@ export class VocalSynthesisService {
    * Generate effort sound
    */
   private async generateEffort(request: VoiceFusionRequest): Promise<VoiceFusionResult> {
+    const validEffortTypes = ["attack", "hit", "jump", "climb", "death", "exertion", "pain", "relief"] as const;
+    const effortType = validEffortTypes.includes(request.effortType as typeof validEffortTypes[number])
+      ? (request.effortType as EffortSoundRequest["type"])
+      : "exertion";
     const effortRequest: EffortSoundRequest = {
-      type: request.effortType || "attack",
+      type: effortType,
       intensity: request.emotionalIntensity || 0.7,
       duration: request.duration || 1,
       voiceProfileId: request.baseVoiceId,

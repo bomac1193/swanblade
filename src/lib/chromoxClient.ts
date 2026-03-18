@@ -309,10 +309,11 @@ export class ChromoxClient {
 
   // ==================== Private Helpers ====================
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private async fetch(
     path: string,
     options: RequestInit = {}
-  ): Promise<Record<string, unknown>> {
+  ): Promise<any> {
     const url = `${this.config.apiUrl}${path}`;
 
     const response = await fetch(url, {

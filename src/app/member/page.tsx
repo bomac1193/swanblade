@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
@@ -23,6 +23,18 @@ interface UsageStats {
 }
 
 export default function MemberPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-[#0A0A0A] text-white flex items-center justify-center">
+        <div className="text-white/40">Loading...</div>
+      </div>
+    }>
+      <MemberPageContent />
+    </Suspense>
+  );
+}
+
+function MemberPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const success = searchParams.get("success");
@@ -92,7 +104,7 @@ export default function MemberPage() {
         if (usageData) {
           setUsage({
             sounds_generated: usageData.length,
-            total_duration_ms: usageData.reduce((sum, s) => sum + (s.duration_ms || 0), 0),
+            total_duration_ms: usageData.reduce((sum: number, s: { duration_ms?: number }) => sum + (s.duration_ms || 0), 0),
           });
         }
       } catch {
