@@ -200,7 +200,7 @@ function MemberPageContent() {
       {/* Header */}
       <header className="border-b border-white/5 px-6 py-5">
         <div className="max-w-3xl mx-auto flex items-center justify-between">
-          <Link href="/" className="font-display font-light text-lg tracking-wide">
+          <Link href="/" className="font-display font-light text-sm tracking-wide">
             Swanblade
           </Link>
           <div className="flex items-center gap-6">
@@ -234,7 +234,7 @@ function MemberPageContent() {
       {/* Member Info */}
       <main className="max-w-3xl mx-auto px-6 py-16">
         <div className="mb-16">
-          <h1 className="text-3xl font-display font-light">{member.name}</h1>
+          <h1 className="text-2xl font-display font-light">{member.name}</h1>
           <p className="text-white/40 text-sm mt-1">
             {member.email}
           </p>
@@ -244,21 +244,21 @@ function MemberPageContent() {
         <div className="grid grid-cols-3 gap-4 mb-16">
           <div className="border border-white/10 p-5">
             <p className="text-xs text-white/30 mb-2">Membership</p>
-            <p className="text-lg">{getTierDisplay(member.membership_tier)}</p>
+            <p className="text-base">{getTierDisplay(member.membership_tier)}</p>
             <p className={`text-xs mt-1 ${getStatusColor(member.membership_status)}`}>
               {member.membership_status}
             </p>
           </div>
           <div className="border border-white/10 p-5">
             <p className="text-xs text-white/30 mb-2">Sounds generated</p>
-            <p className="text-lg">{usage.sounds_generated.toLocaleString()}</p>
+            <p className="text-base">{usage.sounds_generated.toLocaleString()}</p>
             <p className="text-xs text-white/30 mt-1">
               {formatDuration(usage.total_duration_ms)} total
             </p>
           </div>
           <div className="border border-white/10 p-5">
             <p className="text-xs text-white/30 mb-2">Invites left</p>
-            <p className="text-lg">{member.invites_remaining}</p>
+            <p className="text-base">{member.invites_remaining}</p>
           </div>
         </div>
 
@@ -267,7 +267,7 @@ function MemberPageContent() {
           <div className="border border-white/10 p-6 mb-6">
             <p className="text-xs text-white/30 mb-3">Your invite code</p>
             <div className="flex items-center gap-4">
-              <p className="font-mono text-xl tracking-wider text-white/70">
+              <p className="font-mono text-base tracking-wider text-white/70">
                 {member.invite_code}
               </p>
               <button

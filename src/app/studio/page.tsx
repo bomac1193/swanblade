@@ -428,7 +428,7 @@ export default function Home() {
       {/* Sidebar */}
       <aside className="fixed left-0 top-0 bottom-0 w-64 bg-black border-r border-white/[0.06] flex flex-col z-30">
         <div className="p-6 border-b border-white/[0.06]">
-          <span className="text-lg text-white tracking-wide" style={{ fontFamily: "var(--font-canela), Georgia, serif" }}>
+          <span className="text-sm font-display font-light text-white tracking-wide">
             Swanblade
           </span>
         </div>
@@ -437,7 +437,7 @@ export default function Home() {
             <button
               key={tab}
               onClick={() => setMode(tab)}
-              className={`block w-full text-left px-4 py-2.5 text-sm font-display tracking-wide transition-all duration-300 ${
+              className={`block w-full text-left px-4 py-2.5 text-sm tracking-wide transition-all duration-300 ${
                 mode === tab
                   ? "text-white"
                   : "text-gray-600 hover:text-gray-300"
@@ -486,14 +486,14 @@ export default function Home() {
       <main className="ml-64 pt-16 min-h-screen px-8 pb-12">
         {mode === "training" ? (
           <>
-            <p className="text-lg tracking-[0.05em] text-white font-display mb-5">Training</p>
+            <p className="text-sm text-white mb-4">Training</p>
             <div className="max-w-xl">
               <TrainingPanel onToast={toast} />
             </div>
           </>
         ) : mode === "library" ? (
           <>
-            <p className="text-lg tracking-[0.05em] text-white font-display mb-5">Library</p>
+            <p className="text-sm text-white mb-4">Library</p>
             <LibraryPanel />
           </>
         ) : mode === "game-audio" ? (
@@ -520,7 +520,7 @@ export default function Home() {
           />
         ) : (
           <>
-            <p className="text-lg tracking-[0.05em] text-white font-display mb-5">Generate</p>
+            <p className="text-sm text-white mb-4">Generate</p>
             <div className="grid gap-6 lg:grid-cols-2">
               {/* Left: Controls */}
               <div className="space-y-6">
@@ -738,7 +738,7 @@ export default function Home() {
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-lg font-medium text-white" style={{ fontFamily: "var(--font-canela), Georgia, serif" }}>Shortcuts</h3>
+              <h3 className="text-sm font-medium text-white">Shortcuts</h3>
               <button onClick={() => setShowShortcuts(false)} className="text-gray-500 hover:text-white">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                   <path d="M6 6l12 12M6 18L18 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
@@ -810,7 +810,7 @@ function GameAudioView({
 }) {
   return (
     <>
-      <p className="text-lg tracking-[0.05em] text-white font-display mb-5">Game Audio</p>
+      <p className="text-sm text-white mb-4">Game Audio</p>
       <div className="grid gap-6 lg:grid-cols-2">
         <div className="space-y-6">
           <O8IdentityPanel
@@ -905,7 +905,7 @@ function GameAudioView({
             <div className="mt-4">
               <div className="flex items-center justify-between border-b border-white/[0.06] pb-3">
                 <div>
-                  <p className="text-lg font-medium capitalize text-white" style={{ fontFamily: "var(--font-canela), Georgia, serif" }}>{currentBundle.gameState} Bundle</p>
+                  <p className="text-sm font-medium capitalize text-white">{currentBundle.gameState} Bundle</p>
                   <p className="text-body-sm font-light text-gray-500">{currentBundle.stems.length} stems generated</p>
                 </div>
               </div>

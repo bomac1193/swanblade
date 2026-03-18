@@ -29,7 +29,7 @@ export function Frame2147241533({ className, children }: Frame2147241533Props) {
       {/* Top Navigation */}
       <header className="pointer-events-auto">
         <div className="flex items-center justify-between px-8 py-6">
-          <Link href="/" className="text-white/60 text-sm font-mono tracking-wider hover:text-white transition">
+          <Link href="/" className="text-white/60 text-xs font-mono tracking-wider hover:text-white transition">
             SB
           </Link>
           <nav className="flex items-center gap-10">
@@ -64,12 +64,12 @@ export function Frame2147241533({ className, children }: Frame2147241533Props) {
       {/* Main Content */}
       <main className="flex-1 flex flex-col items-center justify-center px-8">
         <div className="text-center max-w-2xl pointer-events-auto">
-          <h1 className="text-6xl md:text-7xl text-white leading-tight mb-8 font-display font-light tracking-tight">
+          <h1 className="text-3xl text-white leading-tight mb-6 font-display font-light tracking-tight">
             Swanblade
           </h1>
           <button
             onClick={cycleSlogan}
-            className="block italic text-white/50 mb-12 max-w-md mx-auto text-2xl font-display tracking-wide hover:text-white/70 transition-all duration-300 cursor-pointer select-none"
+            className="block italic text-white/50 mb-10 max-w-md mx-auto text-sm tracking-wide hover:text-white/70 transition-all duration-300 cursor-pointer select-none"
           >
             {SLOGANS[sloganIndex]}
           </button>

@@ -147,7 +147,7 @@ function PricingContent() {
       {/* Hero */}
       <section className="py-24 px-6">
         <div className="max-w-2xl mx-auto">
-          <h1 className="text-4xl font-display font-light mb-12">
+          <h1 className="text-2xl font-display font-light mb-12">
             Membership
           </h1>
 
@@ -221,7 +221,7 @@ function PricingContent() {
                     </p>
                   </div>
                   <div className="text-right shrink-0 ml-4">
-                    <span className="text-2xl font-display font-light">
+                    <span className="text-lg font-light">
                       {formatPrice(price, currency)}
                     </span>
                     {price && (
@@ -280,7 +280,7 @@ function PricingContent() {
       <section className="py-20 px-6 border-t border-white/10">
         <div className="max-w-2xl mx-auto text-center">
           <p className="text-white/50 text-sm">
-            <span className="text-white font-display font-light text-xl">12</span> seats remaining
+            <span className="text-white font-light">12</span> seats remaining
           </p>
         </div>
       </section>
