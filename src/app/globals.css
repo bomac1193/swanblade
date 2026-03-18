@@ -45,31 +45,12 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-h1 {
-  font-size: 5rem;
-  line-height: 0.9;
-  font-weight: 700;
-  letter-spacing: -0.03em;
-}
-
-h2 {
-  font-size: 3rem;
-  line-height: 0.95;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-}
-
-h3 {
-  font-size: 2rem;
-  line-height: 1;
-  font-weight: 500;
-  letter-spacing: -0.01em;
-}
-
-h4, h5, h6 {
-  font-size: 1.25rem;
-  line-height: 1.5;
-  font-weight: 500;
+/* Heading resets — all sizing via Tailwind classes */
+h1, h2, h3, h4, h5, h6 {
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: inherit;
+  letter-spacing: inherit;
 }
 
 p {
@@ -181,21 +162,6 @@ audio::-webkit-media-controls-panel {
 /* ==================== RESPONSIVE STYLES ==================== */
 
 @media (max-width: 768px) {
-  h1 {
-    font-size: 32px;
-    line-height: 40px;
-  }
-
-  h2 {
-    font-size: 24px;
-    line-height: 32px;
-  }
-
-  h3 {
-    font-size: 20px;
-    line-height: 28px;
-  }
-
   button,
   a,
   input,

@@ -52,6 +52,12 @@ export function Frame2147241533({ className, children }: Frame2147241533Props) {
               About
             </Link>
             <Link
+              href="/login"
+              className="text-white/40 hover:text-white text-sm tracking-wide transition"
+            >
+              Sign in
+            </Link>
+            <Link
               href="/apply"
               className="shrink-0 border border-white/30 text-white px-5 py-2 text-sm tracking-wide hover:bg-white hover:text-black transition"
             >
