@@ -200,7 +200,7 @@ function MemberPageContent() {
       {/* Header */}
       <header className="border-b border-white/5 px-6 py-5">
         <div className="max-w-3xl mx-auto flex items-center justify-between">
-          <Link href="/" className="font-display font-light text-sm tracking-wide">
+          <Link href="/" className="font-display font-normal text-sm tracking-wide">
             Swanblade
           </Link>
           <div className="flex items-center gap-6">
@@ -234,7 +234,7 @@ function MemberPageContent() {
       {/* Member Info */}
       <main className="max-w-3xl mx-auto px-6 py-16">
         <div className="mb-16">
-          <h1 className="text-4xl font-display font-light">{member.name}</h1>
+          <h1 className="text-5xl font-display font-normal">{member.name}</h1>
           <p className="text-white/40 text-sm mt-1">
             {member.email}
           </p>

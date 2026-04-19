@@ -56,22 +56,80 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const protectedPaths = ["/studio", "/member", "/settings"];
-  const isProtectedPath = protectedPaths.some((path) =>
-    request.nextUrl.pathname.startsWith(path)
+  const pathname = request.nextUrl.pathname;
+
+  // Pages that require login
+  const authProtectedPaths = ["/studio", "/member", "/settings"];
+  const isAuthProtected = authProtectedPaths.some((path) =>
+    pathname.startsWith(path)
   );
 
-  if (isProtectedPath && !user) {
+  // API routes that require active membership
+  const membershipGatedAPIs = [
+    "/api/remix",
+    "/api/training",
+    "/api/generate-sound",
+    "/api/generate-lora",
+  ];
+  const isMembershipGatedAPI = membershipGatedAPIs.some((path) =>
+    pathname.startsWith(path)
+  );
+
+  // Allow training/models (read-only, needed for UI state) without membership
+  const isAllowedWithoutMembership =
+    pathname === "/api/training/models" ||
+    pathname === "/api/training/active-job";
+
+  // Redirect unauthenticated users from protected pages
+  if (isAuthProtected && !user) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
-    url.searchParams.set("redirect", request.nextUrl.pathname);
+    url.searchParams.set("redirect", pathname);
     return NextResponse.redirect(url);
   }
 
-  if (request.nextUrl.pathname.startsWith("/login") && user) {
+  // Redirect logged-in users away from login
+  if (pathname.startsWith("/login") && user) {
     const url = request.nextUrl.clone();
     url.pathname = "/studio";
     return NextResponse.redirect(url);
+  }
+
+  // Membership gate: check for active subscription on gated routes
+  if (user && (pathname === "/studio" || (isMembershipGatedAPI && !isAllowedWithoutMembership))) {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("membership_status")
+      .eq("id", user.id)
+      .single();
+
+    const status = profile?.membership_status;
+
+    if (status !== "active") {
+      // API routes: return 403
+      if (isMembershipGatedAPI) {
+        return NextResponse.json(
+          { error: "Active membership required", membership_status: status || "pending" },
+          { status: 403 }
+        );
+      }
+
+      // Studio page: redirect to pricing
+      if (pathname === "/studio" || pathname.startsWith("/studio/")) {
+        const url = request.nextUrl.clone();
+        url.pathname = "/pricing";
+        url.searchParams.set("reason", "membership_required");
+        return NextResponse.redirect(url);
+      }
+    }
+  }
+
+  // API routes without user: return 401
+  if (isMembershipGatedAPI && !isAllowedWithoutMembership && !user) {
+    return NextResponse.json(
+      { error: "Unauthorized" },
+      { status: 401 }
+    );
   }
 
   return supabaseResponse;

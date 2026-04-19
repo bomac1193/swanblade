@@ -174,11 +174,6 @@ export function PresetsPanel({
                                 {preset.engine === "stable-audio" ? "Diffusion" : preset.engine === "vampnet" ? "VampNet" : "MAGNeT"}
                               </span>
                             )}
-                            {preset.gameState && (
-                              <span className="text-[10px] px-1.5 py-0.5 bg-[#66023C]/10 border border-[#66023C]/20 text-[#66023C]">
-                                {preset.gameState}
-                              </span>
-                            )}
                           </div>
                         </button>
                         <button

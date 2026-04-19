@@ -1,7 +1,8 @@
 /**
- * Swanblade Auth Middleware
+ * Swanblade Auth + Membership Middleware
  *
  * In production: protects /studio, /member, /settings and refreshes Supabase sessions.
+ * Membership-gated routes require active subscription.
  * In dev: no-op pass-through.
  */
 
@@ -22,5 +23,9 @@ export const config = {
     "/member/:path*",
     "/settings/:path*",
     "/login",
+    "/api/remix/:path*",
+    "/api/training/:path*",
+    "/api/generate-sound/:path*",
+    "/api/generate-lora/:path*",
   ],
 };

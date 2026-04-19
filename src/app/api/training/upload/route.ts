@@ -57,6 +57,7 @@ export async function POST(request: Request) {
     consent_timestamp,
     model_name,
     model_description,
+    model_type = "lora",
   } = body;
 
   // Determine upload mode: client-encrypted or server-side encryption
@@ -66,16 +67,26 @@ export async function POST(request: Request) {
     : body.files;
   const sessionKeyB64: string | undefined = body.session_key_b64;
 
-  if (!inputFiles?.length || !consent_timestamp) {
+  // RAVE chunked upload: create job first, upload files separately
+  const isChunkedInit = body.chunked_init === true;
+
+  if (!isChunkedInit && !inputFiles?.length && !consent_timestamp) {
     return NextResponse.json(
       { error: "Missing files or consent timestamp." },
       { status: 400 }
     );
   }
 
-  if (!isServerSideEncrypt && !sessionKeyB64) {
+  if (!isChunkedInit && !isServerSideEncrypt && !sessionKeyB64) {
     return NextResponse.json(
       { error: "Missing session key for client-encrypted upload." },
+      { status: 400 }
+    );
+  }
+
+  if (!consent_timestamp) {
+    return NextResponse.json(
+      { error: "Missing consent timestamp." },
       { status: 400 }
     );
   }
@@ -83,22 +94,26 @@ export async function POST(request: Request) {
   // Generate server-side key if needed
   let keyB64 = sessionKeyB64;
   let keyBytes: Buffer | null = null;
-  if (isServerSideEncrypt) {
+  if (isServerSideEncrypt || isChunkedInit) {
     keyBytes = randomBytes(32);
     keyB64 = keyBytes.toString("base64");
   }
 
-  const totalSize = inputFiles.reduce(
-    (sum: number, f: { original_size: number }) => sum + f.original_size,
-    0
-  );
+  const totalSize = isChunkedInit
+    ? (body.total_size_bytes || 0)
+    : (inputFiles || []).reduce(
+        (sum: number, f: { original_size: number }) => sum + f.original_size,
+        0
+      );
 
   // Build source file metadata (persists after training for user reference)
-  const sourceFiles = inputFiles.map((f: EncryptedFileEntry | RawFileEntry) => ({
-    name: f.original_name,
-    size: f.original_size,
-    mime_type: "mime_type" in f ? (f as RawFileEntry).mime_type : "audio/*",
-  }));
+  const sourceFiles = isChunkedInit
+    ? (body.source_files || [])
+    : (inputFiles || []).map((f: EncryptedFileEntry | RawFileEntry) => ({
+        name: f.original_name,
+        size: f.original_size,
+        mime_type: "mime_type" in f ? (f as RawFileEntry).mime_type : "audio/*",
+      }));
 
   const { data: job, error: jobError } = await supabase
     .from("training_jobs")
@@ -111,6 +126,7 @@ export async function POST(request: Request) {
       data_protection_enabled: true,
       model_name: model_name || null,
       model_description: model_description || null,
+      model_type: model_type === "rave" ? "rave" : "lora",
       source_files: sourceFiles,
       training_config: {
         session_key_b64: keyB64,
@@ -128,6 +144,16 @@ export async function POST(request: Request) {
   }
 
   const jobId = job.id;
+
+  // For chunked init: return job_id + session key so client can upload files one at a time
+  if (isChunkedInit) {
+    return NextResponse.json({
+      job_id: jobId,
+      session_key_b64: keyB64,
+      file_count: body.file_count || 0,
+      status: "uploading",
+    });
+  }
 
   const tempDir = join(tmpdir(), `swanblade-upload-${jobId}`);
   const encDir = join(tempDir, "encrypted");

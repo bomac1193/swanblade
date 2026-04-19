@@ -101,18 +101,34 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     return;
   }
 
-  // Update profile with Stripe IDs
+  // Determine tier from the subscription's price
+  let tier: string = "professional";
+  if (stripe && subscriptionId) {
+    try {
+      const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+      const priceId = subscription.items.data[0]?.price.id;
+      if (priceId) {
+        tier = getPriceTier(priceId) || "professional";
+      }
+    } catch {
+      console.warn("Could not retrieve subscription for tier — defaulting to professional");
+    }
+  }
+
+  // Update profile with Stripe IDs and activate membership immediately
   await supabaseAdmin
     .from("profiles")
     .update({
       stripe_customer_id: customerId,
       stripe_subscription_id: subscriptionId,
+      membership_tier: tier,
+      membership_status: "active",
       application_status: "approved",
       approved_at: new Date().toISOString(),
     })
     .eq("id", userId);
 
-  console.log(`Checkout completed for user ${userId}`);
+  console.log(`Checkout completed for user ${userId}: ${tier} (active)`);
 }
 
 async function handleSubscriptionUpdate(subscription: Stripe.Subscription) {

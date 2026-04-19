@@ -4,9 +4,6 @@
  * Tracks all generated sounds with their provenance metadata
  */
 
-import type { SoundDNA } from "./soundDna";
-import type { SoundPalette } from "./soundPalette";
-import type { GameState } from "./gameStateEngine";
 
 export interface ProvenanceRecord {
   declarationCid: string;
@@ -39,12 +36,8 @@ export interface LibrarySoundWithProvenance {
     noisiness?: number;
   };
 
-  // Blue Ocean features
+  // DNA reference
   dnaId?: string;
-  paletteId?: string;
-  gameState?: GameState;
-  stemType?: string;
-  bundleId?: string;
 
   // LoRA context
   loraId?: string;
@@ -62,8 +55,6 @@ export interface LibrarySoundWithProvenance {
 export interface LibraryFilter {
   search?: string;
   tags?: string[];
-  gameStates?: GameState[];
-  paletteIds?: string[];
   hasProvenance?: boolean;
   favorite?: boolean;
   archived?: boolean;
@@ -77,8 +68,6 @@ export interface LibraryStats {
   totalSounds: number;
   totalDuration: number;
   withProvenance: number;
-  byGameState: Record<GameState, number>;
-  byPalette: Record<string, number>;
   byProvider: Record<string, number>;
 }
 
@@ -136,20 +125,6 @@ export class ProvenanceLibrary {
     if (filters.tags?.length) {
       results = results.filter((s) =>
         filters.tags!.some((tag) => s.tags.includes(tag))
-      );
-    }
-
-    // Game states
-    if (filters.gameStates?.length) {
-      results = results.filter(
-        (s) => s.gameState && filters.gameStates!.includes(s.gameState)
-      );
-    }
-
-    // Palettes
-    if (filters.paletteIds?.length) {
-      results = results.filter(
-        (s) => s.paletteId && filters.paletteIds!.includes(s.paletteId)
       );
     }
 
@@ -242,8 +217,6 @@ export class ProvenanceLibrary {
   getStats(): LibraryStats {
     const sounds = this.getAll();
 
-    const byGameState: Record<string, number> = {};
-    const byPalette: Record<string, number> = {};
     const byProvider: Record<string, number> = {};
 
     let totalDuration = 0;
@@ -256,14 +229,6 @@ export class ProvenanceLibrary {
         withProvenance++;
       }
 
-      if (sound.gameState) {
-        byGameState[sound.gameState] = (byGameState[sound.gameState] || 0) + 1;
-      }
-
-      if (sound.paletteId) {
-        byPalette[sound.paletteId] = (byPalette[sound.paletteId] || 0) + 1;
-      }
-
       byProvider[sound.provider] = (byProvider[sound.provider] || 0) + 1;
     }
 
@@ -271,8 +236,6 @@ export class ProvenanceLibrary {
       totalSounds: sounds.length,
       totalDuration,
       withProvenance,
-      byGameState: byGameState as Record<GameState, number>,
-      byPalette,
       byProvider,
     };
   }

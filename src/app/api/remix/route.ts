@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { checkUsageLimit, recordUsage } from "@/lib/usage";
 import { writeFileSync, readFileSync, mkdirSync, rmSync, existsSync } from "fs";
 import { randomBytes, createCipheriv } from "crypto";
 import { join } from "path";
@@ -56,6 +57,20 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  // Check generation limit for user's tier
+  const usage = await checkUsageLimit(supabase, user.id, "generation");
+  if (!usage.allowed) {
+    return NextResponse.json(
+      {
+        error: "Monthly generation limit reached.",
+        current: usage.current,
+        limit: usage.limit,
+        tier: usage.tier,
+      },
+      { status: 429 }
+    );
+  }
+
   const body = await request.json();
   const {
     prompt,
@@ -84,10 +99,11 @@ export async function POST(request: Request) {
     inpaint_end = 0,
     transplant = false,
     transplant_codebooks = "low",
+    my_sound_job_id,
   } = body;
 
   const referenceB64: string | undefined = body.reference_b64;
-  const donorB64: string | undefined = body.donor_b64;
+  let donorB64: string | undefined = body.donor_b64;
 
   // Accept either client-encrypted or raw audio
   const isClientEncrypted = !!body.encrypted_b64;
@@ -122,6 +138,62 @@ export async function POST(request: Request) {
         { error: "LoRA model not found or not ready." },
         { status: 400 }
       );
+    }
+  }
+
+  // If "My Sound" donor requested, fetch pre-generated donor clip from RAVE model
+  if (my_sound_job_id && transplant && !donorB64) {
+    // Verify RAVE model belongs to user and is completed
+    const { data: raveJob, error: raveErr } = await supabase
+      .from("training_jobs")
+      .select("id, status, model_type")
+      .eq("id", my_sound_job_id)
+      .eq("user_id", user.id)
+      .single();
+
+    if (raveErr || !raveJob || raveJob.status !== "completed" || raveJob.model_type !== "rave") {
+      return NextResponse.json(
+        { error: "My Sound model not found or not ready." },
+        { status: 400 }
+      );
+    }
+
+    // Pick donor clip closest to source duration
+    const donorDurations = [10, 30, 60, 120];
+    const targetDur = Number(duration_seconds) || 10;
+    const bestDur = donorDurations.reduce((best, d) =>
+      Math.abs(d - targetDur) < Math.abs(best - targetDur) ? d : best
+    );
+
+    const donorDlDir = join(tmpdir(), `swanblade-donor-${my_sound_job_id}`);
+    try {
+      mkdirSync(donorDlDir, { recursive: true });
+      const donorWavPath = join(donorDlDir, `${bestDur}s.wav`);
+      execSync(
+        `cd /home/sphinxy/modal-audio && modal volume get swanblade-training "rave_jobs/${my_sound_job_id}/donors/${bestDur}s.wav" "${donorWavPath}"`,
+        { timeout: 60000 }
+      );
+
+      if (existsSync(donorWavPath)) {
+        const donorBuffer = readFileSync(donorWavPath);
+        donorB64 = donorBuffer.toString("base64");
+        console.log(`[remix] Fetched My Sound donor clip: ${bestDur}s (${(donorBuffer.byteLength / 1e6).toFixed(1)} MB)`);
+      } else {
+        return NextResponse.json(
+          { error: "My Sound donor clip not found. Model may need retraining." },
+          { status: 400 }
+        );
+      }
+    } catch (err) {
+      console.error("[remix] Failed to fetch My Sound donor:", err);
+      return NextResponse.json(
+        { error: "Failed to fetch My Sound donor clip." },
+        { status: 500 }
+      );
+    } finally {
+      if (existsSync(donorDlDir)) {
+        rmSync(donorDlDir, { recursive: true, force: true });
+      }
     }
   }
 
@@ -346,6 +418,12 @@ export async function POST(request: Request) {
     console.log(
       `[remix] Complete: ${genId} (${(audioBuffer.byteLength / 1e6).toFixed(1)} MB)`
     );
+
+    // Record usage for tier-based limits
+    await recordUsage(supabase, user.id, "generation", {
+      provider: engine,
+      model: engine === "vampnet" ? "vampnet" : engine === "magnet" ? "magnet" : "stable-audio",
+    });
 
     return NextResponse.json({
       audioUrl,

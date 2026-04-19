@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { checkUsageLimit, recordUsage } from "@/lib/usage";
 import { execSync } from "child_process";
 import { readFileSync, existsSync, mkdirSync, rmSync } from "fs";
 import { join } from "path";
@@ -37,6 +38,20 @@ export async function POST(request: Request) {
 
   if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  // Check generation limit for user's tier
+  const usage = await checkUsageLimit(supabase, user.id, "generation");
+  if (!usage.allowed) {
+    return NextResponse.json(
+      {
+        error: "Monthly generation limit reached.",
+        current: usage.current,
+        limit: usage.limit,
+        tier: usage.tier,
+      },
+      { status: 429 }
+    );
   }
 
   const body = await request.json();
@@ -134,6 +149,12 @@ export async function POST(request: Request) {
     console.log(
       `[generate-lora] Generation complete: ${genId} (${(audioBuffer.byteLength / 1e6).toFixed(1)} MB)`
     );
+
+    // Record usage for tier-based limits
+    await recordUsage(supabase, user.id, "generation", {
+      provider: "modal",
+      model: "stable-audio-lora",
+    });
 
     return NextResponse.json({
       audioUrl,

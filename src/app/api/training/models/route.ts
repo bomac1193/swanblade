@@ -22,7 +22,7 @@ export async function GET() {
   const { data: jobs, error } = await supabase
     .from("training_jobs")
     .select(
-      "id, status, file_count, lora_model_url, training_log, created_at, completed_at, model_name, model_description"
+      "id, status, file_count, lora_model_url, training_log, created_at, completed_at, model_name, model_description, model_type"
     )
     .eq("user_id", user.id)
     .eq("status", "completed")
@@ -38,7 +38,7 @@ export async function GET() {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const models = (jobs || []).map((job: any) => {
-    let trainingInfo: { final_loss?: number; dataset_chunks?: number } = {};
+    let trainingInfo: { final_loss?: number; dataset_chunks?: number; donor_clips?: number[] } = {};
     if (job.training_log) {
       try {
         trainingInfo =
@@ -50,18 +50,25 @@ export async function GET() {
       }
     }
 
+    const modelType = job.model_type || "lora";
+
     return {
       id: job.id,
-      name: job.model_name || `Model ${job.id.slice(0, 8)}`,
+      name: job.model_name || `${modelType === "rave" ? "My Sound" : "Model"} ${job.id.slice(0, 8)}`,
       description: job.model_description || null,
+      model_type: modelType,
       file_count: job.file_count,
       final_loss: trainingInfo.final_loss,
       dataset_chunks: trainingInfo.dataset_chunks,
+      donor_clips: modelType === "rave" ? (trainingInfo.donor_clips || []) : undefined,
       created_at: job.created_at,
       completed_at: job.completed_at,
       available: !!job.lora_model_url,
     };
   });
 
-  return NextResponse.json({ models });
+  const loraModels = models.filter((m: { model_type: string }) => m.model_type === "lora");
+  const raveModels = models.filter((m: { model_type: string }) => m.model_type === "rave");
+
+  return NextResponse.json({ models, loraModels, raveModels });
 }

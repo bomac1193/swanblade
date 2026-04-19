@@ -2,7 +2,7 @@
 
 **Date:** 2026-02-10
 **Status:** Planning
-**Scope:** Swanblade + Starforge + Clarosa Integration
+**Scope:** Swanblade + Starforge + Tizita Integration
 
 ---
 
@@ -26,7 +26,7 @@
                               │
                               ▼
 ┌─────────────────────────────────────────────────────────────────────────┐
-│                           CLAROSA                                        │
+│                           TIZITA                                        │
 │                       (Local-First)                                      │
 │                                                                         │
 │   Photo Curation  ·  Visual Taste Vector  ·  A/B Comparisons           │
@@ -65,7 +65,7 @@
            │                    │                    │
            ▼                    ▼                    ▼
 ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐
-│   SWANBLADE     │  │   STARFORGE     │  │    CLAROSA      │
+│   SWANBLADE     │  │   STARFORGE     │  │    TIZITA      │
 │   Domain DB     │  │   Domain DB     │  │   Local-First   │
 │                 │  │                 │  │                 │
 │ - Sound Library │  │ - Audio DNA     │  │ - Photos (local)│
@@ -81,7 +81,7 @@
 |-----------|-----------|
 | **Single auth** | User logs in once, token works everywhere |
 | **Domain isolation** | Each app owns its data, scales independently |
-| **Clarosa local** | Photos never leave device (privacy-first) |
+| **Tizita local** | Photos never leave device (privacy-first) |
 | **API contracts** | Apps sync via defined endpoints |
 
 ---
@@ -113,7 +113,7 @@ Onboarding (brief)
     │
     ├──▶ Settings → Connect Starforge (Audio DNA)
     │
-    └──▶ Settings → Sync Clarosa (Visual DNA)
+    └──▶ Settings → Sync Tizita (Visual DNA)
 ```
 
 ---
@@ -147,10 +147,10 @@ Response: {
 - Auto-tune generation params to their DNA
 - Show "Your sound signature" in studio UI
 
-### Clarosa → Starforge (Visual DNA Sync)
+### Tizita → Starforge (Visual DNA Sync)
 
 ```javascript
-// Clarosa exports taste vector (local → cloud)
+// Tizita exports taste vector (local → cloud)
 POST /api/v1/visual-dna/export
 
 Request: { user_id: string }
@@ -192,7 +192,7 @@ Response: {
 ```
 swanblade.com          → Landing, Apply, Studio (primary)
 twin.swanblade.com     → Starforge (Audio/Visual DNA)
-local.swanblade.com    → Clarosa download/sync portal
+local.swanblade.com    → Tizita download/sync portal
 ```
 
 ### Option B: Unified Routes (Recommended)
@@ -200,7 +200,7 @@ local.swanblade.com    → Clarosa download/sync portal
 ```
 swanblade.com          → Everything
 swanblade.com/twin     → Starforge features (embedded)
-swanblade.com/visual   → Clarosa sync portal
+swanblade.com/visual   → Tizita sync portal
 swanblade.com/studio   → Sound generation
 ```
 
@@ -231,7 +231,7 @@ SUPABASE_SERVICE_KEY=xxx
 # Cross-App Communication
 ECOSYSTEM_API_SECRET=<shared-secret>
 STARFORGE_API_URL=http://localhost:5000/api
-CLAROSA_API_URL=http://localhost:8001/api/v1
+TIZITA_API_URL=http://localhost:8001/api/v1
 
 # Payments
 STRIPE_SECRET_KEY=sk_xxx
@@ -248,7 +248,7 @@ STRIPE_PRICE_STUDIO=price_xxx
 |-----|---------|----------|
 | Swanblade | 3000 (Next.js) | — |
 | Starforge | 5000 | 3000 |
-| Clarosa | 8001 | 5180 |
+| Tizita | 8001 | 5180 |
 
 ---
 
@@ -256,7 +256,7 @@ STRIPE_PRICE_STUDIO=price_xxx
 
 **Swanblade is the luxury audio platform with optional DNA intelligence.**
 
-Starforge and Clarosa are premium features, not separate products. Users come for audio generation. They stay for the ecosystem.
+Starforge and Tizita are premium features, not separate products. Users come for audio generation. They stay for the ecosystem.
 
 ---
 

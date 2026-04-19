@@ -3,6 +3,7 @@
 import { ReactNode } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { SwanbladeLogo } from "@/components/SwanbladeLogo";
 
 interface MarketingLayoutProps {
   children: ReactNode;
@@ -22,7 +23,8 @@ export function MarketingLayout({ children }: MarketingLayoutProps) {
       {/* Navigation */}
       <header className="fixed top-0 left-0 right-0 z-50 bg-black/90 backdrop-blur-md border-b border-white/5">
         <div className="max-w-3xl mx-auto px-6 py-5 flex items-center justify-between">
-          <Link href="/" className="font-display font-light text-sm tracking-wide">
+          <Link href="/" className="flex items-center gap-3 font-display font-normal text-sm tracking-wide">
+            <SwanbladeLogo size={36} />
             Swanblade
           </Link>
 

@@ -3,13 +3,10 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { ToastItem, ToastStack } from "@/components/toast-stack";
 import { LibraryPanel } from "@/components/library-panel";
-import { PaletteEditor } from "@/components/PaletteEditor";
-import { GameStateSelector } from "@/components/GameStateSelector";
 import { O8IdentityPanel } from "@/components/o8-identity-panel";
 import { OutputPanel } from "@/components/studio/output-panel";
-import type { SoundGeneration, SoundCategory, GameState } from "@/types";
+import type { SoundGeneration, SoundCategory } from "@/types";
 import { uuid, generateSoundName } from "@/lib/utils";
-import type { SoundPalette } from "@/lib/soundPalette";
 import type { O8Identity, O8Provenance } from "@/lib/o8/types";
 import { useKeyboardShortcuts, getShortcutsList } from "@/hooks/useKeyboardShortcuts";
 import { useTheme } from "@/hooks/useTheme";
@@ -21,6 +18,7 @@ import { TrainingPanel } from "@/components/studio/training-panel";
 import { LoraSelector, type LoraSelection } from "@/components/studio/lora-selector";
 import { RemixPanel, type RemixFile, type RemixEngineId, type StereoMode, type VampnetMode, type TransplantCodebooks } from "@/components/studio/remix-panel";
 import { useSessionPersistence, type SessionSettings } from "@/hooks/useSessionPersistence";
+import { SwanbladeLogo } from "@/components/SwanbladeLogo";
 
 type AppMode = "generate" | "library" | "training";
 
@@ -71,6 +69,8 @@ export default function Home() {
   const [inpaintEnd, setInpaintEnd] = useState(0);
   const [donorFile, setDonorFile] = useState<RemixFile | null>(null);
   const [transplantCodebooks, setTransplantCodebooks] = useState<TransplantCodebooks>("low");
+  const [mySoundJobId, setMySoundJobId] = useState<string | null>(null);
+  const [raveModels, setRaveModels] = useState<{ id: string; name: string; completed_at: string }[]>([]);
 
   // ── Session persistence ──
   const getSettings = useCallback((): SessionSettings => ({
@@ -135,16 +135,27 @@ export default function Home() {
   // Auto-save settings on any change
   useEffect(() => { saveSettings(); }, [getSettings, saveSettings]);
 
-  // Blue Ocean state
-  const [selectedPalette, setSelectedPalette] = useState<SoundPalette | null>(null);
-  const [selectedGameState, setSelectedGameState] = useState<GameState | null>(null);
+  // Fetch RAVE models for transplant "My Sound" donor
+  useEffect(() => {
+    async function fetchRaveModels() {
+      try {
+        const res = await fetch("/api/training/models");
+        if (!res.ok) return;
+        const data = await res.json();
+        setRaveModels(data.raveModels || []);
+      } catch {
+        // Silent fail — user may not have any models
+      }
+    }
+    fetchRaveModels();
+  }, []);
+
   const [showAdvanced, setShowAdvanced] = useState(false);
 
   // o8 Identity state
   const [o8Identity, setO8Identity] = useState<O8Identity | null>(null);
   const [o8PromptModifier, setO8PromptModifier] = useState<string>("");
   const [currentProvenance, setCurrentProvenance] = useState<O8Provenance | null>(null);
-  const [showStemExport, setShowStemExport] = useState(false);
 
   const handleIdentityChange = useCallback((identity: O8Identity | null, promptModifier: string) => {
     setO8Identity(identity);
@@ -193,8 +204,6 @@ export default function Home() {
       name,
       prompt,
       lengthSeconds,
-      palette: selectedPalette,
-      gameState: selectedGameState,
       // Sculpt params
       engine: remixEngine,
       strength: remixStrength,
@@ -216,13 +225,11 @@ export default function Home() {
       vampnetMode,
       transplantCodebooks,
     });
-  }, [savePreset, prompt, lengthSeconds, selectedPalette, selectedGameState, remixEngine, remixStrength, vampnetPeriodicPrompt, vampnetUpperCodebookMask, vampnetOnsetMaskWidth, vampnetTemperature, vampnetFeedbackSteps, vampnetStereoMode, dryWet, spectralMatch, normalizeLoudness, hpssEnabled, demucsStems, enhanceEnabled, compressEnabled, magnetTemperature, magnetTopK, vampnetMode, transplantCodebooks]);
+  }, [savePreset, prompt, lengthSeconds, remixEngine, remixStrength, vampnetPeriodicPrompt, vampnetUpperCodebookMask, vampnetOnsetMaskWidth, vampnetTemperature, vampnetFeedbackSteps, vampnetStereoMode, dryWet, spectralMatch, normalizeLoudness, hpssEnabled, demucsStems, enhanceEnabled, compressEnabled, magnetTemperature, magnetTopK, vampnetMode, transplantCodebooks]);
 
   const handleLoadPreset = useCallback((preset: GenerationPreset) => {
     setPrompt(preset.prompt);
     setLengthSeconds(preset.lengthSeconds);
-    if (preset.palette) setSelectedPalette(preset.palette as SoundPalette);
-    if (preset.gameState) setSelectedGameState(preset.gameState as GameState);
     // Restore sculpt params if present
     if (preset.engine != null) setRemixEngine(preset.engine);
     if (preset.strength != null) setRemixStrength(preset.strength);
@@ -432,9 +439,9 @@ export default function Home() {
       ...requestParameters,
     };
 
-    // Warn if transplant mode but no donor file
-    if (remixFile && remixEngine === "vampnet" && vampnetMode === "transplant" && !donorFile) {
-      toast("No donor audio loaded. Running normal VampNet sculpt.", "neutral");
+    // Warn if transplant mode but no donor
+    if (remixFile && remixEngine === "vampnet" && vampnetMode === "transplant" && !donorFile && !mySoundJobId) {
+      toast("No donor audio or My Sound model selected. Running normal VampNet sculpt.", "neutral");
     }
 
     setCurrentSound(pendingSound);
@@ -449,9 +456,15 @@ export default function Home() {
         const audioB64 = await readFileAsBase64(remixFile.file);
 
         // Build optional payloads
-        const donorPayload = (remixEngine === "vampnet" && vampnetMode === "transplant" && donorFile)
-          ? { donor_b64: await (async () => { const { readFileAsBase64: r } = await import("@/components/studio/reference-panel"); return r(donorFile.file); })(), transplant: true, transplant_codebooks: transplantCodebooks }
-          : {};
+        let donorPayload: Record<string, unknown> = {};
+        if (remixEngine === "vampnet" && vampnetMode === "transplant") {
+          if (mySoundJobId) {
+            donorPayload = { my_sound_job_id: mySoundJobId, transplant: true, transplant_codebooks: transplantCodebooks };
+          } else if (donorFile) {
+            const donorB64 = await (async () => { const { readFileAsBase64: r } = await import("@/components/studio/reference-panel"); return r(donorFile.file); })();
+            donorPayload = { donor_b64: donorB64, transplant: true, transplant_codebooks: transplantCodebooks };
+          }
+        }
         const inpaintPayload = (remixEngine === "vampnet" && vampnetMode === "inpaint" && (inpaintStart > 0 || inpaintEnd > 0))
           ? { inpaint_start: inpaintStart, inpaint_end: inpaintEnd }
           : {};
@@ -568,7 +581,7 @@ export default function Home() {
       { key: "d", description: "Toggle dark mode", action: toggleTheme },
       { key: "z", ctrl: true, description: "Undo", action: handleUndo },
       { key: "z", ctrl: true, shift: true, description: "Redo", action: handleRedo },
-      { key: "Escape", description: "Close dialogs", action: () => { setShowShortcuts(false); setShowStemExport(false); } },
+      { key: "Escape", description: "Close dialogs", action: () => { setShowShortcuts(false); } },
     ],
     [mode, currentSound?.status, toggleTheme, handleUndo, handleRedo]
   );
@@ -580,9 +593,12 @@ export default function Home() {
       {/* Sidebar */}
       <aside className="fixed left-0 top-0 bottom-0 w-64 bg-black border-r border-white/[0.06] flex flex-col z-30">
         <div className="p-6 border-b border-white/[0.06]">
-          <span className="text-sm font-display font-normal text-white tracking-wide">
-            Swanblade
-          </span>
+          <div className="flex items-center gap-3">
+            <SwanbladeLogo size={32} />
+            <span className="text-sm font-display font-normal text-white tracking-wide">
+              Swanblade
+            </span>
+          </div>
         </div>
         <nav className="flex-1 p-4 space-y-1">
           {(["generate", "library", "training"] as const).map((tab) => (
@@ -704,6 +720,9 @@ export default function Home() {
                   onDonorFileChange={handleDonorFileChange}
                   transplantCodebooks={transplantCodebooks}
                   onTransplantCodebooksChange={setTransplantCodebooks}
+                  mySoundJobId={mySoundJobId}
+                  onMySoundJobIdChange={setMySoundJobId}
+                  raveModels={raveModels}
                 />
 
                 {/* 2. DURATION */}
@@ -785,40 +804,20 @@ export default function Home() {
                         onIdentityChange={handleIdentityChange}
                         className="bg-black border border-white/[0.06]"
                       />
-                      <div>
-                        <p className="text-[11px] text-gray-500 mb-2">Sound Palette</p>
-                        <PaletteEditor value={selectedPalette} onChange={setSelectedPalette} />
-                      </div>
-                      <div>
-                        <p className="text-[11px] text-gray-500 mb-2">Game State</p>
-                        <GameStateSelector value={selectedGameState} onChange={setSelectedGameState} showDetails={false} />
-                      </div>
                     </div>
                   )}
                 </div>
 
                 {/* Active config tags */}
-                {(selectedPalette || selectedGameState || selectedLora) && (
+                {selectedLora && (
                   <div className="flex flex-wrap gap-1.5">
-                    {selectedLora && (
-                      <span className={`border px-2 py-1 text-[10px] ${
-                        remixFile && remixEngine === "vampnet"
-                          ? "border-white/[0.04] text-gray-600 line-through"
-                          : "border-white/[0.08] text-gray-400"
-                      }`}>
-                        {selectedLora.name}{remixFile && remixEngine === "vampnet" ? " (n/a)" : ""}
-                      </span>
-                    )}
-                    {selectedPalette && (
-                      <span className="border border-white/[0.06] px-2 py-1 text-[10px] text-gray-500">
-                        {selectedPalette.name}
-                      </span>
-                    )}
-                    {selectedGameState && (
-                      <span className="border border-white/[0.06] px-2 py-1 text-[10px] text-gray-500 capitalize">
-                        {selectedGameState}
-                      </span>
-                    )}
+                    <span className={`border px-2 py-1 text-[10px] ${
+                      remixFile && remixEngine === "vampnet"
+                        ? "border-white/[0.04] text-gray-600 line-through"
+                        : "border-white/[0.08] text-gray-400"
+                    }`}>
+                      {selectedLora.name}{remixFile && remixEngine === "vampnet" ? " (n/a)" : ""}
+                    </span>
                   </div>
                 )}
 
@@ -847,12 +846,6 @@ export default function Home() {
                   toast("Audio stamped with provenance.", "success");
                 }}
                 onSaveToLibrary={saveToLibrary}
-                showStemExport={showStemExport}
-                onToggleStemExport={() => setShowStemExport(!showStemExport)}
-                onStemExported={(config) => {
-                  toast(`Exported ${config.stems.length} stems to Burn the Square.`, "success");
-                  setShowStemExport(false);
-                }}
                 canUndo={canUndo}
                 canRedo={canRedo}
                 onUndo={handleUndo}

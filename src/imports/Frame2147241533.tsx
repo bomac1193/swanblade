@@ -2,6 +2,7 @@
 
 import { ReactNode, useState } from "react";
 import Link from "next/link";
+import { SwanbladeLogo } from "@/components/SwanbladeLogo";
 
 const SLOGANS = [
   "Diamonds or Silence",
@@ -29,8 +30,8 @@ export function Frame2147241533({ className, children }: Frame2147241533Props) {
       {/* Top Navigation */}
       <header className="pointer-events-auto">
         <div className="flex items-center justify-between px-8 py-6">
-          <Link href="/" className="text-white/60 text-xs font-mono tracking-wider hover:text-white transition">
-            SB
+          <Link href="/" className="text-white/60 hover:text-white transition">
+            <SwanbladeLogo size={44} />
           </Link>
           <nav className="flex items-center gap-10">
             <Link
@@ -70,7 +71,7 @@ export function Frame2147241533({ className, children }: Frame2147241533Props) {
       {/* Main Content */}
       <main className="flex-1 flex flex-col items-center justify-center px-8">
         <div className="text-center max-w-2xl pointer-events-auto">
-          <h1 className="text-5xl text-white leading-tight mb-6 font-display font-light tracking-tight">
+          <h1 className="text-6xl text-white leading-tight mb-6 font-display font-normal tracking-tight">
             Swanblade
           </h1>
           <button

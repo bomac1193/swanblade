@@ -45,12 +45,23 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Heading resets — all sizing via Tailwind classes */
-h1, h2, h3, h4, h5, h6 {
-  font-size: inherit;
-  font-weight: inherit;
-  line-height: inherit;
-  letter-spacing: inherit;
+/* Heading resets — let Tailwind control everything */
+@layer base {
+  h1, h2, h3, h4, h5, h6 {
+    font-size: inherit;
+    font-weight: inherit;
+    line-height: inherit;
+    letter-spacing: inherit;
+  }
+
+  input,
+  textarea,
+  select {
+    background-color: transparent;
+    color: inherit;
+    -webkit-appearance: none;
+    appearance: none;
+  }
 }
 
 p {
@@ -83,6 +94,17 @@ p {
 
 ::-webkit-scrollbar-thumb:hover {
   background: #333;
+}
+
+/* Kill browser autofill white background */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px #161616 inset !important;
+  -webkit-text-fill-color: #fff !important;
+  background-color: #161616 !important;
+  transition: background-color 5000s ease-in-out 0s;
 }
 
 /* Focus states */
@@ -157,6 +179,21 @@ audio::-webkit-media-controls-panel {
 
 .animate-pulse-subtle {
   animation: pulse-subtle 2s ease-in-out infinite;
+}
+
+@keyframes progress-sweep {
+  0% {
+    left: -40%;
+    width: 40%;
+  }
+  100% {
+    left: 100%;
+    width: 40%;
+  }
+}
+
+.animate-progress-sweep {
+  animation: progress-sweep 2.4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
 }
 
 /* ==================== RESPONSIVE STYLES ==================== */

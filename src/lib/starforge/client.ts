@@ -129,7 +129,7 @@ export async function getVisualDnaStatus(userId: string): Promise<{
 }
 
 /**
- * Import Visual DNA from Clarosa via Starforge
+ * Import Visual DNA from Tizita via Starforge
  */
 export async function importVisualDna(
   userId: string,
@@ -173,11 +173,11 @@ export async function importVisualDna(
 }
 
 /**
- * Sync Visual DNA from Clarosa through Starforge
+ * Sync Visual DNA from Tizita through Starforge
  */
-export async function syncVisualDnaFromClarosa(
+export async function syncVisualDnaFromTizita(
   userId: string,
-  clarosaUrl?: string
+  tizitaUrl?: string
 ): Promise<{ success: boolean; message?: string; cross_modal_analysis?: { coherence_score: number } }> {
   try {
     const response = await fetch(`${STARFORGE_API_URL}/twin/visual-dna/sync`, {
@@ -189,19 +189,19 @@ export async function syncVisualDnaFromClarosa(
       },
       body: JSON.stringify({
         user_id: userId,
-        clarosa_url: clarosaUrl,
+        tizita_url: tizitaUrl,
       }),
     });
 
     if (!response.ok) {
       const error = await response.text();
-      console.error("Failed to sync from Clarosa:", error);
+      console.error("Failed to sync from Tizita:", error);
       return { success: false };
     }
 
     return await response.json();
   } catch (error) {
-    console.error("Error syncing from Clarosa:", error);
+    console.error("Error syncing from Tizita:", error);
     return { success: false };
   }
 }
@@ -279,7 +279,7 @@ export const starforge = {
   getTwinContext,
   getVisualDnaStatus,
   importVisualDna,
-  syncVisualDnaFromClarosa,
+  syncVisualDnaFromTizita,
   deriveAudioHints,
   checkConnection: checkStarforgeConnection,
 };

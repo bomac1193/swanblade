@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { checkUsageLimit, recordUsage } from "@/lib/usage";
 import { exec } from "child_process";
 
 export const runtime = "nodejs";
@@ -34,6 +35,20 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  // Check training limit for user's tier
+  const usage = await checkUsageLimit(supabase, user.id, "training");
+  if (!usage.allowed) {
+    return NextResponse.json(
+      {
+        error: "Monthly training limit reached.",
+        current: usage.current,
+        limit: usage.limit,
+        tier: usage.tier,
+      },
+      { status: 429 }
+    );
+  }
+
   const { job_id } = await request.json();
 
   if (!job_id) {
@@ -43,7 +58,7 @@ export async function POST(request: Request) {
   // Verify job belongs to user
   const { data: job, error } = await supabase
     .from("training_jobs")
-    .select("id, status, training_config")
+    .select("id, status, training_config, model_type")
     .eq("id", job_id)
     .eq("user_id", user.id)
     .single();
@@ -80,13 +95,20 @@ export async function POST(request: Request) {
     })
     .eq("id", job_id);
 
+  const isRave = job.model_type === "rave";
+
   // Pass session key via environment variable, not CLI arg (security)
-  const modalCmd = `cd /home/sphinxy/modal-audio && modal run lora_train.py --job-id "${job_id}" --key "$SWANBLADE_SESSION_KEY"`;
+  const modalCmd = isRave
+    ? `cd /home/sphinxy/modal-audio && modal run rave_catalog.py --job-id "${job_id}" --key "$SWANBLADE_SESSION_KEY"`
+    : `cd /home/sphinxy/modal-audio && modal run lora_train.py --job-id "${job_id}" --key "$SWANBLADE_SESSION_KEY"`;
+
+  // RAVE training takes ~20 hours; LoRA takes ~1-3 hours
+  const timeout = isRave ? 86400000 : 10800000;
 
   exec(
     modalCmd,
     {
-      timeout: 10800000,
+      timeout,
       env: { ...process.env, SWANBLADE_SESSION_KEY: sessionKey },
     },
     async (err, stdout, stderr) => {
@@ -109,23 +131,38 @@ export async function POST(request: Request) {
       const result = extractJsonFromOutput(stdout);
 
       if (result && result.status === "completed") {
+        const updateData: Record<string, unknown> = {
+          status: "completed",
+          completed_at: new Date().toISOString(),
+          audio_deleted_at:
+            (result.audio_deleted_at as string) || new Date().toISOString(),
+        };
+
+        if (isRave) {
+          // RAVE stores model in rave_jobs/{job_id}/
+          updateData.lora_model_url = `modal://swanblade-training/rave_jobs/${job_id}`;
+          updateData.training_log = JSON.stringify({
+            model_path: result.model_path,
+            donor_clips: result.donor_clips,
+            final_step: result.final_step,
+            file_count: result.file_count,
+            config: result.config,
+          });
+        } else {
+          updateData.lora_model_url = `modal://swanblade-training/jobs/${job_id}/model`;
+          updateData.training_log = JSON.stringify({
+            final_loss: result.final_loss,
+            dataset_chunks: result.dataset_chunks,
+            file_count: result.file_count,
+          });
+        }
+
         await supabase
           .from("training_jobs")
-          .update({
-            status: "completed",
-            completed_at: new Date().toISOString(),
-            lora_model_url: `modal://swanblade-training/jobs/${job_id}/model`,
-            audio_deleted_at:
-              (result.audio_deleted_at as string) || new Date().toISOString(),
-            training_log: JSON.stringify({
-              final_loss: result.final_loss,
-              dataset_chunks: result.dataset_chunks,
-              file_count: result.file_count,
-            }),
-          })
+          .update(updateData)
           .eq("id", job_id);
 
-        console.log(`[training/trigger] Job ${job_id} completed successfully`);
+        console.log(`[training/trigger] Job ${job_id} (${isRave ? "rave" : "lora"}) completed successfully`);
       } else if (result && result.status === "failed") {
         await supabase
           .from("training_jobs")
@@ -134,14 +171,15 @@ export async function POST(request: Request) {
             error_message: ((result.error as string) || "Training failed.").slice(0, 500),
           })
           .eq("id", job_id);
-      } else if (stdout.includes("Training complete")) {
-        // Fallback: no parseable JSON but log indicates success
+      } else if (stdout.includes("Training complete") || stdout.includes("training complete")) {
         await supabase
           .from("training_jobs")
           .update({
             status: "completed",
             completed_at: new Date().toISOString(),
-            lora_model_url: `modal://swanblade-training/jobs/${job_id}/model`,
+            lora_model_url: isRave
+              ? `modal://swanblade-training/rave_jobs/${job_id}`
+              : `modal://swanblade-training/jobs/${job_id}/model`,
           })
           .eq("id", job_id);
       } else {
@@ -156,11 +194,18 @@ export async function POST(request: Request) {
     }
   );
 
-  console.log(`[training/trigger] Training triggered for job ${job_id}`);
+  // Record training usage for tier-based limits
+  await recordUsage(supabase, user.id, "training", {
+    provider: "modal",
+    model: isRave ? "rave" : "stable-audio-lora",
+  });
+
+  console.log(`[training/trigger] ${isRave ? "RAVE" : "LoRA"} training triggered for job ${job_id}`);
 
   return NextResponse.json({
     job_id,
     status: "training",
-    message: "Training job triggered on Modal GPU.",
+    model_type: isRave ? "rave" : "lora",
+    message: `${isRave ? "RAVE" : "LoRA"} training job triggered on Modal GPU.`,
   });
 }

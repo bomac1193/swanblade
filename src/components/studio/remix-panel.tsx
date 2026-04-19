@@ -79,6 +79,10 @@ interface RemixPanelProps {
   onDonorFileChange: (file: RemixFile | null) => void;
   transplantCodebooks: TransplantCodebooks;
   onTransplantCodebooksChange: (cb: TransplantCodebooks) => void;
+  // My Sound (RAVE donor)
+  mySoundJobId: string | null;
+  onMySoundJobIdChange: (id: string | null) => void;
+  raveModels: { id: string; name: string; completed_at: string }[];
 }
 
 export function RemixPanel({
@@ -130,7 +134,11 @@ export function RemixPanel({
   onDonorFileChange,
   transplantCodebooks,
   onTransplantCodebooksChange,
+  mySoundJobId,
+  onMySoundJobIdChange,
+  raveModels,
 }: RemixPanelProps) {
+  const [donorSource, setDonorSource] = useState<"upload" | "my-sound">("upload");
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const previewUrlRef = useRef<string | null>(null);
@@ -320,36 +328,92 @@ export function RemixPanel({
           {/* Transplant: donor audio drop zone + codebook presets */}
           {engine === "vampnet" && vampnetMode === "transplant" && (
             <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <p className="text-[11px] text-gray-500">Donor Audio</p>
-                {donorFile && (
-                  <button
-                    onClick={() => onDonorFileChange(null)}
-                    className="text-[10px] text-gray-600 hover:text-gray-400 transition-colors"
-                  >
-                    Clear
-                  </button>
-                )}
+              {/* Donor source toggle */}
+              <div className="flex gap-1">
+                <button
+                  onClick={() => { setDonorSource("upload"); onMySoundJobIdChange(null); }}
+                  className={`flex-1 px-2 py-1 text-[10px] border transition-colors ${
+                    donorSource === "upload"
+                      ? "border-white/20 bg-white/[0.06] text-white"
+                      : "border-white/[0.04] text-gray-600 hover:text-gray-400"
+                  }`}
+                >Upload</button>
+                <button
+                  onClick={() => { setDonorSource("my-sound"); onDonorFileChange(null); }}
+                  className={`flex-1 px-2 py-1 text-[10px] border transition-colors ${
+                    donorSource === "my-sound"
+                      ? "border-white/20 bg-white/[0.06] text-white"
+                      : "border-white/[0.04] text-gray-600 hover:text-gray-400"
+                  }`}
+                >My Sound</button>
               </div>
-              {donorFile ? (
-                <div className="border border-white/[0.08] bg-white/[0.02] px-3 py-2 flex items-center justify-between">
-                  <p className="text-[10px] text-gray-400 truncate max-w-[180px]">{donorFile.name}</p>
-                  <p className="text-[10px] text-gray-600 shrink-0 ml-2">{formatBytes(donorFile.size)}</p>
-                </div>
+
+              {donorSource === "upload" ? (
+                <>
+                  <div className="flex items-center justify-between">
+                    <p className="text-[11px] text-gray-500">Donor Audio</p>
+                    {donorFile && (
+                      <button
+                        onClick={() => onDonorFileChange(null)}
+                        className="text-[10px] text-gray-600 hover:text-gray-400 transition-colors"
+                      >
+                        Clear
+                      </button>
+                    )}
+                  </div>
+                  {donorFile ? (
+                    <div className="border border-white/[0.08] bg-white/[0.02] px-3 py-2 flex items-center justify-between">
+                      <p className="text-[10px] text-gray-400 truncate max-w-[180px]">{donorFile.name}</p>
+                      <p className="text-[10px] text-gray-600 shrink-0 ml-2">{formatBytes(donorFile.size)}</p>
+                    </div>
+                  ) : (
+                    <ReferenceDropZone label="Drop donor audio" onFile={(f) => {
+                      if (!f.type.startsWith("audio/")) {
+                        onToast("Audio files only.", "error");
+                        return;
+                      }
+                      if (f.size > MAX_FILE_BYTES) {
+                        onToast("File exceeds 100 MB limit.", "error");
+                        return;
+                      }
+                      const previewUrl = URL.createObjectURL(f);
+                      onDonorFileChange({ file: f, name: f.name, size: f.size, previewUrl });
+                    }} />
+                  )}
+                </>
               ) : (
-                <ReferenceDropZone label="Drop donor audio" onFile={(f) => {
-                  if (!f.type.startsWith("audio/")) {
-                    onToast("Audio files only.", "error");
-                    return;
-                  }
-                  if (f.size > MAX_FILE_BYTES) {
-                    onToast("File exceeds 100 MB limit.", "error");
-                    return;
-                  }
-                  const previewUrl = URL.createObjectURL(f);
-                  onDonorFileChange({ file: f, name: f.name, size: f.size, previewUrl });
-                }} />
+                <>
+                  {raveModels.length > 0 ? (
+                    <div>
+                      <p className="text-[11px] text-gray-500 mb-1.5">Your Trained Sound</p>
+                      <div className="space-y-1">
+                        {raveModels.map((model) => (
+                          <button
+                            key={model.id}
+                            onClick={() => onMySoundJobIdChange(model.id === mySoundJobId ? null : model.id)}
+                            className={`w-full text-left px-3 py-2 border transition-colors ${
+                              mySoundJobId === model.id
+                                ? "border-white/20 bg-white/[0.06] text-white"
+                                : "border-white/[0.04] text-gray-500 hover:text-gray-300"
+                            }`}
+                          >
+                            <p className="text-[11px] truncate">{model.name}</p>
+                            <p className="text-[9px] text-gray-600">
+                              {new Date(model.completed_at).toLocaleDateString()}
+                            </p>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="border border-dashed border-white/[0.08] py-4 text-center">
+                      <p className="text-[11px] text-gray-500">No trained sounds yet</p>
+                      <p className="text-[9px] text-gray-600 mt-1">Go to Training tab → My Sound</p>
+                    </div>
+                  )}
+                </>
               )}
+
               <div>
                 <p className="text-[11px] text-gray-500 mb-1.5">Take From Donor</p>
                 <div className="flex gap-1.5">
@@ -373,7 +437,12 @@ export function RemixPanel({
                   ))}
                 </div>
               </div>
-              <p className="text-[9px] text-gray-600">Mix codebook layers from two audio sources.</p>
+              <p className="text-[9px] text-gray-600">
+                {donorSource === "my-sound"
+                  ? "Fuse your sonic DNA into any audio via codebook transplant."
+                  : "Mix codebook layers from two audio sources."
+                }
+              </p>
             </div>
           )}
 

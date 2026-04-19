@@ -1,34 +1,6 @@
-<svg
-  width="32"
-  height="32"
-  viewBox="0 0 100 100"
-  fill="none"
-  xmlns="http://www.w3.org/2000/svg"
->
-  <!-- Warped swan neck curving into blade -->
-  <path
-    d="M25 85 C15 75, 12 55, 20 40 C28 25, 35 15, 50 10 C55 8, 58 12, 55 18 C52 24, 48 28, 45 35 C42 42, 44 48, 50 50 C56 52, 65 48, 75 35 C85 22, 90 15, 95 12"
-    stroke="#0A0A0A"
-    stroke-width="4"
-    stroke-linecap="round"
-    fill="none"
-  />
-  <!-- Swan body - ink splash effect -->
-  <path
-    d="M25 85 C30 80, 40 78, 50 80 C60 82, 68 78, 72 70 C76 62, 72 55, 65 52"
-    stroke="#0A0A0A"
-    stroke-width="3"
-    stroke-linecap="round"
-    fill="none"
-  />
-  <!-- Blade edge - sharp diagonal -->
-  <path
-    d="M75 35 L95 12"
-    stroke="#0A0A0A"
-    stroke-width="5"
-    stroke-linecap="square"
-  />
-  <!-- Ink drip accent -->
-  <circle cx="22" cy="88" r="4" fill="#0A0A0A" />
-  <ellipse cx="32" cy="92" rx="3" ry="2" fill="#0A0A0A" />
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="-10 -2 54 124">
+  <path d="M6 34 C7 24, 14 14, 20 7 C24 3, 28 2, 29 6 C30 9, 28 12, 25 11" stroke="white" stroke-width="2.8" stroke-linecap="round" fill="none"/>
+  <path d="M6 42 C6 37, 10.5 34, 15 34 C19.5 34, 22 38, 22 42 C22 46, 18.5 48.5, 15 48.5 C11.5 48.5, 9.5 45.5, 9.5 42 C9.5 39.5, 12 37.5, 15 37.5 C17.5 37.5, 18.5 39.5, 18.5 42 C18.5 44, 17 45, 15 45 C13.5 45, 12.5 43.5, 12.5 42 C12.5 41, 14 40.5, 14.8 41.2" stroke="white" stroke-width="2" stroke-linecap="round" fill="none"/>
+  <path d="M6 34 L6 106" stroke="white" stroke-width="2.8" stroke-linecap="round"/>
+  <path d="M6 106 C6 110, 10 114, 16 115 C20 116, 22 114, 20 112" stroke="white" stroke-width="2.8" stroke-linecap="round" fill="none"/>
 </svg>

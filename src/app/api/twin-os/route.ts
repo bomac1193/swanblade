@@ -4,7 +4,7 @@
  * Connects Swanblade to Starforge's Twin OS
  *
  * GET: Get Twin OS context + audio hints for current user
- * POST: Sync Visual DNA from Clarosa
+ * POST: Sync Visual DNA from Tizita
  */
 
 import { NextRequest, NextResponse } from "next/server";
@@ -39,7 +39,7 @@ export async function GET() {
     return NextResponse.json({
       connected: true,
       has_context: false,
-      message: "No Twin OS context found. Upload tracks to Starforge or sync Visual DNA from Clarosa.",
+      message: "No Twin OS context found. Upload tracks to Starforge or sync Visual DNA from Tizita.",
       audio_hints: deriveAudioHints(null),
     });
   }
@@ -70,13 +70,13 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { action } = body;
 
-    // Sync Visual DNA from Clarosa
+    // Sync Visual DNA from Tizita
     if (action === "sync_visual_dna") {
-      const result = await starforge.syncVisualDnaFromClarosa(user.id);
+      const result = await starforge.syncVisualDnaFromTizita(user.id);
 
       if (!result.success) {
         return NextResponse.json(
-          { error: "Failed to sync Visual DNA. Make sure Clarosa is running." },
+          { error: "Failed to sync Visual DNA. Make sure Tizita is running." },
           { status: 500 }
         );
       }

@@ -2,8 +2,7 @@
 
 import { useState, useCallback, useEffect } from "react";
 import { uuid } from "@/lib/utils";
-import type { SoundCategory, GameState } from "@/types";
-import type { SoundPalette } from "@/lib/soundPalette";
+import type { SoundCategory } from "@/types";
 import type { RemixEngineId, StereoMode, VampnetMode, TransplantCodebooks } from "@/components/studio/remix-panel";
 
 const STORAGE_KEY = "swanblade-presets";
@@ -15,8 +14,6 @@ export interface GenerationPreset {
   createdAt: string;
   prompt: string;
   lengthSeconds: number;
-  palette?: SoundPalette | null;
-  gameState?: GameState | null;
   type?: SoundCategory;
   tags?: string[];
   // Sculpt params (optional — only set when saved from sculpt mode)

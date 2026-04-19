@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { AudioPlayerControls } from "@/components/audio-player-controls";
 import { GenerationProgress } from "@/components/studio/generation-progress";
 import { ProvenanceBadge, ProvenanceStampButton } from "@/components/provenance-badge";
-import { StemExportPanel } from "@/components/stem-export-panel";
 import { HistoryControls, GenerationHistory } from "@/components/generation-history";
 import { SpectrogramComparison } from "@/components/spectrogram";
 import type { SoundGeneration } from "@/types";
@@ -18,9 +17,6 @@ export function OutputPanel({
   currentProvenance,
   onProvenanceStamped,
   onSaveToLibrary,
-  showStemExport,
-  onToggleStemExport,
-  onStemExported,
   canUndo,
   canRedo,
   onUndo,
@@ -39,9 +35,6 @@ export function OutputPanel({
   currentProvenance: O8Provenance | null;
   onProvenanceStamped: (provenance: O8Provenance) => void;
   onSaveToLibrary: () => void;
-  showStemExport: boolean;
-  onToggleStemExport: () => void;
-  onStemExported: (config: { stems: unknown[] }) => void;
   canUndo: boolean;
   canRedo: boolean;
   onUndo: () => void;
@@ -270,38 +263,6 @@ export function OutputPanel({
                   </div>
                 )}
 
-                {/* Stem Export */}
-                {currentSound.status === "ready" && currentSound.audioUrl && (
-                  <div className="border-t border-white/[0.06] pt-3">
-                    <button
-                      onClick={onToggleStemExport}
-                      className="flex w-full items-center justify-between text-left"
-                    >
-                      <span className="text-body-sm font-light text-gray-500">
-                        Export to Burn the Square
-                      </span>
-                      <svg
-                        width="12"
-                        height="12"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        className={`text-gray-500 transition-transform ${showStemExport ? "rotate-180" : ""}`}
-                      >
-                        <path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                      </svg>
-                    </button>
-                    {showStemExport && (
-                      <div className="mt-3">
-                        <StemExportPanel
-                          soundId={currentSound.id}
-                          soundName={currentSound.name}
-                          audioUrl={currentSound.audioUrl}
-                          onExport={onStemExported}
-                        />
-                      </div>
-                    )}
-                  </div>
-                )}
               </div>
             )}
           </div>

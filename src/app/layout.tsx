@@ -76,7 +76,7 @@ export default function RootLayout({
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
-      <body className={`${sohne.className} antialiased`}>
+      <body className={`${sohne.className} antialiased bg-black`}>
         {children}
       </body>
     </html>
