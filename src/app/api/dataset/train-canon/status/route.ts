@@ -88,6 +88,38 @@ export async function GET(request: NextRequest) {
 
   const status = await fetchStatus(jobId);
 
+  // If the Modal side has been silent for too long, assume the detached
+  // spawn never reached the volume or the function died mid-init. Mark it
+  // failed so the UI can stop polling and the user can retry.
+  const STALE_MINUTES = 15;
+  const { data: jobRow } = await supabase
+    .from("training_jobs")
+    .select("id, status, created_at")
+    .eq("id", jobId)
+    .single();
+  if (!status && jobRow && jobRow.status === "training") {
+    const ageMs = Date.now() - new Date(jobRow.created_at).getTime();
+    if (ageMs > STALE_MINUTES * 60_000) {
+      await supabase
+        .from("training_jobs")
+        .update({
+          status: "failed",
+          error_message: `no status after ${STALE_MINUTES} minutes — Modal function did not report back. Re-run Train canon.`,
+          completed_at: new Date().toISOString(),
+        })
+        .eq("id", jobId);
+      return NextResponse.json({
+        job_id: jobId,
+        db_status: "failed",
+        status: {
+          stage: "failed",
+          progress: 0,
+          error: `no status after ${STALE_MINUTES} minutes`,
+        },
+      });
+    }
+  }
+
   // Update the DB row on terminal transitions so the jobs list reflects truth.
   if (status?.stage === "completed" && job.status !== "completed") {
     await supabase
